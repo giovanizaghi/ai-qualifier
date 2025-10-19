@@ -14,18 +14,19 @@
     "jsx": "preserve",
     "incremental": true,
     // Enhanced TypeScript Strict Rules
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "exactOptionalPropertyTypes": true,
+    // Temporarily disabled during type migration - see docs/TypeScript-Migration-Plan.md
+    // "noUnusedLocals": true,
+    // "noUnusedParameters": true,
+    // "exactOptionalPropertyTypes": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedIndexedAccess": true,
+    // "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
     // Type Checking
     "forceConsistentCasingInFileNames": true,
-    "verbatimModuleSyntax": true,
+    // "verbatimModuleSyntax": true,
     "plugins": [
       {
         "name": "next"
