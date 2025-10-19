@@ -351,40 +351,43 @@ export function AssessmentInterface({
     <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${className}`}>
       {/* Header */}
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex-1">
-              <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-gray-100 truncate">
                 {assessment.title}
               </h1>
-              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
                 {assessment.description}
               </p>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-4">
               {assessment.timeLimit && (
-                <AssessmentTimer
-                  totalTimeMinutes={assessment.timeLimit}
-                  onTimeUp={handleTimeUp}
-                  onTimeUpdate={(remaining) => {}}
-                  isActive={!isPaused}
-                  isPaused={isPaused}
-                  onPause={allowPause ? handlePause : undefined}
-                  onResume={allowPause ? handleResume : undefined}
-                  showControls={allowPause}
-                />
+                <div className="flex-shrink-0">
+                  <AssessmentTimer
+                    totalTimeMinutes={assessment.timeLimit}
+                    onTimeUp={handleTimeUp}
+                    onTimeUpdate={(remaining) => {}}
+                    isActive={!isPaused}
+                    isPaused={isPaused}
+                    onPause={allowPause ? handlePause : undefined}
+                    onResume={allowPause ? handleResume : undefined}
+                    showControls={allowPause}
+                  />
+                </div>
               )}
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => setShowNavigation(!showNavigation)}
-                  className="gap-2"
+                  className="gap-1 sm:gap-2 text-xs sm:text-sm"
                 >
-                  <Eye className="w-4 h-4" />
-                  Navigation
+                  <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <span className="hidden sm:inline">Navigation</span>
+                  <span className="sm:hidden">Nav</span>
                 </Button>
 
                 {onExit && (
@@ -392,6 +395,7 @@ export function AssessmentInterface({
                     variant="outline"
                     size="sm"
                     onClick={() => setShowConfirmExit(true)}
+                    className="text-xs sm:text-sm"
                   >
                     Exit
                   </Button>
@@ -401,7 +405,7 @@ export function AssessmentInterface({
           </div>
 
           {/* Progress Indicator */}
-          <div className="mt-4">
+          <div className="mt-3 sm:mt-4">
             <ProgressIndicator
               currentQuestion={currentQuestionIndex + 1}
               totalQuestions={questions.length}
@@ -422,11 +426,11 @@ export function AssessmentInterface({
       )}
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="grid lg:grid-cols-4 gap-6">
+      <div className="max-w-6xl mx-auto px-4 py-4 sm:py-6">
+        <div className="grid lg:grid-cols-4 gap-4 sm:gap-6">
           {/* Question */}
           <div className="lg:col-span-3">
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {/* Real-time Feedback */}
               {showRealTimeFeedback && (
                 <RealTimeFeedback
@@ -462,22 +466,22 @@ export function AssessmentInterface({
               )}
 
               {/* Navigation */}
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0">
                 <Button
                   variant="outline"
                   onClick={() => handleNavigation('prev')}
                   disabled={currentQuestionIndex === 0}
-                  className="gap-2"
+                  className="gap-2 order-2 sm:order-1"
                 >
                   <ChevronLeft className="w-4 h-4" />
                   Previous
                 </Button>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 order-1 sm:order-2">
                   <Button
                     variant="outline"
                     onClick={handleQuestionFlag}
-                    className={`gap-2 ${
+                    className={`gap-2 flex-1 sm:flex-none text-sm ${
                       flaggedQuestions.includes(currentQuestionIndex + 1)
                         ? 'text-yellow-600 border-yellow-300'
                         : ''
@@ -490,18 +494,20 @@ export function AssessmentInterface({
                   {isLastQuestion ? (
                     <Button
                       onClick={() => setShowConfirmSubmit(true)}
-                      className="gap-2"
+                      className="gap-2 flex-1 sm:flex-none"
                       disabled={isSubmitting}
                     >
                       <Send className="w-4 h-4" />
-                      Submit Assessment
+                      <span className="hidden sm:inline">Submit Assessment</span>
+                      <span className="sm:hidden">Submit</span>
                     </Button>
                   ) : (
                     <Button
                       onClick={() => handleNavigation('next')}
-                      className="gap-2"
+                      className="gap-2 flex-1 sm:flex-none order-3 sm:order-2"
                     >
-                      Next
+                      <span className="hidden sm:inline">Next</span>
+                      <span className="sm:hidden">Next</span>
                       <ChevronRight className="w-4 h-4" />
                     </Button>
                   )}
@@ -511,8 +517,8 @@ export function AssessmentInterface({
           </div>
 
           {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="space-y-6 sticky top-32">
+          <div className="lg:col-span-1 order-first lg:order-last">
+            <div className="space-y-4 sm:space-y-6 lg:sticky lg:top-32">
               {/* Progress Details */}
               <ProgressIndicator
                 currentQuestion={currentQuestionIndex + 1}
@@ -525,7 +531,7 @@ export function AssessmentInterface({
               {/* Question Navigation */}
               {showNavigation && (
                 <Card>
-                  <CardHeader>
+                  <CardHeader className="pb-3">
                     <CardTitle className="text-sm">Quick Navigation</CardTitle>
                   </CardHeader>
                   <CardContent>
