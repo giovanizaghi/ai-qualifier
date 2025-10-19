@@ -33,10 +33,10 @@ interface AnalyticsData {
 // Function to determine performance rating
 function getRating(name: string, value: number): 'good' | 'needs-improvement' | 'poor' {
   const threshold = PERFORMANCE_THRESHOLDS[name as keyof typeof PERFORMANCE_THRESHOLDS]
-  if (!threshold) return 'good'
+  if (!threshold) {return 'good'}
   
-  if (value <= threshold.good) return 'good'
-  if (value <= threshold.poor) return 'needs-improvement'
+  if (value <= threshold.good) {return 'good'}
+  if (value <= threshold.poor) {return 'needs-improvement'}
   return 'poor'
 }
 
