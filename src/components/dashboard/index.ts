@@ -1,0 +1,7 @@
+export { DashboardHeader } from './dashboard-header'
+export { DashboardShell } from './dashboard-shell'
+export { QualificationProgressWidget } from './qualification-progress-widget'
+export { PerformanceAnalytics } from './performance-analytics'
+export { AchievementSystem } from './achievement-system'
+export { LearningPathVisualization } from './learning-path-visualization'
+export { PersonalizedRecommendations } from './personalized-recommendations'

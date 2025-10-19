@@ -503,9 +503,10 @@ export class AdaptiveQuestionSelector {
         if (strategy.adaptationPoints.includes(i + 1) && config.learningMode === 'adaptive_learning') {
           // This would typically be done based on real-time performance
           // For now, we'll simulate some adjustment logic
-          if (performance.difficultyPerformance[currentDifficulty].trend === 'improving') {
+          const difficultyData = performance.difficultyPerformance[currentDifficulty as DifficultyLevel]
+          if (difficultyData && difficultyData.trend === 'improving') {
             currentDifficulty = this.adjustDifficultyUp(currentDifficulty)
-          } else if (performance.difficultyPerformance[currentDifficulty].trend === 'declining') {
+          } else if (difficultyData && difficultyData.trend === 'declining') {
             currentDifficulty = this.adjustDifficultyDown(currentDifficulty)
           }
         }
