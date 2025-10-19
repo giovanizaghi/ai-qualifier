@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UAT_SCENARIOS } from '@/constants/uat-scenarios';
 
 interface UATSession {
@@ -54,14 +55,14 @@ export default function UATSessionRunner({ onSessionComplete }: UATSessionRunner
     let device = 'desktop';
 
     // Detect browser
-    if (userAgent.includes('Chrome')) browser = 'Chrome';
-    else if (userAgent.includes('Firefox')) browser = 'Firefox';
-    else if (userAgent.includes('Safari')) browser = 'Safari';
-    else if (userAgent.includes('Edge')) browser = 'Edge';
+    if (userAgent.includes('Chrome')) {browser = 'Chrome';}
+    else if (userAgent.includes('Firefox')) {browser = 'Firefox';}
+    else if (userAgent.includes('Safari')) {browser = 'Safari';}
+    else if (userAgent.includes('Edge')) {browser = 'Edge';}
 
     // Detect device type
-    if (/Mobi|Android/i.test(userAgent)) device = 'mobile';
-    else if (/Tablet|iPad/i.test(userAgent)) device = 'tablet';
+    if (/Mobi|Android/i.test(userAgent)) {device = 'mobile';}
+    else if (/Tablet|iPad/i.test(userAgent)) {device = 'tablet';}
 
     setSelectedDevice(device);
   }, []);
@@ -137,7 +138,7 @@ export default function UATSessionRunner({ onSessionComplete }: UATSessionRunner
   };
 
   const startTask = async (taskIndex: number) => {
-    if (!currentSession) return;
+    if (!currentSession) {return;}
 
     const task = currentTasks[taskIndex];
     const updatedTasks = [...currentTasks];
@@ -166,7 +167,7 @@ export default function UATSessionRunner({ onSessionComplete }: UATSessionRunner
   };
 
   const completeTask = async (taskIndex: number, status: 'completed' | 'failed' | 'skipped', notes?: string) => {
-    if (!currentSession) return;
+    if (!currentSession) {return;}
 
     const task = currentTasks[taskIndex];
     const endTime = new Date().toISOString();
@@ -220,7 +221,7 @@ export default function UATSessionRunner({ onSessionComplete }: UATSessionRunner
   };
 
   const endSession = async (status: 'completed' | 'abandoned') => {
-    if (!currentSession) return;
+    if (!currentSession) {return;}
 
     setIsLoading(true);
     try {

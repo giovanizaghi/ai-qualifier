@@ -1,14 +1,15 @@
 'use client';
 
+import { Star, MessageSquare, Bug, Lightbulb } from 'lucide-react';
 import React, { useState } from 'react';
+import { toast } from 'sonner';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Star, MessageSquare, Bug, Lightbulb } from 'lucide-react';
-import { toast } from 'sonner';
 
 interface FeedbackFormProps {
   sessionId: string;

@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { z } from 'zod';
+
 import { prisma } from '@/lib/prisma';
 
 // User Testing Session Schema
@@ -271,9 +272,9 @@ export class UserTestingFramework {
       const hasPositive = positiveKeywords.some(keyword => comment.includes(keyword));
       const hasNegative = negativeKeywords.some(keyword => comment.includes(keyword));
 
-      if (hasPositive && !hasNegative) positive++;
-      else if (hasNegative && !hasPositive) negative++;
-      else neutral++;
+      if (hasPositive && !hasNegative) {positive++;}
+      else if (hasNegative && !hasPositive) {negative++;}
+      else {neutral++;}
     });
 
     return {
@@ -324,7 +325,7 @@ export class UserTestingFramework {
   private static identifyCriticalIssues(sessions: any[]): string[] {
     const issues: string[] = [];
 
-    if (sessions.length === 0) return issues;
+    if (sessions.length === 0) {return issues;}
 
     const abandonmentRate = sessions.filter((s: any) => s.status === 'abandoned').length / sessions.length;
     if (abandonmentRate > 0.2) {

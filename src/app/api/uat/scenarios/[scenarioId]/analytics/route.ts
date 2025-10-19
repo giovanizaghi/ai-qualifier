@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { UserTestingFramework } from '@/lib/user-testing-framework';
 
 // GET /api/uat/scenarios/[scenarioId]/analytics - Get scenario analytics
