@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { auth } from "@/lib/auth"
+import { getToken } from "next-auth/jwt"
 
 // Define public routes that don't require authentication
 const publicRoutes = [
   "/",
   "/auth/signin",
-  "/auth/signup",
+  "/auth/signup", 
   "/auth/error",
-  "/api/auth",
 ]
 
 // Define auth routes that redirect to dashboard if user is already logged in
@@ -23,36 +22,44 @@ const protectedRoutes = [
   "/qualifications",
 ]
 
-export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl
+export default async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl
   
-  // Get the session
-  const session = await auth()
-  const isAuthenticated = !!session?.user
+  // Allow all API routes to pass through
+  if (pathname.startsWith("/api")) {
+    return NextResponse.next()
+  }
 
-  // Check if the route is public
+  // Allow static files and public routes
   const isPublicRoute = publicRoutes.some(route => 
-    pathname.startsWith(route) || pathname === route
+    pathname === route || pathname.startsWith(route)
   )
+
+  if (isPublicRoute) {
+    return NextResponse.next()
+  }
+
+  // Get the JWT token to check authentication status
+  const token = await getToken({ 
+    req, 
+    secret: process.env.NEXTAUTH_SECRET 
+  })
+  
+  const isAuthenticated = !!token
 
   // Check if the route is an auth route
   const isAuthRoute = authRoutes.some(route => 
-    pathname.startsWith(route) || pathname === route
+    pathname === route || pathname.startsWith(route)
   )
 
   // Check if the route is protected
   const isProtectedRoute = protectedRoutes.some(route => 
-    pathname.startsWith(route) || pathname === route
+    pathname === route || pathname.startsWith(route)
   )
-
-  // Allow API routes and public routes
-  if (pathname.startsWith("/api") || isPublicRoute) {
-    return NextResponse.next()
-  }
 
   // Redirect authenticated users away from auth pages
   if (isAuthRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL("/dashboard", request.url))
+    return NextResponse.redirect(new URL("/dashboard", req.url))
   }
 
   // Redirect unauthenticated users to sign in for protected routes
@@ -60,7 +67,7 @@ export default async function middleware(request: NextRequest) {
     const searchParams = new URLSearchParams()
     searchParams.set("callbackUrl", pathname)
     return NextResponse.redirect(
-      new URL(`/auth/signin?${searchParams.toString()}`, request.url)
+      new URL(`/auth/signin?${searchParams.toString()}`, req.url)
     )
   }
 

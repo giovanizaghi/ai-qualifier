@@ -1,0 +1,405 @@
+// AI Qualifier Database Schema
+// Comprehensive schema for AI qualification assessment platform
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User Management
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  emailVerified     DateTime?
+  name              String?
+  image             String?
+  password          String?   // For email/password auth
+  role              Role      @default(USER)
+  
+  // Profile information
+  firstName         String?
+  lastName          String?
+  bio               String?
+  linkedInUrl       String?
+  githubUrl         String?
+  portfolioUrl      String?
+  
+  // Account settings
+  isActive          Boolean   @default(true)
+  lastLoginAt       DateTime?
+  timezone          String?   @default("UTC")
+  preferredLanguage String?   @default("en")
+  
+  // Relations
+  accounts          Account[]
+  sessions          Session[]
+  assessmentResults AssessmentResult[]
+  qualificationProgress QualificationProgress[]
+  bookmarks         Bookmark[]
+  achievements      Achievement[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@map("users")
+}
+
+// NextAuth.js models
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// Core Qualification System
+model Qualification {
+  id                String    @id @default(cuid())
+  title             String
+  description       String
+  slug              String    @unique
+  shortDescription  String?
+  
+  // Qualification metadata
+  category          QualificationCategory
+  difficulty        DifficultyLevel
+  estimatedDuration Int       // in minutes
+  prerequisites     String[]  // Array of qualification IDs or skills
+  tags              String[]
+  
+  // Scoring and assessment
+  passingScore      Int       @default(70)
+  totalQuestions    Int       @default(50)
+  timeLimit         Int?      // in minutes, null = no time limit
+  allowRetakes      Boolean   @default(true)
+  retakeCooldown    Int?      // hours between retakes
+  
+  // Content and structure
+  learningObjectives String[]
+  syllabus          Json?     // Detailed curriculum structure
+  
+  // Status and visibility
+  isActive          Boolean   @default(true)
+  isPublished       Boolean   @default(false)
+  version           String    @default("1.0")
+  
+  // Relations
+  assessments       Assessment[]
+  questions         Question[]
+  qualificationProgress QualificationProgress[]
+  bookmarks         Bookmark[]
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@map("qualifications")
+}
+
+model Assessment {
+  id              String    @id @default(cuid())
+  qualificationId String
+  title           String
+  description     String?
+  
+  // Assessment configuration
+  questionCount   Int       @default(50)
+  timeLimit       Int?      // in minutes
+  randomizeQuestions Boolean @default(true)
+  randomizeAnswers   Boolean @default(true)
+  showResults     Boolean   @default(true)
+  
+  // Question selection criteria
+  questionCategories Json?  // Breakdown by category/topic
+  difficultyMix      Json?  // Distribution of question difficulties
+  
+  // Relations
+  qualification   Qualification @relation(fields: [qualificationId], references: [id], onDelete: Cascade)
+  results         AssessmentResult[]
+  
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("assessments")
+}
+
+model Question {
+  id              String    @id @default(cuid())
+  qualificationId String
+  
+  // Question content
+  title           String
+  content         String    @db.Text
+  explanation     String?   @db.Text
+  
+  // Question metadata
+  type            QuestionType
+  category        String    // Topic/category within qualification
+  difficulty      DifficultyLevel
+  tags            String[]
+  
+  // Question configuration
+  options         Json      // Answer options for multiple choice, etc.
+  correctAnswers  String[]  // Correct answer(s)
+  points          Int       @default(1)
+  timeEstimate    Int?      // estimated time in seconds
+  
+  // Analytics and quality
+  timesUsed       Int       @default(0)
+  timesCorrect    Int       @default(0)
+  averageTime     Float?    // average time to answer in seconds
+  
+  // Relations
+  qualification   Qualification @relation(fields: [qualificationId], references: [id], onDelete: Cascade)
+  questionResults QuestionResult[]
+  
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("questions")
+}
+
+model AssessmentResult {
+  id              String    @id @default(cuid())
+  userId          String
+  assessmentId    String
+  
+  // Result data
+  score           Float     // percentage score 0-100
+  totalQuestions  Int
+  correctAnswers  Int
+  incorrectAnswers Int
+  skippedQuestions Int      @default(0)
+  
+  // Timing information
+  startedAt       DateTime
+  completedAt     DateTime?
+  timeSpent       Int?      // total time in seconds
+  
+  // Status and metadata
+  status          AssessmentStatus @default(IN_PROGRESS)
+  passed          Boolean   @default(false)
+  certificateId   String?   @unique
+  
+  // Additional data
+  categoryScores  Json?     // Breakdown by question category
+  metadata        Json?     // Additional assessment data
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment      Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  questionResults QuestionResult[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("assessment_results")
+}
+
+model QuestionResult {
+  id                String    @id @default(cuid())
+  assessmentResultId String
+  questionId        String
+  
+  // Response data
+  userAnswer        String[]  // User's selected answer(s)
+  isCorrect         Boolean
+  points            Int       @default(0)
+  timeSpent         Int?      // time spent on this question in seconds
+  
+  // Additional data
+  confidence        Int?      // User's confidence level 1-5
+  flaggedForReview  Boolean   @default(false)
+  
+  // Relations
+  assessmentResult  AssessmentResult @relation(fields: [assessmentResultId], references: [id], onDelete: Cascade)
+  question          Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now())
+  
+  @@unique([assessmentResultId, questionId])
+  @@map("question_results")
+}
+
+// Progress Tracking
+model QualificationProgress {
+  id                String    @id @default(cuid())
+  userId            String
+  qualificationId   String
+  
+  // Progress data
+  status            ProgressStatus @default(NOT_STARTED)
+  completionPercentage Float   @default(0)
+  
+  // Study tracking
+  studyTimeMinutes  Int       @default(0)
+  lastStudiedAt     DateTime?
+  
+  // Attempt tracking
+  attempts          Int       @default(0)
+  bestScore         Float?    // best score achieved
+  lastAttemptScore  Float?
+  lastAttemptAt     DateTime?
+  
+  // Learning path
+  currentTopic      String?
+  completedTopics   String[]
+  
+  // Relations
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  qualification     Qualification @relation(fields: [qualificationId], references: [id], onDelete: Cascade)
+  
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  
+  @@unique([userId, qualificationId])
+  @@map("qualification_progress")
+}
+
+// User Engagement
+model Bookmark {
+  id              String    @id @default(cuid())
+  userId          String
+  qualificationId String
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  qualification   Qualification @relation(fields: [qualificationId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@unique([userId, qualificationId])
+  @@map("bookmarks")
+}
+
+model Achievement {
+  id              String    @id @default(cuid())
+  userId          String
+  
+  // Achievement data
+  type            AchievementType
+  title           String
+  description     String
+  iconUrl         String?
+  
+  // Achievement metadata
+  category        String    // e.g., "completion", "streak", "performance"
+  value           Int?      // numeric value associated with achievement
+  qualificationId String?   // if achievement is qualification-specific
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  earnedAt        DateTime  @default(now())
+  
+  @@map("achievements")
+}
+
+// Enums
+enum Role {
+  USER
+  ADMIN
+  INSTRUCTOR
+}
+
+enum QualificationCategory {
+  ARTIFICIAL_INTELLIGENCE
+  MACHINE_LEARNING
+  DATA_SCIENCE
+  SOFTWARE_ENGINEERING
+  CLOUD_COMPUTING
+  CYBERSECURITY
+  BLOCKCHAIN
+  MOBILE_DEVELOPMENT
+  WEB_DEVELOPMENT
+  DEVOPS
+  PRODUCT_MANAGEMENT
+  UX_UI_DESIGN
+  BUSINESS_ANALYSIS
+  PROJECT_MANAGEMENT
+  DIGITAL_MARKETING
+  OTHER
+}
+
+enum DifficultyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  MULTIPLE_SELECT
+  TRUE_FALSE
+  FILL_IN_BLANK
+  CODING_CHALLENGE
+  DRAG_AND_DROP
+  MATCHING
+  ESSAY
+}
+
+enum AssessmentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  ABANDONED
+  EXPIRED
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+  PAUSED
+}
+
+enum AchievementType {
+  FIRST_QUALIFICATION
+  QUALIFICATION_COMPLETED
+  PERFECT_SCORE
+  QUICK_LEARNER
+  CONSISTENT_LEARNER
+  STREAK_ACHIEVEMENT
+  CATEGORY_EXPERT
+  IMPROVEMENT_MILESTONE
+  COMMUNITY_CONTRIBUTOR
+}

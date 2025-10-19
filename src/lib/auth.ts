@@ -4,6 +4,7 @@ import GitHub from "next-auth/providers/github"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
+import { prisma } from "@/lib/prisma"
 
 // Extend the built-in session types
 declare module "next-auth" {
@@ -25,24 +26,6 @@ const credentialsSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 })
-
-// Mock user store (replace with database later)
-const mockUsers = [
-  {
-    id: "1",
-    email: "admin@example.com",
-    name: "Admin User",
-    password: "$2a$10$F7q8f8f8f8f8f8f8f8f8fuLZb8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8", // "password123"
-    role: "admin",
-  },
-  {
-    id: "2", 
-    email: "user@example.com",
-    name: "Test User",
-    password: "$2a$10$F7q8f8f8f8f8f8f8f8f8fuLZb8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8Z8", // "password123"
-    role: "user",
-  },
-]
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   session: {
@@ -72,29 +55,50 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
       async authorize(credentials) {
         try {
+          console.log("Authorize called with:", { email: credentials?.email })
+          
           // Validate credentials
           const { email, password } = credentialsSchema.parse(credentials)
+          console.log("Credentials validated for:", email)
 
-          // Find user in mock store (replace with database query)
-          const user = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase())
+          // Find user in database
+          const user = await prisma.user.findUnique({
+            where: { email: email.toLowerCase() },
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              password: true,
+              role: true,
+            }
+          })
+
+          console.log("User found:", user ? { id: user.id, email: user.email, hasPassword: !!user.password } : "null")
 
           if (!user || !user.password) {
+            console.log("User not found or no password set")
             return null
           }
 
           // Verify password
           const passwordMatch = await bcrypt.compare(password, user.password)
+          console.log("Password match:", passwordMatch)
+          
           if (!passwordMatch) {
+            console.log("Password does not match")
             return null
           }
 
-          // Return user object
-          return {
+          // Return user object (without password)
+          const userResult = {
             id: user.id,
             email: user.email,
             name: user.name,
             role: user.role,
           }
+          
+          console.log("Returning user:", userResult)
+          return userResult
         } catch (error) {
           console.error("Authorization error:", error)
           return null
@@ -106,7 +110,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     async jwt({ token, user, trigger, session }) {
       // Initial sign in
       if (user) {
-        token.role = user.role || "user"
+        token.role = user.role || "USER"
       }
 
       // Handle session updates
@@ -120,7 +124,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       // Send properties to the client
       if (token && session.user) {
         session.user.id = token.sub!
-        session.user.role = (token.role as string) || "user"
+        session.user.role = (token.role as string) || "USER"
       }
       return session
     },

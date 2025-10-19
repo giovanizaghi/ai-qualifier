@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
+import { prisma } from "@/lib/prisma"
 
 // Registration schema
 const registerSchema = z.object({
@@ -8,16 +9,6 @@ const registerSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters"),
 })
-
-// Mock user store (replace with database later)
-const mockUsers: Array<{
-  id: string
-  name: string
-  email: string
-  password: string
-  role: string
-  createdAt: Date
-}> = []
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,9 +18,9 @@ export async function POST(req: NextRequest) {
     const { name, email, password } = registerSchema.parse(body)
 
     // Check if user already exists
-    const existingUser = mockUsers.find(
-      user => user.email.toLowerCase() === email.toLowerCase()
-    )
+    const existingUser = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() }
+    })
 
     if (existingUser) {
       return NextResponse.json(
@@ -41,26 +32,27 @@ export async function POST(req: NextRequest) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 12)
 
-    // Create new user
-    const newUser = {
-      id: Math.random().toString(36).substring(2),
-      name,
-      email: email.toLowerCase(),
-      password: hashedPassword,
-      role: "user",
-      createdAt: new Date(),
-    }
-
-    // Add to mock store (replace with database save)
-    mockUsers.push(newUser)
-
-    // Return success response (don't include password)
-    const { password: _, ...userWithoutPassword } = newUser
+    // Create new user in database
+    const newUser = await prisma.user.create({
+      data: {
+        name,
+        email: email.toLowerCase(),
+        password: hashedPassword,
+        role: "USER",
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true,
+      }
+    })
     
     return NextResponse.json(
       { 
         message: "User created successfully", 
-        user: userWithoutPassword 
+        user: newUser 
       },
       { status: 201 }
     )
