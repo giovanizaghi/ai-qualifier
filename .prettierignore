@@ -1,0 +1,12 @@
+node_modules
+.next
+out
+build
+coverage
+test-results
+playwright-report
+*.min.js
+*.bundle.js
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

@@ -25,7 +25,8 @@ export const notification = {
     return toast.success(message, {
       duration: options?.duration || 4000,
       action: options?.action,
-      dismissible: options?.dismissible ?? true
+      dismissible: options?.dismissible ?? true,
+      icon: <CheckCircle className="h-5 w-5" />
     });
   },
 
@@ -33,7 +34,8 @@ export const notification = {
     return toast.error(message, {
       duration: options?.duration || 6000,
       action: options?.action,
-      dismissible: options?.dismissible ?? true
+      dismissible: options?.dismissible ?? true,
+      icon: <XCircle className="h-5 w-5" />
     });
   },
 
@@ -41,7 +43,8 @@ export const notification = {
     return toast.warning(message, {
       duration: options?.duration || 5000,
       action: options?.action,
-      dismissible: options?.dismissible ?? true
+      dismissible: options?.dismissible ?? true,
+      icon: <AlertCircle className="h-5 w-5" />
     });
   },
 
@@ -49,7 +52,8 @@ export const notification = {
     return toast.info(message, {
       duration: options?.duration || 4000,
       action: options?.action,
-      dismissible: options?.dismissible ?? true
+      dismissible: options?.dismissible ?? true,
+      icon: <Info className="h-5 w-5" />
     });
   },
 
@@ -60,7 +64,8 @@ export const notification = {
       : `Assessment started: ${qualificationTitle}`;
     
     return toast.info(message, {
-      duration: 3000
+      duration: 3000,
+      icon: <Target className="h-5 w-5" />
     });
   },
 
@@ -70,6 +75,7 @@ export const notification = {
     if (passed) {
       return toast.success(message, {
         duration: 6000,
+        icon: <Trophy className="h-5 w-5" />,
         action: {
           label: 'View Results',
           onClick: () => {
@@ -80,6 +86,7 @@ export const notification = {
     } else {
       return toast.warning(message, {
         duration: 6000,
+        icon: <Target className="h-5 w-5" />,
         action: {
           label: 'Review',
           onClick: () => {
@@ -94,6 +101,7 @@ export const notification = {
     return toast.success(`🏆 Achievement Unlocked: ${title}`, {
       description,
       duration: 8000,
+      icon: <Trophy className="h-5 w-5" />,
       action: {
         label: 'View',
         onClick: () => {
@@ -106,7 +114,8 @@ export const notification = {
   perfectScore: (qualificationTitle: string) => {
     return toast.success(`🌟 Perfect Score!`, {
       description: `You aced the ${qualificationTitle} assessment!`,
-      duration: 8000
+      duration: 8000,
+      icon: <Star className="h-5 w-5" />
     });
   },
 
@@ -117,20 +126,23 @@ export const notification = {
     
     return toast.info(message, {
       description: qualificationTitle,
-      duration: options.duration || 3000
+      duration: options.duration || 3000,
+      icon: <Target className="h-5 w-5" />
     });
   },
 
   // Time-based notifications
   timeWarning: (remainingMinutes: number) => {
     return toast.warning(`⏰ ${remainingMinutes} minutes remaining`, {
-      duration: 4000
+      duration: 4000,
+      icon: <Clock className="h-5 w-5" />
     });
   },
 
   timeUp: () => {
     return toast.error('⏰ Time\'s up! Your assessment has been submitted.', {
-      duration: 6000
+      duration: 6000,
+      icon: <Clock className="h-5 w-5" />
     });
   },
 
