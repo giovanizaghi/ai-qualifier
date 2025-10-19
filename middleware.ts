@@ -1,6 +1,20 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getToken } from "next-auth/jwt"
 
+// Security headers configuration
+const securityHeaders = {
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https:; frame-ancestors 'none';",
+}
+
+// Rate limiting storage (in production, use Redis or similar)
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>()
+
 // Define public routes that don't require authentication
 const publicRoutes = [
   "/",
@@ -24,10 +38,46 @@ const protectedRoutes = [
 
 export default async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl
+  const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'unknown'
   
-  // Allow all API routes to pass through
+  // Apply security headers to all responses
+  const response = NextResponse.next()
+  
+  // Add security headers
+  Object.entries(securityHeaders).forEach(([key, value]) => {
+    response.headers.set(key, value)
+  })
+
+  // Rate limiting for auth routes
+  if (pathname.startsWith('/auth') || pathname.startsWith('/api/auth')) {
+    const key = `${ip}-auth`
+    const now = Date.now()
+    const windowMs = 15 * 60 * 1000 // 15 minutes
+    const maxAttempts = 5
+    
+    const current = rateLimitStore.get(key)
+    
+    if (current && current.resetTime > now) {
+      if (current.count >= maxAttempts) {
+        return new NextResponse('Too Many Requests', { 
+          status: 429,
+          headers: {
+            'Retry-After': Math.ceil((current.resetTime - now) / 1000).toString(),
+          }
+        })
+      }
+      current.count++
+    } else {
+      rateLimitStore.set(key, {
+        count: 1,
+        resetTime: now + windowMs,
+      })
+    }
+  }
+  
+  // Allow all API routes to pass through (with security headers)
   if (pathname.startsWith("/api")) {
-    return NextResponse.next()
+    return response
   }
 
   // Allow static files and public routes
@@ -36,7 +86,7 @@ export default async function middleware(req: NextRequest) {
   )
 
   if (isPublicRoute) {
-    return NextResponse.next()
+    return response
   }
 
   // Get the JWT token to check authentication status
@@ -59,19 +109,27 @@ export default async function middleware(req: NextRequest) {
 
   // Redirect authenticated users away from auth pages
   if (isAuthRoute && isAuthenticated) {
-    return NextResponse.redirect(new URL("/dashboard", req.url))
+    const redirectResponse = NextResponse.redirect(new URL("/dashboard", req.url))
+    Object.entries(securityHeaders).forEach(([key, value]) => {
+      redirectResponse.headers.set(key, value)
+    })
+    return redirectResponse
   }
 
   // Redirect unauthenticated users to sign in for protected routes
   if (isProtectedRoute && !isAuthenticated) {
     const searchParams = new URLSearchParams()
     searchParams.set("callbackUrl", pathname)
-    return NextResponse.redirect(
+    const redirectResponse = NextResponse.redirect(
       new URL(`/auth/signin?${searchParams.toString()}`, req.url)
     )
+    Object.entries(securityHeaders).forEach(([key, value]) => {
+      redirectResponse.headers.set(key, value)
+    })
+    return redirectResponse
   }
 
-  return NextResponse.next()
+  return response
 }
 
 export const config = {
