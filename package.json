@@ -32,7 +32,19 @@
     "test:all": "npm run test && npm run test:e2e",
     "prepare": "husky",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "npx prisma db push --force-reset && npm run db:seed"
+    "db:reset": "npx prisma db push --force-reset && npm run db:seed",
+    "docker:dev": "./docker.sh dev:start",
+    "docker:dev:stop": "./docker.sh dev:stop",
+    "docker:dev:logs": "./docker.sh dev:logs --follow",
+    "docker:prod": "./docker.sh prod:start",
+    "docker:prod:stop": "./docker.sh prod:stop",
+    "docker:prod:deploy": "./docker.sh prod:deploy",
+    "docker:build": "./docker.sh build",
+    "docker:build:prod": "./docker.sh build:prod",
+    "docker:backup": "./docker.sh backup",
+    "docker:status": "./docker.sh status",
+    "docker:health": "./docker.sh health",
+    "docker:cleanup": "./docker.sh cleanup"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.0",

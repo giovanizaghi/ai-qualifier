@@ -1,0 +1,324 @@
+version: '3.8'
+
+services:
+  # Main Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    image: ai-qualifier:latest
+    container_name: ai-qualifier-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - APP_ENV=production
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    env_file:
+      - .env.production.local
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    depends_on:
+      - database
+      - redis
+    networks:
+      - ai-qualifier-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.ai-qualifier.rule=Host(`your-domain.com`)"
+      - "traefik.http.routers.ai-qualifier.tls=true"
+      - "traefik.http.routers.ai-qualifier.tls.certresolver=letsencrypt"
+      - "traefik.http.services.ai-qualifier.loadbalancer.server.port=3000"
+    healthcheck:
+      test: ["CMD", "node", "healthcheck.js"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: ai-qualifier-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-ai_qualifier}
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./backups:/backups
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - ai-qualifier-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DATABASE_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for Caching and Sessions
+  redis:
+    image: redis:7-alpine
+    container_name: ai-qualifier-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    ports:
+      - "6379:6379"
+    networks:
+      - ai-qualifier-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+  # Nginx Reverse Proxy (Alternative to Traefik)
+  nginx:
+    image: nginx:alpine
+    container_name: ai-qualifier-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./config/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./config/nginx-sites:/etc/nginx/conf.d:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_cache:/var/cache/nginx
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - app
+    networks:
+      - ai-qualifier-network
+    profiles:
+      - nginx
+
+  # Traefik Reverse Proxy (Alternative to Nginx)
+  traefik:
+    image: traefik:v3.0
+    container_name: ai-qualifier-traefik
+    restart: unless-stopped
+    command:
+      - "--api.dashboard=true"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080" # Traefik dashboard
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - traefik_data:/letsencrypt
+    networks:
+      - ai-qualifier-network
+    profiles:
+      - traefik
+
+  # Monitoring - Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: ai-qualifier-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - ai-qualifier-network
+    profiles:
+      - monitoring
+
+  # Monitoring - Grafana
+  grafana:
+    image: grafana/grafana:latest
+    container_name: ai-qualifier-grafana
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+    networks:
+      - ai-qualifier-network
+    profiles:
+      - monitoring
+
+  # Log Management - Loki
+  loki:
+    image: grafana/loki:latest
+    container_name: ai-qualifier-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./config/loki.yml:/etc/loki/local-config.yaml:ro
+      - loki_data:/tmp/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - ai-qualifier-network
+    profiles:
+      - monitoring
+
+  # Log Collection - Promtail
+  promtail:
+    image: grafana/promtail:latest
+    container_name: ai-qualifier-promtail
+    restart: unless-stopped
+    volumes:
+      - ./config/promtail.yml:/etc/promtail/config.yml:ro
+      - ./logs:/var/log:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    command: -config.file=/etc/promtail/config.yml
+    networks:
+      - ai-qualifier-network
+    profiles:
+      - monitoring
+
+  # Advanced Backup Service
+  backup:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backup
+    container_name: ai-qualifier-backup
+    restart: unless-stopped
+    depends_on:
+      - database
+      - redis
+    environment:
+      # Database connection
+      - PGHOST=database
+      - PGPORT=5432
+      - PGDATABASE=${DATABASE_NAME:-ai_qualifier}
+      - PGUSER=${DATABASE_USER:-postgres}
+      - PGPASSWORD=${DATABASE_PASSWORD}
+      
+      # Backup configuration
+      - BACKUP_DIR=/backups
+      - BACKUP_ENCRYPTION_KEY=${BACKUP_ENCRYPTION_KEY}
+      - ENABLE_ENCRYPTION=${ENABLE_BACKUP_ENCRYPTION:-true}
+      - ENABLE_COMPRESSION=${ENABLE_BACKUP_COMPRESSION:-true}
+      - RETENTION_DAYS=${BACKUP_RETENTION_DAYS:-30}
+      
+      # Cloud storage
+      - AWS_S3_BACKUP_BUCKET=${AWS_S3_BACKUP_BUCKET}
+      - AWS_S3_REGION=${AWS_S3_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      
+      # Notifications
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - SMTP_SERVER=${SMTP_SERVER}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      
+      # Monitoring
+      - ENABLE_MONITORING=true
+      - METRICS_PORT=8080
+      
+    volumes:
+      # Backup storage
+      - backup_data:/backups
+      - backup_logs:/var/log
+      
+      # Configuration files
+      - ./config/backup.conf:/etc/ai-qualifier/backup.conf:ro
+      - ./scripts/backup-manager.sh:/usr/local/bin/backup-manager.sh:ro
+      
+    networks:
+      - ai-qualifier-network
+      
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+          
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "3"
+        
+    # Labels for monitoring
+    labels:
+      - "traefik.enable=false"
+      - "backup.service=ai-qualifier"
+      - "monitoring.enable=true"
+    
+    profiles:
+      - backup
+      - monitoring
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  loki_data:
+    driver: local
+  traefik_data:
+    driver: local
+  nginx_cache:
+    driver: local
+  backup_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ${BACKUP_VOLUME_PATH:-./backups}
+  backup_logs:
+    driver: local
+
+networks:
+  ai-qualifier-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

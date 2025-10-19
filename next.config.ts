@@ -52,10 +52,23 @@ const nextConfig: NextConfig = {
     },
   }),
 
-  // PWA configuration
+  // Docker and production optimizations
   ...(process.env.NODE_ENV === 'production' && {
     swcMinify: true,
+    output: 'standalone',
+    compiler: {
+      removeConsole: {
+        exclude: ['error', 'warn'],
+      },
+    },
   }),
+
+  // Logging configuration
+  logging: {
+    fetches: {
+      fullUrl: process.env.NODE_ENV === 'development',
+    },
+  },
 };
 
 export default nextConfig;
