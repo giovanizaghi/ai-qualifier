@@ -541,3 +541,68 @@ enum FeedbackStatus {
   CLOSED
   REJECTED
 }
+
+// User Acceptance Testing Models
+model UserTestingSession {
+  id              String    @id @default(cuid())
+  sessionId       String    @unique @default(cuid())
+  scenarioId      String
+  userId          String?
+  userPersona     String    // 'new_user', 'intermediate_user', 'expert_user', 'administrator'
+  device          String    // 'desktop', 'tablet', 'mobile'
+  browser         String
+  startTime       DateTime  @default(now())
+  endTime         DateTime?
+  status          String    @default("in_progress") // 'in_progress', 'completed', 'abandoned'
+  metadata        Json?
+  
+  // Relations
+  taskCompletions TaskCompletion[]
+  feedback        UserTestingFeedback[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  
+  @@map("user_testing_sessions")
+}
+
+model TaskCompletion {
+  id                  String    @id @default(cuid())
+  sessionId           String
+  taskId              String
+  scenarioId          String
+  startTime           DateTime  @default(now())
+  endTime             DateTime?
+  status              String    @default("not_started") // 'not_started', 'in_progress', 'completed', 'failed', 'skipped'
+  completionTime      Int?      // in seconds
+  errorCount          Int       @default(0)
+  helpRequests        Int       @default(0)
+  notes               String?   @db.Text
+  
+  // Relations
+  session             UserTestingSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  
+  @@map("task_completions")
+}
+
+model UserTestingFeedback {
+  id              String    @id @default(cuid())
+  sessionId       String
+  scenarioId      String
+  taskId          String
+  feedbackType    String    // 'rating', 'comment', 'bug_report', 'suggestion'
+  rating          Int?      // 1-5 scale
+  comment         String?   @db.Text
+  timestamp       DateTime  @default(now())
+  metadata        Json?
+  
+  // Relations
+  session         UserTestingSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@map("user_testing_feedback")
+}
