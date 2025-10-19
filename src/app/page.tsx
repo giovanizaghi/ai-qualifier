@@ -2,8 +2,12 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Award, Users, TrendingUp, CheckCircle, Star } from "lucide-react";
+import Link from "next/link";
+import { auth } from "@/lib/auth";
 
-export default function Home() {
+export default async function Home() {
+  const session = await auth();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
       {/* Navigation */}
@@ -16,8 +20,20 @@ export default function Home() {
           <div className="flex items-center gap-4">
             <Button variant="ghost">Features</Button>
             <Button variant="ghost">About</Button>
-            <Button variant="outline">Login</Button>
-            <Button>Get Started</Button>
+            {session?.user ? (
+              <Button asChild>
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+            ) : (
+              <>
+                <Button variant="outline" asChild>
+                  <Link href="/auth/signin">Sign In</Link>
+                </Button>
+                <Button asChild>
+                  <Link href="/auth/signup">Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       </nav>
@@ -38,12 +54,20 @@ export default function Home() {
             and real-time feedback designed for the modern AI practitioner.
           </p>
           <div className="flex items-center justify-center gap-4 mb-12">
-            <Button size="lg" className="text-lg px-8 py-6">
-              Start Your Journey
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6">
-              Watch Demo
-            </Button>
+            {session?.user ? (
+              <Button size="lg" className="text-lg px-8 py-6" asChild>
+                <Link href="/dashboard">Go to Dashboard</Link>
+              </Button>
+            ) : (
+              <>
+                <Button size="lg" className="text-lg px-8 py-6" asChild>
+                  <Link href="/auth/signup">Start Your Journey</Link>
+                </Button>
+                <Button size="lg" variant="outline" className="text-lg px-8 py-6">
+                  Watch Demo
+                </Button>
+              </>
+            )}
           </div>
           
           {/* Stats */}
@@ -162,12 +186,20 @@ export default function Home() {
             Join thousands of professionals who have advanced their careers with AI Qualifier
           </p>
           <div className="flex items-center justify-center gap-4">
-            <Button size="lg" variant="secondary" className="text-lg px-8 py-6">
-              Start Free Trial
-            </Button>
-            <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-              View Pricing
-            </Button>
+            {session?.user ? (
+              <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
+                <Link href="/dashboard">View Dashboard</Link>
+              </Button>
+            ) : (
+              <>
+                <Button size="lg" variant="secondary" className="text-lg px-8 py-6" asChild>
+                  <Link href="/auth/signup">Start Free Trial</Link>
+                </Button>
+                <Button size="lg" variant="outline" className="text-lg px-8 py-6 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                  View Pricing
+                </Button>
+              </>
+            )}
           </div>
           
           {/* Testimonial */}

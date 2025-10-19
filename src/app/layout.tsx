@@ -2,6 +2,7 @@ import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import { SonnerProvider } from "@/components/ui/sonner-provider"
+import { SessionProvider } from "@/components/providers/session-provider"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -18,8 +19,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SonnerProvider />
-        {children}
+        <SessionProvider>
+          <SonnerProvider />
+          {children}
+        </SessionProvider>
       </body>
     </html>
   )
