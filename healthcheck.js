@@ -13,8 +13,8 @@ const hostname = process.env.HOSTNAME || 'localhost';
 
 // Health check options
 const options = {
-  hostname: hostname,
-  port: port,
+  hostname,
+  port,
   path: '/api/health',
   method: 'GET',
   timeout: 10000, // 10 seconds

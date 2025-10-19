@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { env } from '@/lib/env';
 
 // Type definitions for global metrics
@@ -157,7 +158,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    const metricsText = metrics.join('\n') + '\n';
+    const metricsText = `${metrics.join('\n')  }\n`;
 
     return new Response(metricsText, {
       status: 200,

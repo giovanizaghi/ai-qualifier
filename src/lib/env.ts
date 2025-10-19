@@ -126,20 +126,20 @@ function getEnvironmentConfig(): EnvironmentConfig {
 
   // Helper function to parse boolean environment variables
   const parseBoolean = (value: string | undefined, defaultValue: boolean): boolean => {
-    if (value === undefined) return defaultValue;
+    if (value === undefined) {return defaultValue;}
     return value.toLowerCase() === 'true';
   };
 
   // Helper function to parse number environment variables
   const parseNumber = (value: string | undefined, defaultValue: number): number => {
-    if (value === undefined) return defaultValue;
+    if (value === undefined) {return defaultValue;}
     const parsed = parseInt(value, 10);
     return isNaN(parsed) ? defaultValue : parsed;
   };
 
   // Helper function to parse array environment variables
   const parseArray = (value: string | undefined, defaultValue: string[]): string[] => {
-    if (value === undefined) return defaultValue;
+    if (value === undefined) {return defaultValue;}
     return value.split(',').map(item => item.trim()).filter(Boolean);
   };
 
@@ -290,7 +290,7 @@ export const isTest = APP_ENV === 'test';
 
 // Validation helper
 export function validateProductionConfig(): void {
-  if (!isProduction) return;
+  if (!isProduction) {return;}
   
   const productionRequiredVars = [
     'DATABASE_URL',

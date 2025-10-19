@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import { NextRequest, NextResponse } from 'next/server';
 
 // Simple in-memory rate limiter for demonstration
 // In production, use Redis or a proper rate limiting solution
@@ -152,7 +152,7 @@ function getClientIp(request: NextRequest): string {
 
 // User Agent validation
 function isValidUserAgent(userAgent: string | null): boolean {
-  if (!userAgent) return false;
+  if (!userAgent) {return false;}
   
   // Block known bot patterns (customize as needed)
   const blockedPatterns = [
