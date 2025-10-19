@@ -1,6 +1,10 @@
 import NextAuth, { type DefaultSession } from "next-auth"
 import Google from "next-auth/providers/google"
 import GitHub from "next-auth/providers/github"
+import Discord from "next-auth/providers/discord"
+import LinkedIn from "next-auth/providers/linkedin"
+import Apple from "next-auth/providers/apple"
+import MicrosoftEntraId from "next-auth/providers/microsoft-entra-id"
 import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
 import { z } from "zod"
@@ -45,6 +49,26 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     GitHub({
       clientId: process.env.GITHUB_CLIENT_ID!,
       clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    Discord({
+      clientId: process.env.DISCORD_CLIENT_ID!,
+      clientSecret: process.env.DISCORD_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    LinkedIn({
+      clientId: process.env.LINKEDIN_CLIENT_ID!,
+      clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    Apple({
+      clientId: process.env.APPLE_CLIENT_ID!,
+      clientSecret: process.env.APPLE_CLIENT_SECRET!,
+      allowDangerousEmailAccountLinking: true,
+    }),
+    MicrosoftEntraId({
+      clientId: process.env.MICROSOFT_CLIENT_ID!,
+      clientSecret: process.env.MICROSOFT_CLIENT_SECRET!,
       allowDangerousEmailAccountLinking: true,
     }),
     Credentials({

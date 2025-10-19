@@ -35,6 +35,14 @@ model User {
   timezone          String?   @default("UTC")
   preferredLanguage String?   @default("en")
   
+  // Subscription and billing
+  stripeCustomerId     String?
+  subscriptionId       String?
+  subscriptionStatus   String?
+  subscriptionPriceId  String?
+  subscriptionStartDate DateTime?
+  subscriptionEndDate   DateTime?
+  
   // Relations
   accounts          Account[]
   sessions          Session[]
