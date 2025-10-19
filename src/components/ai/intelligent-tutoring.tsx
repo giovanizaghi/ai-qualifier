@@ -1,12 +1,14 @@
 'use client';
 
+import { Lightbulb, Brain, CheckCircle, AlertCircle, TrendingUp, Clock } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { toast } from 'sonner';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Lightbulb, Brain, CheckCircle, AlertCircle, TrendingUp, Clock } from 'lucide-react';
-import { toast } from 'sonner';
+
 
 interface TutorHint {
   type: 'hint' | 'explanation' | 'example' | 'step-by-step';

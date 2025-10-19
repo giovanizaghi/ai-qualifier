@@ -1,13 +1,15 @@
 'use client';
 
-import { useState } from 'react';
 import { Book, Play, CheckCircle, Clock, Users, Award } from 'lucide-react';
+import { useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tutorial } from './tutorial-provider';
 import { cn } from '@/lib/utils';
+
+import { Tutorial } from './tutorial-provider';
 
 interface HelpCenterProps {
   tutorials: Tutorial[];

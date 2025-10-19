@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test'
 import AxeBuilder from '@axe-core/playwright'
+import { test, expect } from '@playwright/test'
 
 /**
  * Accessibility testing utilities for Playwright E2E tests
@@ -79,7 +79,7 @@ export const a11yAssertions = {
   async checkHeadingHierarchy(page: any) {
     const headings = await page.locator('h1, h2, h3, h4, h5, h6').all()
     
-    if (headings.length === 0) return
+    if (headings.length === 0) {return}
     
     let previousLevel = 0
     for (const heading of headings) {
@@ -138,7 +138,7 @@ export const a11yAssertions = {
       
       if (id) {
         const label = await page.locator(`label[for="${id}"]`).count()
-        if (label > 0) hasLabel = true
+        if (label > 0) {hasLabel = true}
       }
       
       if (ariaLabel || ariaLabelledby) {
@@ -147,7 +147,7 @@ export const a11yAssertions = {
       
       // Check if wrapped in label
       const parentLabel = await control.locator('xpath=ancestor::label').count()
-      if (parentLabel > 0) hasLabel = true
+      if (parentLabel > 0) {hasLabel = true}
       
       if (!hasLabel) {
         const tagName = await control.evaluate((el: HTMLElement) => el.tagName.toLowerCase())

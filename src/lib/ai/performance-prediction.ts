@@ -336,7 +336,7 @@ Respond with JSON format containing detailed analytical insights.`;
 
   // Helper methods for statistical calculations
   private calculateTrendSlope(values: number[]): number {
-    if (values.length < 2) return 0;
+    if (values.length < 2) {return 0;}
     
     const n = values.length;
     const xSum = (n - 1) * n / 2; // Sum of indices 0, 1, 2, ..., n-1
@@ -349,7 +349,7 @@ Respond with JSON format containing detailed analytical insights.`;
   }
 
   private calculateVariance(values: number[]): number {
-    if (values.length < 2) return 0;
+    if (values.length < 2) {return 0;}
     
     const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
     const variance = values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / values.length;

@@ -1,6 +1,11 @@
 "use client"
 
+import { User, Settings, LogOut, Home, Menu, X } from "lucide-react"
+import Link from "next/link"
 import { signOut, useSession } from "next-auth/react"
+import { useState } from "react"
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { 
   DropdownMenu,
@@ -10,10 +15,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { User, Settings, LogOut, Home, Menu, X } from "lucide-react"
-import Link from "next/link"
-import { useState } from "react"
 
 interface DashboardShellProps {
   children: React.ReactNode

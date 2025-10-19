@@ -1,6 +1,7 @@
 "use client"
 
 import { useCallback, useEffect, useRef } from 'react'
+
 import { AnalyticsEventType } from '@/lib/user-analytics'
 
 interface AnalyticsHookOptions {

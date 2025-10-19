@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { auth } from '@/lib/auth'
 import { sendEmail } from '@/lib/integrations/email'
 import { getTemplate, renderTemplate, validateTemplateVariables } from '@/lib/integrations/email-templates'
-import { z } from 'zod'
 
 // Validation schema for templated email requests
 const templatedEmailSchema = z.object({

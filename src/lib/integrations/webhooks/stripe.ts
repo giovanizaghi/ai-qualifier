@@ -1,7 +1,8 @@
-import { webhookRegistry, type WebhookEvent, verifyStripeSignature } from '../webhooks'
-import { stripe } from '../stripe'
 import { prisma } from '@/lib/prisma'
+
 import { sendEmail, sendNotificationEmail } from '../email'
+import { stripe } from '../stripe'
+import { webhookRegistry, type WebhookEvent, verifyStripeSignature } from '../webhooks'
 
 // Stripe webhook event handlers
 async function handleCustomerCreated(event: WebhookEvent): Promise<void> {

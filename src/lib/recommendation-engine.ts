@@ -388,15 +388,15 @@ export class AIRecommendationEngine implements RecommendationEngine {
     score += priorityScores[rec.priority];
     
     // Type relevance based on current performance
-    if (context.assessmentResult.score < 60 && rec.type === 'study') score += 50;
-    if (context.assessmentResult.score >= 60 && context.assessmentResult.score < 80 && rec.type === 'practice') score += 40;
-    if (context.assessmentResult.score >= 80 && rec.type === 'advance') score += 30;
+    if (context.assessmentResult.score < 60 && rec.type === 'study') {score += 50;}
+    if (context.assessmentResult.score >= 60 && context.assessmentResult.score < 80 && rec.type === 'practice') {score += 40;}
+    if (context.assessmentResult.score >= 80 && rec.type === 'advance') {score += 30;}
     
     // Time feasibility
     if (context.personalizationFactors?.availableTimePerWeek) {
       const weeklyTime = context.personalizationFactors.availableTimePerWeek;
-      if (rec.estimatedTime <= weeklyTime) score += 20;
-      else if (rec.estimatedTime <= weeklyTime * 2) score += 10;
+      if (rec.estimatedTime <= weeklyTime) {score += 20;}
+      else if (rec.estimatedTime <= weeklyTime * 2) {score += 10;}
     }
     
     // Resource quality (number of resources available)
@@ -415,8 +415,8 @@ export class AIRecommendationEngine implements RecommendationEngine {
   }
   
   private determineDifficultyForWeakArea(score: number): DifficultyLevel {
-    if (score < 40) return DifficultyLevel.BEGINNER;
-    if (score < 60) return DifficultyLevel.INTERMEDIATE;
+    if (score < 40) {return DifficultyLevel.BEGINNER;}
+    if (score < 60) {return DifficultyLevel.INTERMEDIATE;}
     return DifficultyLevel.ADVANCED;
   }
   
@@ -441,7 +441,7 @@ export class AIRecommendationEngine implements RecommendationEngine {
   private calculateStudyTime(scoreDifference: number, factors?: PersonalizationFactors): number {
     const baseTime = Math.max(30, scoreDifference * 2); // 2 minutes per point needed
     
-    if (!factors) return baseTime;
+    if (!factors) {return baseTime;}
     
     // Adjust for learning pace preference
     const paceMultipliers = { slow: 1.5, moderate: 1.0, fast: 0.7 };
@@ -465,7 +465,7 @@ export class AIRecommendationEngine implements RecommendationEngine {
   }
   
   private identifyModeratePerformanceAreas(result: AssessmentResult): string[] {
-    if (!result.categoryScores || typeof result.categoryScores !== 'object') return [];
+    if (!result.categoryScores || typeof result.categoryScores !== 'object') {return [];}
     
     return Object.entries(result.categoryScores)
       .filter(([_, score]) => typeof score === 'number' && score >= 60 && score < 80)

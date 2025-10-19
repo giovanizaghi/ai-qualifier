@@ -1,10 +1,12 @@
 'use client';
 
 import { Share2, Link, Twitter, Facebook, Linkedin, Mail } from 'lucide-react';
+
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { CopyToClipboard } from './copy-to-clipboard';
 import { cn } from '@/lib/utils';
+
+import { CopyToClipboard } from './copy-to-clipboard';
 
 interface ShareData {
   title: string;

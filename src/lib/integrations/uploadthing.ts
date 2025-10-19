@@ -1,4 +1,5 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next"
+
 import { auth } from "@/lib/auth"
 
 const f = createUploadthing()
@@ -13,7 +14,7 @@ export const ourFileRouter = {
       const session = await auth()
 
       // If you throw, the user will not be able to upload
-      if (!session?.user?.id) throw new Error("Unauthorized")
+      if (!session?.user?.id) {throw new Error("Unauthorized")}
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: session.user.id }
@@ -34,7 +35,7 @@ export const ourFileRouter = {
   })
     .middleware(async ({ req }) => {
       const session = await auth()
-      if (!session?.user?.id) throw new Error("Unauthorized")
+      if (!session?.user?.id) {throw new Error("Unauthorized")}
       return { userId: session.user.id }
     })
     .onUploadComplete(async ({ metadata, file }) => {
@@ -51,7 +52,7 @@ export const ourFileRouter = {
   })
     .middleware(async ({ req }) => {
       const session = await auth()
-      if (!session?.user?.id) throw new Error("Unauthorized")
+      if (!session?.user?.id) {throw new Error("Unauthorized")}
       
       // Check if user has admin role
       if (session.user.role !== "ADMIN") {
@@ -72,7 +73,7 @@ export const ourFileRouter = {
   })
     .middleware(async ({ req }) => {
       const session = await auth()
-      if (!session?.user?.id) throw new Error("Unauthorized")
+      if (!session?.user?.id) {throw new Error("Unauthorized")}
       return { userId: session.user.id }
     })
     .onUploadComplete(async ({ metadata, file }) => {

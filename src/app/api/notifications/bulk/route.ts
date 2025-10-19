@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { auth } from '@/lib/auth'
 import { sendBulkEmails } from '@/lib/integrations/email'
-import { z } from 'zod'
 
 // Validation schema for bulk notification requests
 const bulkNotificationSchema = z.object({

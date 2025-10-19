@@ -33,7 +33,7 @@ export function setupTestDatabase() {
 
 // Clean database function
 async function cleanDatabase() {
-  if (!prisma) return
+  if (!prisma) {return}
 
   const tablenames = await prisma.$queryRaw<Array<{ tablename: string }>>`
     SELECT tablename FROM pg_tables WHERE schemaname='public'

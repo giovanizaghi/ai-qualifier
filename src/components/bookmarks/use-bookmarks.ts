@@ -32,7 +32,7 @@ export function useBookmarks({ userId }: UseBookmarksOptions = {}): UseBookmarks
 
   // Fetch user's bookmarks
   const fetchBookmarks = async () => {
-    if (!userId) return;
+    if (!userId) {return;}
 
     setState(prev => ({ ...prev, isLoading: true, error: null }));
 

@@ -1,22 +1,5 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { 
-  Assessment, 
-  Question, 
-  QuestionResult, 
-  AssessmentResult, 
-  AssessmentStatus 
-} from "@/types"
-import { QuestionCard } from "./question-card"
-import { AssessmentTimer, TimeWarning } from "./assessment-timer"
-import { ProgressIndicator, QuestionNavigation } from "./progress-indicator"
-import { RealTimeFeedback, AnswerFeedback } from "./real-time-feedback"
-import { AssessmentResults } from "./assessment-results"
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -28,6 +11,25 @@ import {
   Pause,
   Play
 } from "lucide-react"
+import React, { useState, useEffect, useCallback } from "react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
+import { 
+  Assessment, 
+  Question, 
+  QuestionResult, 
+  AssessmentResult, 
+  AssessmentStatus 
+} from "@/types"
+
+import { AssessmentResults } from "./assessment-results"
+import { AssessmentTimer, TimeWarning } from "./assessment-timer"
+import { ProgressIndicator, QuestionNavigation } from "./progress-indicator"
+import { QuestionCard } from "./question-card"
+import { RealTimeFeedback, AnswerFeedback } from "./real-time-feedback"
 
 interface AssessmentInterfaceProps {
   assessment: Assessment
@@ -154,7 +156,7 @@ export function AssessmentInterface({
   }, [answers, currentQuestionIndex, timeSpent, flaggedQuestions, onSave])
 
   const handleAnswerChange = useCallback((answer: string[]) => {
-    if (!currentQuestion) return
+    if (!currentQuestion) {return}
 
     const currentAnswer = answers.get(currentQuestion.id)
     const questionStartTime = Date.now()
@@ -205,7 +207,7 @@ export function AssessmentInterface({
   }, [currentQuestionIndex, currentQuestion, flaggedQuestions])
 
   const handleConfidenceChange = useCallback((confidence: number) => {
-    if (!currentQuestion) return
+    if (!currentQuestion) {return}
 
     setAnswers(prev => {
       const newAnswers = new Map(prev)
@@ -297,7 +299,7 @@ export function AssessmentInterface({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.ctrlKey || e.metaKey) return
+      if (e.ctrlKey || e.metaKey) {return}
 
       switch (e.key) {
         case 'ArrowLeft':

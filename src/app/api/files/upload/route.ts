@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { auth } from '@/lib/auth'
 import { processFileUpload, uploadMultipleFiles } from '@/lib/integrations/storage'
-import { z } from 'zod'
 
 // Validation schema for file upload requests
 const fileUploadSchema = z.object({

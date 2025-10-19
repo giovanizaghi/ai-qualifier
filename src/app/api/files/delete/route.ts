@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { auth } from '@/lib/auth'
 import { deleteFromS3, deleteMultipleFiles } from '@/lib/integrations/storage'
-import { z } from 'zod'
 
 // Validation schema for file deletion requests
 const fileDeletionSchema = z.object({

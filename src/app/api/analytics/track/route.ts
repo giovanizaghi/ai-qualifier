@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { UserAnalyticsService, AnalyticsEventType } from "@/lib/user-analytics"
+
 import { 
   successResponse,
   handleApiError,
   badRequestResponse
 } from "@/lib/api/responses"
 import { auth } from "@/lib/auth"
+import { UserAnalyticsService, AnalyticsEventType } from "@/lib/user-analytics"
 
 // POST /api/analytics/track - Track user analytics event
 export async function POST(req: NextRequest) {

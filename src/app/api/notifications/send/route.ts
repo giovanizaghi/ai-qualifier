@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { z } from 'zod'
+
 import { auth } from '@/lib/auth'
 import { sendNotificationEmail } from '@/lib/integrations/email'
-import { z } from 'zod'
 
 // Validation schema for notification requests
 const notificationSchema = z.object({

@@ -1,17 +1,5 @@
 "use client"
 
-import React from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { 
-  AssessmentResult, 
-  Question, 
-  QuestionResult, 
-  DifficultyLevel, 
-  QuestionType 
-} from "@/types"
 import { 
   CheckCircle, 
   XCircle, 
@@ -24,6 +12,19 @@ import {
   Download,
   Share
 } from "lucide-react"
+import React from "react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { 
+  AssessmentResult, 
+  Question, 
+  QuestionResult, 
+  DifficultyLevel, 
+  QuestionType 
+} from "@/types"
 
 interface AssessmentResultsProps {
   result: AssessmentResult
@@ -55,26 +56,26 @@ export function AssessmentResults({
   }
 
   const getScoreColor = (score: number, passed: boolean) => {
-    if (!passed) return "text-red-600 dark:text-red-400"
-    if (score >= 90) return "text-green-600 dark:text-green-400"
-    if (score >= 80) return "text-blue-600 dark:text-blue-400"
+    if (!passed) {return "text-red-600 dark:text-red-400"}
+    if (score >= 90) {return "text-green-600 dark:text-green-400"}
+    if (score >= 80) {return "text-blue-600 dark:text-blue-400"}
     return "text-yellow-600 dark:text-yellow-400"
   }
 
   const getScoreGrade = (score: number) => {
-    if (score >= 95) return "A+"
-    if (score >= 90) return "A"
-    if (score >= 85) return "A-"
-    if (score >= 80) return "B+"
-    if (score >= 75) return "B"
-    if (score >= 70) return "B-"
-    if (score >= 65) return "C+"
-    if (score >= 60) return "C"
+    if (score >= 95) {return "A+"}
+    if (score >= 90) {return "A"}
+    if (score >= 85) {return "A-"}
+    if (score >= 80) {return "B+"}
+    if (score >= 75) {return "B"}
+    if (score >= 70) {return "B-"}
+    if (score >= 65) {return "C+"}
+    if (score >= 60) {return "C"}
     return "F"
   }
 
   const getCategoryScores = () => {
-    if (!result.categoryScores) return null
+    if (!result.categoryScores) {return null}
     
     try {
       return typeof result.categoryScores === 'string' 
@@ -278,7 +279,7 @@ export function AssessmentResults({
             </CardHeader>
             <CardContent className="space-y-4">
               {Object.entries(difficultyBreakdown).map(([difficulty, stats]) => {
-                if (stats.total === 0) return null
+                if (stats.total === 0) {return null}
                 const percentage = (stats.correct / stats.total) * 100
                 
                 return (

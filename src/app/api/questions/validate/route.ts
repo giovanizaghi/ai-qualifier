@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { questionBankService } from "@/lib/question-bank"
-import { QuestionDifficultyValidator, QuestionContentValidator } from "@/lib/question-validation"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponse,
   handleApiError,
   badRequestResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { questionBankService } from "@/lib/question-bank"
+import { QuestionDifficultyValidator, QuestionContentValidator } from "@/lib/question-validation"
 import { QuestionType, DifficultyLevel } from "@/types"
 
 // POST /api/questions/validate - Validate question before creation/update

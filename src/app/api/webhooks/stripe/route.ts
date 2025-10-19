@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+
 import { processWebhook } from '@/lib/integrations/webhooks'
 
 export async function POST(request: NextRequest) {

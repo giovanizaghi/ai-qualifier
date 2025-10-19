@@ -1,8 +1,9 @@
+import { AlertTriangle } from "lucide-react"
 import { Metadata } from "next"
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertTriangle } from "lucide-react"
-import Link from "next/link"
 
 export const metadata: Metadata = {
   title: "Authentication Error | AI Qualifier",

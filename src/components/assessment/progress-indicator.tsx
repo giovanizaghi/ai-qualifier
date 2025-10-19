@@ -1,9 +1,10 @@
 "use client"
 
-import React from "react"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
 import { CheckCircle, Circle, Flag, AlertCircle } from "lucide-react"
+import React from "react"
+
+import { Badge } from "@/components/ui/badge"
+import { Progress } from "@/components/ui/progress"
 
 interface ProgressIndicatorProps {
   currentQuestion: number
@@ -170,10 +171,10 @@ export function QuestionNavigation({
   className?: string
 }) {
   const getQuestionStatus = (questionNum: number) => {
-    if (questionNum === currentQuestion) return 'current'
-    if (flaggedQuestions.includes(questionNum)) return 'flagged'
-    if (skippedQuestions.includes(questionNum)) return 'skipped'
-    if (questionNum <= answeredQuestions) return 'answered'
+    if (questionNum === currentQuestion) {return 'current'}
+    if (flaggedQuestions.includes(questionNum)) {return 'flagged'}
+    if (skippedQuestions.includes(questionNum)) {return 'skipped'}
+    if (questionNum <= answeredQuestions) {return 'answered'}
     return 'unanswered'
   }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { aiService } from '@/lib/ai';
 import { z } from 'zod';
+
+import { aiService } from '@/lib/ai';
 
 // Validation schemas
 const generateQuestionsSchema = z.object({

@@ -1,7 +1,9 @@
-import { prisma } from '@/lib/prisma'
-import { uploadToS3, downloadFromS3 } from './storage'
-import { sendNotificationEmail } from './email'
 import { z } from 'zod'
+
+import { prisma } from '@/lib/prisma'
+
+import { sendNotificationEmail } from './email'
+import { uploadToS3, downloadFromS3 } from './storage'
 
 // Backup configuration types
 export interface BackupConfig {
@@ -307,7 +309,7 @@ export class BackupService {
   }
 
   private async restoreTableData(tableName: string, data: any[]): Promise<void> {
-    if (data.length === 0) return
+    if (data.length === 0) {return}
 
     // Clear existing data (be careful!)
     await (prisma as any).$queryRawUnsafe(`TRUNCATE TABLE "${tableName}" CASCADE`)
@@ -348,7 +350,7 @@ export class BackupService {
       expires: 3600,
     })
 
-    if (!downloadUrl) return null
+    if (!downloadUrl) {return null}
 
     // Download and return content
     const response = await fetch(downloadUrl)
@@ -399,11 +401,11 @@ export class BackupService {
   }
 
   private formatFileSize(bytes: number): string {
-    if (bytes === 0) return '0 Bytes'
+    if (bytes === 0) {return '0 Bytes'}
     const k = 1024
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))  } ${  sizes[i]}`
   }
 }
 

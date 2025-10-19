@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { 
-  validatePaginationParams,
-  validateQueryParams
-} from "@/lib/api/validation"
+import { z } from "zod"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponseWithPagination,
   successResponse,
@@ -11,8 +9,12 @@ import {
   calculatePagination,
   notFoundResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
-import { z } from "zod"
+import { 
+  validatePaginationParams,
+  validateQueryParams
+} from "@/lib/api/validation"
+import { prisma } from "@/lib/prisma"
+
 
 // Query schema for qualification progress
 const progressQuerySchema = z.object({

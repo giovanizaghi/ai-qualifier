@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { UserAnalyticsService } from "@/lib/user-analytics"
+
 import { 
   successResponse,
   handleApiError,
@@ -7,6 +7,7 @@ import {
 } from "@/lib/api/responses"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import { UserAnalyticsService } from "@/lib/user-analytics"
 
 interface PerformanceDashboardMetrics {
   overview: {

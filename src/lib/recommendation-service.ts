@@ -162,7 +162,7 @@ export class RecommendationService {
           reason: `Average score of ${Math.round(averageScore)}% in ${category} assessments`,
           confidence: Math.min(90, Math.round((70 - averageScore) * 2)), // Higher confidence for lower scores
           priority: averageScore < 50 ? 'high' : averageScore < 60 ? 'medium' : 'low',
-          category: category,
+          category,
           difficulty: 'Intermediate',
           estimatedTime: 120,
           metadata: {
@@ -288,7 +288,7 @@ export class RecommendationService {
   private static analyzePerformancePatterns(assessmentResults: any[]): StudyInsight[] {
     const insights: StudyInsight[] = []
     
-    if (assessmentResults.length === 0) return insights
+    if (assessmentResults.length === 0) {return insights}
 
     const scores = assessmentResults
       .filter(r => r.status === 'COMPLETED' && r.completedAt)

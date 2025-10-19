@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { questionBankService } from "@/lib/question-bank"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponse,
   handleApiError,
   notFoundResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { questionBankService } from "@/lib/question-bank"
 
 // GET /api/questions/analytics/[id] - Get analytics for a specific question
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

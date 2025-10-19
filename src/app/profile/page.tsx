@@ -1,9 +1,10 @@
 import { Metadata } from "next"
-import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+
 import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { ProfileForm } from "@/components/profile/profile-form"
+import { auth } from "@/lib/auth"
 
 export const metadata: Metadata = {
   title: "Profile | AI Qualifier",

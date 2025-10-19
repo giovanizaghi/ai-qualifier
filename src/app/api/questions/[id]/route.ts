@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { 
-  questionUpdateSchema,
-  validateRequestBody
-} from "@/lib/api/validation"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponse,
   handleApiError,
   notFoundResponse,
   badRequestResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { 
+  questionUpdateSchema,
+  validateRequestBody
+} from "@/lib/api/validation"
+import { prisma } from "@/lib/prisma"
 
 interface RouteParams {
   params: Promise<{

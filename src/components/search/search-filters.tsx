@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
 import { Filter, RotateCcw } from 'lucide-react';
+import { useState } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { QualificationCategory, DifficultyLevel } from '@/types';
 import { cn } from '@/lib/utils';
+import { QualificationCategory, DifficultyLevel } from '@/types';
 
 export interface SearchFilters {
   category?: QualificationCategory;

@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+
 import { 
   measurePerformance, 
   performanceAssertions,
@@ -162,7 +163,7 @@ test.describe('Performance Tests', () => {
       expect(apiTiming.duration).toBeLessThan(1000)
       expect(apiTiming.status).toBe(200)
       
-      console.log('API response time:', apiTiming.duration + 'ms')
+      console.log('API response time:', `${apiTiming.duration  }ms`)
     }
   })
 

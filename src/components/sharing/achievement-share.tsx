@@ -1,12 +1,14 @@
 'use client';
 
 import { Trophy, Star, Target, Calendar } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+
 import { Badge } from '@/components/ui/badge';
-import { SocialShare } from './social-share';
-import { CopyToClipboard } from './copy-to-clipboard';
 import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+
+import { CopyToClipboard } from './copy-to-clipboard';
+import { SocialShare } from './social-share';
 
 interface Achievement {
   id: string;
@@ -52,9 +54,9 @@ interface ProgressShareProps {
 }
 
 const getAchievementIcon = (type: string, category: string) => {
-  if (type.includes('PERFECT_SCORE')) return Star;
-  if (type.includes('COMPLETION')) return Trophy;
-  if (type.includes('STREAK')) return Target;
+  if (type.includes('PERFECT_SCORE')) {return Star;}
+  if (type.includes('COMPLETION')) {return Trophy;}
+  if (type.includes('STREAK')) {return Target;}
   return Trophy;
 };
 
@@ -130,16 +132,16 @@ export function ResultShare({ result, userDisplayName = 'Someone', className }: 
   };
 
   const getScoreColor = (score: number, passed: boolean) => {
-    if (!passed) return 'from-gray-50 to-gray-100 border-gray-200';
-    if (score >= 90) return 'from-green-50 to-emerald-50 border-green-200';
-    if (score >= 80) return 'from-blue-50 to-blue-100 border-blue-200';
+    if (!passed) {return 'from-gray-50 to-gray-100 border-gray-200';}
+    if (score >= 90) {return 'from-green-50 to-emerald-50 border-green-200';}
+    if (score >= 80) {return 'from-blue-50 to-blue-100 border-blue-200';}
     return 'from-yellow-50 to-orange-50 border-yellow-200';
   };
 
   const getScoreTextColor = (score: number, passed: boolean) => {
-    if (!passed) return 'text-gray-700';
-    if (score >= 90) return 'text-green-700';
-    if (score >= 80) return 'text-blue-700';
+    if (!passed) {return 'text-gray-700';}
+    if (score >= 90) {return 'text-green-700';}
+    if (score >= 80) {return 'text-blue-700';}
     return 'text-yellow-700';
   };
 
@@ -213,16 +215,16 @@ export function ProgressShare({
   };
 
   const getProgressColor = (percentage: number) => {
-    if (percentage >= 75) return 'from-green-50 to-emerald-50 border-green-200';
-    if (percentage >= 50) return 'from-blue-50 to-blue-100 border-blue-200';
-    if (percentage >= 25) return 'from-yellow-50 to-orange-50 border-yellow-200';
+    if (percentage >= 75) {return 'from-green-50 to-emerald-50 border-green-200';}
+    if (percentage >= 50) {return 'from-blue-50 to-blue-100 border-blue-200';}
+    if (percentage >= 25) {return 'from-yellow-50 to-orange-50 border-yellow-200';}
     return 'from-gray-50 to-gray-100 border-gray-200';
   };
 
   const getProgressTextColor = (percentage: number) => {
-    if (percentage >= 75) return 'text-green-700';
-    if (percentage >= 50) return 'text-blue-700';
-    if (percentage >= 25) return 'text-yellow-700';
+    if (percentage >= 75) {return 'text-green-700';}
+    if (percentage >= 50) {return 'text-blue-700';}
+    if (percentage >= 25) {return 'text-yellow-700';}
     return 'text-gray-700';
   };
 

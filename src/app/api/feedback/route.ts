@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { z } from 'zod';
 
 // Validation schema
 const feedbackSchema = z.object({
@@ -60,8 +61,8 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     const where: any = {};
-    if (type) where.type = type;
-    if (status) where.status = status;
+    if (type) {where.type = type;}
+    if (status) {where.status = status;}
 
     const [feedback, total] = await Promise.all([
       (prisma as any).feedback.findMany({

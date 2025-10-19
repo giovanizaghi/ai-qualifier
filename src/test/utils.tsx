@@ -1,6 +1,6 @@
 import { render, type RenderOptions } from '@testing-library/react'
-import { ReactElement } from 'react'
 import { axe, toHaveNoViolations } from 'jest-axe'
+import { ReactElement } from 'react'
 import { expect } from 'vitest'
 
 // Extend expect with accessibility matchers

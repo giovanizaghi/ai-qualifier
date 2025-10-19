@@ -1,5 +1,5 @@
-import { webhookRegistry, type WebhookEvent, verifyGitHubSignature } from '../webhooks'
 import { sendNotificationEmail } from '../email'
+import { webhookRegistry, type WebhookEvent, verifyGitHubSignature } from '../webhooks'
 
 // GitHub webhook event handlers
 async function handleRepositoryCreated(event: WebhookEvent): Promise<void> {

@@ -1,12 +1,5 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
   BarChart3, 
   TrendingUp, 
@@ -20,6 +13,14 @@ import {
   RefreshCw,
   Download
 } from "lucide-react"
+import { useState, useEffect } from 'react'
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface PerformanceDashboardProps {
   className?: string
@@ -110,7 +111,7 @@ export function PerformanceDashboard({ className, isAdmin = false }: Performance
     setRefreshInterval(interval)
 
     return () => {
-      if (interval) clearInterval(interval)
+      if (interval) {clearInterval(interval)}
     }
   }, [timeframe])
 
@@ -129,7 +130,7 @@ export function PerformanceDashboard({ className, isAdmin = false }: Performance
         })
       })
 
-      if (!response.ok) throw new Error('Export failed')
+      if (!response.ok) {throw new Error('Export failed')}
 
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
@@ -185,11 +186,11 @@ export function PerformanceDashboard({ className, isAdmin = false }: Performance
     )
   }
 
-  if (!metrics) return null
+  if (!metrics) {return null}
 
   const getStatusColor = (value: number, thresholds: { good: number; warning: number }) => {
-    if (value >= thresholds.good) return 'text-green-600'
-    if (value >= thresholds.warning) return 'text-yellow-600'
+    if (value >= thresholds.good) {return 'text-green-600'}
+    if (value >= thresholds.warning) {return 'text-yellow-600'}
     return 'text-red-600'
   }
 

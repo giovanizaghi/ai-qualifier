@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { aiService } from '@/lib/ai';
 import { z } from 'zod';
+
+import { aiService } from '@/lib/ai';
 
 // Validation schemas
 const qualificationRecommendationsSchema = z.object({
@@ -130,7 +131,7 @@ export async function POST(request: NextRequest) {
           meta: {
             currentScore: validated.userPerformance.currentScore,
             targetScore: validated.userPerformance.targetScore,
-            scoreGap: scoreGap,
+            scoreGap,
             timeUntilExam: validated.userPerformance.timeUntilExam,
             improvementNeeded: scoreGap > 0
           }

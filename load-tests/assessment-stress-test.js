@@ -1,5 +1,5 @@
-import http from 'k6/http'
 import { check, sleep } from 'k6'
+import http from 'k6/http'
 import { Rate, Trend, Counter } from 'k6/metrics'
 
 // Custom metrics
@@ -71,7 +71,7 @@ function startAssessment(userId) {
   // Start assessment (this would typically require authentication)
   const assessmentData = {
     qualificationId: 'test-qualification-id',
-    userId: userId,
+    userId,
   }
   
   response = http.post(`${BASE_URL}/api/assessments`, JSON.stringify(assessmentData), {
@@ -104,7 +104,7 @@ function answerQuestion(assessmentId, questionIndex) {
   
   // Submit answer
   const answerData = {
-    assessmentId: assessmentId,
+    assessmentId,
     questionId: `question_${questionIndex}`,
     answer: Math.floor(Math.random() * 4), // Random answer 0-3
     timeSpent: Math.floor(Math.random() * 60) + 30, // 30-90 seconds

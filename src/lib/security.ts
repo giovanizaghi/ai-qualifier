@@ -28,7 +28,7 @@ class InputSanitizer {
    * Sanitize HTML content to prevent XSS attacks
    */
   static sanitizeHtml(input: string): string {
-    if (typeof input !== 'string') return '';
+    if (typeof input !== 'string') {return '';}
     
     return input
       .replace(/[<>]/g, '') // Remove < and > to prevent tag injection
@@ -41,7 +41,7 @@ class InputSanitizer {
    * Sanitize SQL input to prevent injection
    */
   static sanitizeSql(input: string): string {
-    if (typeof input !== 'string') return '';
+    if (typeof input !== 'string') {return '';}
     
     return input
       .replace(/['";\\]/g, '') // Remove common SQL injection characters
@@ -54,7 +54,7 @@ class InputSanitizer {
    * Sanitize file paths to prevent directory traversal
    */
   static sanitizeFilePath(input: string): string {
-    if (typeof input !== 'string') return '';
+    if (typeof input !== 'string') {return '';}
     
     return input
       .replace(/\.\./g, '') // Remove parent directory references
@@ -67,7 +67,7 @@ class InputSanitizer {
    * Sanitize URL to prevent malicious redirects
    */
   static sanitizeUrl(input: string): string {
-    if (typeof input !== 'string') return '';
+    if (typeof input !== 'string') {return '';}
     
     // Only allow http, https, and relative URLs
     const urlPattern = /^(https?:\/\/[^\s<>"]+|\/[^\s<>"]*|\#[^\s<>"]*)$/i;
@@ -83,7 +83,7 @@ class InputSanitizer {
    * Remove potentially dangerous characters from user input
    */
   static sanitizeUserInput(input: string): string {
-    if (typeof input !== 'string') return '';
+    if (typeof input !== 'string') {return '';}
     
     return input
       .replace(/[<>]/g, '') // Basic XSS prevention
@@ -168,7 +168,7 @@ class CSRFProtection {
    * Get CSRF token from cookies (client-side)
    */
   static getTokenFromCookie(): string | null {
-    if (typeof document === 'undefined') return null;
+    if (typeof document === 'undefined') {return null;}
     
     const cookies = document.cookie.split(';');
     for (const cookie of cookies) {
@@ -341,25 +341,25 @@ class PasswordUtils {
     const feedback: string[] = [];
     let score = 0;
 
-    if (password.length >= 8) score += 20;
-    else feedback.push('Use at least 8 characters');
+    if (password.length >= 8) {score += 20;}
+    else {feedback.push('Use at least 8 characters');}
 
-    if (password.length >= 12) score += 10;
+    if (password.length >= 12) {score += 10;}
     
-    if (/[a-z]/.test(password)) score += 15;
-    else feedback.push('Include lowercase letters');
+    if (/[a-z]/.test(password)) {score += 15;}
+    else {feedback.push('Include lowercase letters');}
 
-    if (/[A-Z]/.test(password)) score += 15;
-    else feedback.push('Include uppercase letters');
+    if (/[A-Z]/.test(password)) {score += 15;}
+    else {feedback.push('Include uppercase letters');}
 
-    if (/\d/.test(password)) score += 15;
-    else feedback.push('Include numbers');
+    if (/\d/.test(password)) {score += 15;}
+    else {feedback.push('Include numbers');}
 
-    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/.test(password)) score += 15;
-    else feedback.push('Include special characters');
+    if (/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>?]/.test(password)) {score += 15;}
+    else {feedback.push('Include special characters');}
 
-    if (!/(.)\1{2,}/.test(password)) score += 10;
-    else feedback.push('Avoid repeating characters');
+    if (!/(.)\1{2,}/.test(password)) {score += 10;}
+    else {feedback.push('Avoid repeating characters');}
 
     return {
       score,

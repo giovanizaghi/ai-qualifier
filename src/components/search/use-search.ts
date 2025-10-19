@@ -1,7 +1,9 @@
 'use client';
 
 import { useMemo } from 'react';
+
 import { QualificationCategory, DifficultyLevel, Qualification } from '@/types';
+
 import { SearchFilters } from './search-filters';
 
 interface UseSearchOptions {
@@ -125,8 +127,8 @@ export function useSearch({
           bValue = b.title.toLowerCase();
       }
 
-      if (aValue < bValue) return sortOrder === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortOrder === 'asc' ? 1 : -1;
+      if (aValue < bValue) {return sortOrder === 'asc' ? -1 : 1;}
+      if (aValue > bValue) {return sortOrder === 'asc' ? 1 : -1;}
       return 0;
     });
 

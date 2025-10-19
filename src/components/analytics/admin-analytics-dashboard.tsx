@@ -1,12 +1,5 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Input } from "@/components/ui/input"
 import { 
   Users, 
   Activity, 
@@ -26,6 +19,14 @@ import {
   Target,
   Zap
 } from "lucide-react"
+import { useState, useEffect } from 'react'
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface AdminAnalyticsData {
   systemOverview: {
@@ -166,7 +167,7 @@ export function AdminAnalyticsDashboard({ className }: AdminAnalyticsDashboardPr
         })
       })
 
-      if (!response.ok) throw new Error('Export failed')
+      if (!response.ok) {throw new Error('Export failed')}
 
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
@@ -243,7 +244,7 @@ export function AdminAnalyticsDashboard({ className }: AdminAnalyticsDashboardPr
     )
   }
 
-  if (!data) return null
+  if (!data) {return null}
 
   return (
     <div className={className}>

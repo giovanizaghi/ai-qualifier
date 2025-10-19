@@ -1,7 +1,7 @@
 'use client';
 
-import { toast } from 'sonner';
 import { CheckCircle, AlertCircle, XCircle, Info, Trophy, Star, Clock, Target } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface NotificationOptions {
   duration?: number;
@@ -219,7 +219,7 @@ export const notification = {
 // Hook for managing notification preferences
 export function useNotificationPreferences() {
   const getPreferences = () => {
-    if (typeof window === 'undefined') return {};
+    if (typeof window === 'undefined') {return {};}
     
     try {
       const stored = localStorage.getItem('notification-preferences');
@@ -242,7 +242,7 @@ export function useNotificationPreferences() {
   };
 
   const updatePreferences = (preferences: Record<string, boolean>) => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined') {return;}
     
     try {
       localStorage.setItem('notification-preferences', JSON.stringify(preferences));

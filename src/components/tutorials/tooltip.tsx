@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
 import { HelpCircle, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -39,7 +40,7 @@ export function Tooltip({
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const calculatePosition = () => {
-    if (!triggerRef.current || !tooltipRef.current) return;
+    if (!triggerRef.current || !tooltipRef.current) {return;}
 
     const triggerRect = triggerRef.current.getBoundingClientRect();
     const tooltipRect = tooltipRef.current.getBoundingClientRect();
@@ -76,7 +77,7 @@ export function Tooltip({
   };
 
   const showTooltip = () => {
-    if (disabled) return;
+    if (disabled) {return;}
     
     if (delay > 0) {
       timeoutRef.current = setTimeout(() => {
@@ -88,7 +89,7 @@ export function Tooltip({
   };
 
   const hideTooltip = () => {
-    if (content.persistent) return;
+    if (content.persistent) {return;}
     
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);

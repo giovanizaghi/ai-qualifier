@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { CheckCircle, XCircle, Clock, TrendingUp, AlertCircle } from "lucide-react"
+import React, { useState, useEffect } from "react"
+
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 
 interface FeedbackMessage {
   id: string

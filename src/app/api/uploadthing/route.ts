@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createRouteHandler } from 'uploadthing/next'
+
 import { ourFileRouter } from '@/lib/integrations/uploadthing'
 
 // Export routes for Next App Router

@@ -209,8 +209,8 @@ export class DashboardService {
           const firstAvg = firstHalf.reduce((sum, score) => sum + score, 0) / firstHalf.length
           const secondAvg = secondHalf.reduce((sum, score) => sum + score, 0) / secondHalf.length
           
-          if (secondAvg > firstAvg + 5) trend = 'up'
-          else if (secondAvg < firstAvg - 5) trend = 'down'
+          if (secondAvg > firstAvg + 5) {trend = 'up'}
+          else if (secondAvg < firstAvg - 5) {trend = 'down'}
         }
 
         return {
@@ -246,7 +246,7 @@ export class DashboardService {
     )
 
     let streak = 0
-    let currentDate = new Date()
+    const currentDate = new Date()
     
     while (dates.has(currentDate.toDateString())) {
       streak++

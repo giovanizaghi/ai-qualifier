@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+
 import { testAccessibility, a11yConfigs, a11yAssertions } from '../src/test/accessibility'
 
 test.describe('Accessibility Tests', () => {

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+
 import { 
   successResponse,
   handleApiError,
@@ -187,9 +188,9 @@ async function getSystemAlerts() {
 function calculatePlatformHealth(activeUsers: number, totalUsers: number): 'excellent' | 'good' | 'warning' | 'critical' {
   const activityRate = totalUsers > 0 ? activeUsers / totalUsers : 0
   
-  if (activityRate > 0.8) return 'excellent'
-  if (activityRate > 0.6) return 'good'
-  if (activityRate > 0.3) return 'warning'
+  if (activityRate > 0.8) {return 'excellent'}
+  if (activityRate > 0.6) {return 'good'}
+  if (activityRate > 0.3) {return 'warning'}
   return 'critical'
 }
 
@@ -353,9 +354,9 @@ function getQuestionIssues(question: any): string[] {
   const issues = []
   const successRate = question.timesUsed > 0 ? (question.timesCorrect / question.timesUsed) * 100 : 0
   
-  if (successRate < 30) issues.push('Very low success rate')
-  if (successRate > 95) issues.push('Too easy')
-  if (question.timesUsed < 10) issues.push('Low usage')
+  if (successRate < 30) {issues.push('Very low success rate')}
+  if (successRate > 95) {issues.push('Too easy')}
+  if (question.timesUsed < 10) {issues.push('Low usage')}
   
   return issues
 }

@@ -1,11 +1,5 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { 
   BarChart3, 
   TrendingUp, 
@@ -20,6 +14,13 @@ import {
   Download,
   RefreshCw
 } from "lucide-react"
+import { useState, useEffect } from 'react'
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface DetailedProgressReportProps {
   userId?: string
@@ -95,7 +96,7 @@ export function DetailedProgressReport({
   }, [userId, timeframe, includeAnalytics])
 
   const exportReport = async (format: 'pdf' | 'csv' | 'json') => {
-    if (!report) return
+    if (!report) {return}
 
     try {
       const response = await fetch('/api/analytics/export', {
@@ -112,7 +113,7 @@ export function DetailedProgressReport({
         })
       })
 
-      if (!response.ok) throw new Error('Export failed')
+      if (!response.ok) {throw new Error('Export failed')}
 
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
@@ -164,11 +165,11 @@ export function DetailedProgressReport({
     )
   }
 
-  if (!report) return null
+  if (!report) {return null}
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 60) return 'text-yellow-600'
+    if (score >= 80) {return 'text-green-600'}
+    if (score >= 60) {return 'text-yellow-600'}
     return 'text-red-600'
   }
 

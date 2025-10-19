@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { Bookmark, BookmarkCheck } from 'lucide-react';
+import { useState } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -30,7 +31,7 @@ export function BookmarkButton({
   const [bookmarked, setBookmarked] = useState(isBookmarked);
 
   const handleToggle = async () => {
-    if (!onToggle || isLoading || disabled) return;
+    if (!onToggle || isLoading || disabled) {return;}
 
     setIsLoading(true);
     try {

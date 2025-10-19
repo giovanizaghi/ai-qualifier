@@ -1,13 +1,14 @@
-import NextAuth, { type DefaultSession } from "next-auth"
-import Google from "next-auth/providers/google"
-import GitHub from "next-auth/providers/github"
-import Discord from "next-auth/providers/discord"
-import LinkedIn from "next-auth/providers/linkedin"
-import Apple from "next-auth/providers/apple"
-import MicrosoftEntraId from "next-auth/providers/microsoft-entra-id"
-import Credentials from "next-auth/providers/credentials"
 import bcrypt from "bcryptjs"
+import NextAuth, { type DefaultSession } from "next-auth"
+import Apple from "next-auth/providers/apple"
+import Credentials from "next-auth/providers/credentials"
+import Discord from "next-auth/providers/discord"
+import GitHub from "next-auth/providers/github"
+import Google from "next-auth/providers/google"
+import LinkedIn from "next-auth/providers/linkedin"
+import MicrosoftEntraId from "next-auth/providers/microsoft-entra-id"
 import { z } from "zod"
+
 import { prisma } from "@/lib/prisma"
 
 // Extend the built-in session types
@@ -163,9 +164,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     },
     async redirect({ url, baseUrl }) {
       // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`
+      if (url.startsWith("/")) {return `${baseUrl}${url}`}
       // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url
+      else if (new URL(url).origin === baseUrl) {return url}
       return baseUrl
     },
   },

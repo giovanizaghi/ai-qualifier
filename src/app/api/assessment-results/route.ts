@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { 
-  assessmentResultCreateSchema,
-  assessmentResultQuerySchema,
-  validateRequestBody,
-  validatePaginationParams,
-  validateQueryParams
-} from "@/lib/api/validation"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponseWithPagination,
   createdResponse,
@@ -14,7 +8,14 @@ import {
   calculatePagination,
   badRequestResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { 
+  assessmentResultCreateSchema,
+  assessmentResultQuerySchema,
+  validateRequestBody,
+  validatePaginationParams,
+  validateQueryParams
+} from "@/lib/api/validation"
+import { prisma } from "@/lib/prisma"
 
 // GET /api/assessment-results - List assessment results with pagination and filtering
 export async function GET(req: NextRequest) {
@@ -185,7 +186,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Process answers and calculate score
-    let totalQuestions = validatedData.answers.length
+    const totalQuestions = validatedData.answers.length
     let correctAnswers = 0
     let score = 0
 
@@ -201,7 +202,7 @@ export async function POST(req: NextRequest) {
         }
       })
 
-      if (!question) continue
+      if (!question) {continue}
 
       // Check if answer is correct
       const isCorrect = JSON.stringify(answer.userAnswer.sort()) === 

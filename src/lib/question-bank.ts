@@ -270,7 +270,7 @@ export class QuestionBankService {
 
     // Group questions by difficulty
     const questionsByDifficulty = questions.reduce((acc, q) => {
-      if (!acc[q.difficulty]) acc[q.difficulty] = []
+      if (!acc[q.difficulty]) {acc[q.difficulty] = []}
       acc[q.difficulty].push(q)
       return acc
     }, {} as Record<DifficultyLevel, any[]>)
@@ -483,14 +483,14 @@ export class QuestionBankService {
    * Calculate discrimination index (how well question differentiates skill levels)
    */
   private calculateDiscriminationIndex(results: any[]): number {
-    if (results.length < 10) return 0 // Need sufficient data
+    if (results.length < 10) {return 0} // Need sufficient data
 
     // Sort results by overall assessment score
     const sortedResults = results
       .filter(r => r.assessmentResult?.score !== undefined)
       .sort((a, b) => b.assessmentResult.score - a.assessmentResult.score)
 
-    if (sortedResults.length < 10) return 0
+    if (sortedResults.length < 10) {return 0}
 
     // Take top 27% and bottom 27% (standard practice)
     const topCount = Math.floor(sortedResults.length * 0.27)
@@ -618,7 +618,7 @@ export class QuestionBankService {
       }
     })
 
-    if (!question) return
+    if (!question) {return}
 
     const newTimesUsed = question.timesUsed + 1
     const newTimesCorrect = question.timesCorrect + (result.isCorrect ? 1 : 0)

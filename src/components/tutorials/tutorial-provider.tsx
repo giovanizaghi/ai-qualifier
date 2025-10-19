@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import { X, ChevronLeft, ChevronRight, SkipForward } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
 export interface TutorialStep {
@@ -133,15 +134,15 @@ function TutorialOverlay({
           break;
         case 'wait':
           setTimeout(() => {
-            if (!isLastStep) onNext();
-            else onComplete();
+            if (!isLastStep) {onNext();}
+            else {onComplete();}
           }, duration || 2000);
           return;
       }
     }
     
-    if (!isLastStep) onNext();
-    else onComplete();
+    if (!isLastStep) {onNext();}
+    else {onComplete();}
   };
 
   return (

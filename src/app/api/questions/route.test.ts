@@ -1,7 +1,8 @@
 import { describe, it, expect, beforeAll, vi } from 'vitest'
+
 import { GET, POST } from '@/app/api/questions/route'
-import { setupTestDatabase, testDataFactory } from '@/test/database'
 import { createMockRequest, extractResponseData, createMockAdminSession } from '@/test/api-helpers'
+import { setupTestDatabase, testDataFactory } from '@/test/database'
 
 // Mock the auth functions
 vi.mock('@/lib/api/middleware', () => ({

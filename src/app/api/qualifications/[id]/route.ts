@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
-import { prisma } from "@/lib/prisma"
+
 import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 
 // Validation schema for updating qualification
 const qualificationUpdateSchema = z.object({

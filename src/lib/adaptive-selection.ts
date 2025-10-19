@@ -218,7 +218,7 @@ export class AdaptiveQuestionSelector {
       }
       const stats = categoryStats.get(category)!
       stats.total++
-      if (qr.isCorrect) stats.correct++
+      if (qr.isCorrect) {stats.correct++}
       stats.totalTime += qr.timeSpent || 0
       if (new Date(qr.createdAt) > stats.lastAttempted) {
         stats.lastAttempted = new Date(qr.createdAt)
@@ -258,7 +258,7 @@ export class AdaptiveQuestionSelector {
       const difficulty = qr.question.difficulty as DifficultyLevel
       const stats = difficultyStats.get(difficulty)!
       stats.total++
-      if (qr.isCorrect) stats.correct++
+      if (qr.isCorrect) {stats.correct++}
       stats.totalTime += qr.timeSpent || 0
       stats.recentResults.push(qr.isCorrect)
     })
@@ -518,7 +518,7 @@ export class AdaptiveQuestionSelector {
 
   // Helper methods
   private calculateTrend(results: boolean[]): 'improving' | 'stable' | 'declining' {
-    if (results.length < 3) return 'stable'
+    if (results.length < 3) {return 'stable'}
     
     const firstHalf = results.slice(0, Math.floor(results.length / 2))
     const secondHalf = results.slice(Math.floor(results.length / 2))
@@ -526,13 +526,13 @@ export class AdaptiveQuestionSelector {
     const firstRate = firstHalf.filter(r => r).length / firstHalf.length
     const secondRate = secondHalf.filter(r => r).length / secondHalf.length
     
-    if (secondRate > firstRate + 0.1) return 'improving'
-    if (firstRate > secondRate + 0.1) return 'declining'
+    if (secondRate > firstRate + 0.1) {return 'improving'}
+    if (firstRate > secondRate + 0.1) {return 'declining'}
     return 'stable'
   }
 
   private calculateConsistencyScore(scores: number[]): number {
-    if (scores.length < 2) return 50
+    if (scores.length < 2) {return 50}
     
     const mean = scores.reduce((a, b) => a + b, 0) / scores.length
     const variance = scores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / scores.length
@@ -546,9 +546,9 @@ export class AdaptiveQuestionSelector {
     difficultyPerformance: Record<DifficultyLevel, any>,
     overallSuccessRate: number
   ): DifficultyLevel {
-    if (overallSuccessRate < 40) return DifficultyLevel.BEGINNER
-    if (overallSuccessRate < 60) return DifficultyLevel.INTERMEDIATE
-    if (overallSuccessRate < 80) return DifficultyLevel.ADVANCED
+    if (overallSuccessRate < 40) {return DifficultyLevel.BEGINNER}
+    if (overallSuccessRate < 60) {return DifficultyLevel.INTERMEDIATE}
+    if (overallSuccessRate < 80) {return DifficultyLevel.ADVANCED}
     return DifficultyLevel.EXPERT
   }
 
@@ -565,7 +565,7 @@ export class AdaptiveQuestionSelector {
   }
 
   private selectRandomWeighted(questions: any[]): any {
-    if (questions.length === 0) return null
+    if (questions.length === 0) {return null}
     
     // Weight questions based on usage (prefer less used questions)
     const weights = questions.map(q => {

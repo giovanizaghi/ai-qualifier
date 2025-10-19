@@ -30,7 +30,7 @@ export class SimpleScoringAlgorithm implements ScoringAlgorithm {
     const questionMap = new Map(questions.map(q => [q.id, q]));
     
     let correctAnswers = 0;
-    let totalQuestions = answers.length;
+    const totalQuestions = answers.length;
     let timeBonus = 0;
     let penalties = 0;
     
@@ -60,7 +60,7 @@ export class SimpleScoringAlgorithm implements ScoringAlgorithm {
     // Process each answer
     for (const answer of answers) {
       const question = questionMap.get(answer.questionId);
-      if (!question) continue;
+      if (!question) {continue;}
       
       if (answer.isCorrect) {
         correctAnswers++;
@@ -107,7 +107,7 @@ export class SimpleScoringAlgorithm implements ScoringAlgorithm {
   }
   
   private calculateSimpleConfidence(correct: number, total: number): number {
-    if (total === 0) return 0;
+    if (total === 0) {return 0;}
     
     const proportion = correct / total;
     // Simple confidence based on binomial proportion
@@ -165,7 +165,7 @@ export class WeightedScoringAlgorithm implements ScoringAlgorithm {
     // Process each answer
     for (const answer of answers) {
       const question = questionMap.get(answer.questionId);
-      if (!question) continue;
+      if (!question) {continue;}
       
       const difficultyMultiplier = config.difficultyMultipliers?.[question.difficulty] || 1;
       const categoryWeight = config.categoryWeights?.[question.category] || 1;
@@ -233,7 +233,7 @@ export class WeightedScoringAlgorithm implements ScoringAlgorithm {
     
     for (const answer of answers) {
       const question = questionMap.get(answer.questionId);
-      if (!question) continue;
+      if (!question) {continue;}
       
       const weight = question.points * (config.difficultyMultipliers?.[question.difficulty] || 1);
       totalWeight += weight;
@@ -243,7 +243,7 @@ export class WeightedScoringAlgorithm implements ScoringAlgorithm {
       }
     }
     
-    if (totalWeight === 0) return 0;
+    if (totalWeight === 0) {return 0;}
     
     const weightedProportion = correctWeight / totalWeight;
     // Adjust confidence based on question distribution
@@ -290,7 +290,7 @@ export class AdaptiveScoringAlgorithm implements ScoringAlgorithm {
     for (let i = 0; i < sortedAnswers.length; i++) {
       const answer = sortedAnswers[i];
       const question = questionMap.get(answer.questionId);
-      if (!question) continue;
+      if (!question) {continue;}
       
       // Calculate adaptive multiplier based on recent performance
       const adaptiveMultiplier = this.calculateAdaptiveMultiplier(

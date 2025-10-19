@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from 'next/dynamic'
+
 import { Spinner } from '@/components/ui/spinner'
 
 // Dynamically import heavy components with loading states

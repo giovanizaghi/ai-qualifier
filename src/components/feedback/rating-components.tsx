@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Star, ThumbsUp, ThumbsDown, Flag, MessageSquare } from 'lucide-react';
+import { useState, useEffect } from 'react';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
@@ -35,7 +36,7 @@ export function QuickRating({
   };
 
   const handleRate = async (newRating: number) => {
-    if (disabled || isSubmitting) return;
+    if (disabled || isSubmitting) {return;}
 
     setIsSubmitting(true);
     try {
@@ -112,7 +113,7 @@ export function ThumbsRating({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleRate = async (isPositive: boolean) => {
-    if (disabled || isSubmitting) return;
+    if (disabled || isSubmitting) {return;}
 
     setIsSubmitting(true);
     try {

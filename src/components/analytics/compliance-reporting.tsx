@@ -1,12 +1,5 @@
 "use client"
 
-import { useState, useEffect } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
 import { 
   Shield, 
   FileText, 
@@ -22,6 +15,14 @@ import {
   Lock,
   Activity
 } from "lucide-react"
+import { useState, useEffect } from 'react'
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface ComplianceReportingProps {
   className?: string
@@ -154,8 +155,8 @@ export function ComplianceReporting({ className }: ComplianceReportingProps) {
     
     const threshold = thresholds[frequency as keyof typeof thresholds] || 720
     
-    if (hoursSince > threshold * 1.5) return 'outdated'
-    if (hoursSince > threshold) return 'pending'
+    if (hoursSince > threshold * 1.5) {return 'outdated'}
+    if (hoursSince > threshold) {return 'pending'}
     return 'current'
   }
 
@@ -178,7 +179,7 @@ export function ComplianceReporting({ className }: ComplianceReportingProps) {
   }
 
   const getComplianceScore = () => {
-    if (!metrics) return 0
+    if (!metrics) {return 0}
     
     const scores = [
       metrics.gdprCompliance.consentRate,

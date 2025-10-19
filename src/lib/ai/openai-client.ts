@@ -17,7 +17,7 @@ class OpenAIClient {
 
     try {
       this.client = new OpenAI({
-        apiKey: apiKey,
+        apiKey,
       });
     } catch (error) {
       console.error('Failed to initialize OpenAI client:', error);
@@ -54,7 +54,7 @@ class OpenAIClient {
 
       const completion = await this.client.chat.completions.create({
         model: options.model || 'gpt-4o-mini',
-        messages: messages,
+        messages,
         max_tokens: options.maxTokens || 1000,
         temperature: options.temperature || 0.7,
       });
@@ -96,13 +96,13 @@ class OpenAIClient {
 
       const completion = await this.client.chat.completions.create({
         model: options.model || 'gpt-4o-mini',
-        messages: messages,
+        messages,
         temperature: options.temperature || 0.7,
         response_format: { type: 'json_object' },
       });
 
       const content = completion.choices[0]?.message?.content;
-      if (!content) return null;
+      if (!content) {return null;}
 
       return JSON.parse(content) as T;
     } catch (error) {

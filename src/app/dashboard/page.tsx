@@ -1,6 +1,6 @@
 import { Metadata } from "next"
-import { auth } from "@/lib/auth"
 import { redirect } from "next/navigation"
+
 import { 
   DashboardHeader, 
   DashboardShell,
@@ -10,10 +10,11 @@ import {
   LearningPathVisualization,
   PersonalizedRecommendations
 } from "@/components/dashboard"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { auth } from "@/lib/auth"
 
 export const metadata: Metadata = {
   title: "Dashboard | AI Qualifier",

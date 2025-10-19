@@ -1,5 +1,7 @@
 import { describe, it, expect, vi } from 'vitest'
+
 import { render, screen, fireEvent, testA11y } from '@/test/utils'
+
 import { Button } from './button'
 
 describe('Button Accessibility', () => {

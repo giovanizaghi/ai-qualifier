@@ -1,6 +1,7 @@
 // Custom React hooks for the AI Qualifier application
 
 import { useState, useEffect, useCallback } from 'react';
+
 import type { User, Assessment, UserProgress } from '@/types';
 
 // Export analytics hook
@@ -54,7 +55,7 @@ export function useAssessmentTimer(initialTime: number = 0) {
     }
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (interval) {clearInterval(interval);}
     };
   }, [isActive, isPaused, timeRemaining]);
 

@@ -1,9 +1,10 @@
 "use client"
 
+import { TrendingUp, TrendingDown, BarChart3, Clock, Target, Award } from "lucide-react"
+
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { TrendingUp, TrendingDown, BarChart3, Clock, Target, Award } from "lucide-react"
 
 interface PerformanceData {
   overallScore: number
@@ -50,8 +51,8 @@ export function PerformanceAnalytics({ data, className }: PerformanceAnalyticsPr
   }
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600'
-    if (score >= 60) return 'text-yellow-600'
+    if (score >= 80) {return 'text-green-600'}
+    if (score >= 60) {return 'text-yellow-600'}
     return 'text-red-600'
   }
 

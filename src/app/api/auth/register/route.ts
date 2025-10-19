@@ -1,16 +1,18 @@
-import { NextRequest, NextResponse } from "next/server"
 import bcrypt from "bcryptjs"
-import { prisma } from "@/lib/prisma"
-import { 
-  validateRequestBody
-} from "@/lib/api/validation"
+import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+
+import { protectApiRoute, rateLimitConfigs, sanitizeInput } from "@/lib/api/middleware"
 import { 
   createdResponse,
   handleApiError,
   conflictResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs, sanitizeInput } from "@/lib/api/middleware"
-import { z } from "zod"
+import { 
+  validateRequestBody
+} from "@/lib/api/validation"
+import { prisma } from "@/lib/prisma"
+
 
 // Registration schema
 const registerSchema = z.object({

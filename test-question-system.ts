@@ -3,10 +3,10 @@
  * Validates all aspects of the question management implementation
  */
 
-import { questionBankService } from "./src/lib/question-bank"
 import { adaptiveQuestionSelector } from "./src/lib/adaptive-selection" 
-import { QuestionDifficultyValidator, QuestionContentValidator } from "./src/lib/question-validation"
 import { prisma } from "./src/lib/prisma"
+import { questionBankService } from "./src/lib/question-bank"
+import { QuestionDifficultyValidator, QuestionContentValidator } from "./src/lib/question-validation"
 import { DifficultyLevel, QuestionType } from "./src/types"
 
 async function runTests() {
@@ -167,9 +167,9 @@ async function testQuestionAnalytics() {
     
     console.log("✅ Question analytics retrieved:", {
       questionId: analytics.questionId,
-      successRate: analytics.statistics.successRate.toFixed(1) + "%",
+      successRate: `${analytics.statistics.successRate.toFixed(1)  }%`,
       usage: analytics.statistics.timesUsed,
-      difficultyAccuracy: analytics.statistics.difficultyAccuracy.toFixed(1) + "%",
+      difficultyAccuracy: `${analytics.statistics.difficultyAccuracy.toFixed(1)  }%`,
       discriminationIndex: analytics.statistics.discriminationIndex.toFixed(1),
       needsReview: analytics.recommendations.needsReview,
       shouldRetire: analytics.recommendations.retire
@@ -195,7 +195,7 @@ async function testAdaptiveSelection() {
     const adaptiveQuestions = await adaptiveQuestionSelector.selectAdaptiveQuestions({
       qualificationId: qualification.id,
       userId: user.id,
-      sessionId: "test-session-" + Date.now(),
+      sessionId: `test-session-${  Date.now()}`,
       totalQuestions: 8,
       learningMode: "practice",
       constraints: {
@@ -208,8 +208,8 @@ async function testAdaptiveSelection() {
       strategy: adaptiveQuestions.strategy.name,
       expectedDifficulty: adaptiveQuestions.strategy.expectedDifficulty,
       adaptationPoints: adaptiveQuestions.strategy.adaptationPoints.length,
-      estimatedSuccessRate: adaptiveQuestions.metadata.estimatedSuccessRate.toFixed(1) + "%",
-      estimatedTime: adaptiveQuestions.metadata.estimatedTimeMinutes + " minutes"
+      estimatedSuccessRate: `${adaptiveQuestions.metadata.estimatedSuccessRate.toFixed(1)  }%`,
+      estimatedTime: `${adaptiveQuestions.metadata.estimatedTimeMinutes  } minutes`
     })
     
     // Show difficulty progression

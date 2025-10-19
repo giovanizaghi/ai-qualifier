@@ -1,9 +1,10 @@
 "use client"
 
+import { Download, X } from 'lucide-react'
 import { useState, useEffect } from 'react'
+
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { Download, X } from 'lucide-react'
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>
@@ -64,7 +65,7 @@ export function PWAInstallPrompt() {
   }, [])
 
   const handleInstallClick = async () => {
-    if (!deferredPrompt) return
+    if (!deferredPrompt) {return}
 
     try {
       await deferredPrompt.prompt()

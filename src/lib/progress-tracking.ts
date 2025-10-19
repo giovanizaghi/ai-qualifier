@@ -219,11 +219,11 @@ export class ProgressTrackingService {
   ): Promise<LearningPath | null> {
     
     const currentPath = await this.getLearningPath(userId, qualificationId);
-    if (!currentPath) return null;
+    if (!currentPath) {return null;}
     
     const adaptations = this.calculateNecessaryAdaptations(currentPath, assessmentResult);
     
-    if (adaptations.length === 0) return currentPath;
+    if (adaptations.length === 0) {return currentPath;}
     
     const adaptedPath = this.applyAdaptations(currentPath, adaptations);
     await this.saveLearningPath(adaptedPath);
@@ -393,14 +393,14 @@ export class ProgressTrackingService {
   }
   
   private calculateAverageScore(assessmentHistory: AssessmentResult[]): number {
-    if (assessmentHistory.length === 0) return 0;
+    if (assessmentHistory.length === 0) {return 0;}
     
     const totalScore = assessmentHistory.reduce((sum, result) => sum + result.score, 0);
     return totalScore / assessmentHistory.length;
   }
   
   private calculateImprovementTrend(assessmentHistory: AssessmentResult[]): 'improving' | 'stable' | 'declining' {
-    if (assessmentHistory.length < 2) return 'stable';
+    if (assessmentHistory.length < 2) {return 'stable';}
     
     // Sort by date
     const sorted = assessmentHistory.sort((a, b) => 
@@ -410,15 +410,15 @@ export class ProgressTrackingService {
     const recentScores = sorted.slice(-3).map(r => r.score);
     const earlierScores = sorted.slice(-6, -3).map(r => r.score);
     
-    if (recentScores.length === 0 || earlierScores.length === 0) return 'stable';
+    if (recentScores.length === 0 || earlierScores.length === 0) {return 'stable';}
     
     const recentAvg = recentScores.reduce((sum, score) => sum + score, 0) / recentScores.length;
     const earlierAvg = earlierScores.reduce((sum, score) => sum + score, 0) / earlierScores.length;
     
     const improvement = recentAvg - earlierAvg;
     
-    if (improvement > 5) return 'improving';
-    if (improvement < -5) return 'declining';
+    if (improvement > 5) {return 'improving';}
+    if (improvement < -5) {return 'declining';}
     return 'stable';
   }
   
@@ -430,7 +430,7 @@ export class ProgressTrackingService {
       if (result.categoryScores && typeof result.categoryScores === 'object') {
         Object.entries(result.categoryScores).forEach(([category, score]) => {
           if (typeof score === 'number') {
-            if (!categoryAverages[category]) categoryAverages[category] = [];
+            if (!categoryAverages[category]) {categoryAverages[category] = [];}
             categoryAverages[category].push(score);
           }
         });
@@ -456,7 +456,7 @@ export class ProgressTrackingService {
       if (result.categoryScores && typeof result.categoryScores === 'object') {
         Object.entries(result.categoryScores).forEach(([category, score]) => {
           if (typeof score === 'number') {
-            if (!categoryAverages[category]) categoryAverages[category] = [];
+            if (!categoryAverages[category]) {categoryAverages[category] = [];}
             categoryAverages[category].push(score);
           }
         });
@@ -486,7 +486,7 @@ export class ProgressTrackingService {
     const completionRate = progress.completionPercentage / 100;
     const remainingProgress = 1 - completionRate;
     
-    if (remainingProgress <= 0) return 0;
+    if (remainingProgress <= 0) {return 0;}
     
     // Calculate average study time per percentage point
     const totalStudyTime = progress.studyTimeMinutes / 60; // Convert to hours

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useEffect, useRef } from "react"
+
 import { Button } from "@/components/ui/button"
 
 interface AccessibilityAnnouncerProps {
@@ -87,7 +88,7 @@ export function KeyboardNavigationHelp({ isVisible, onClose }: KeyboardNavigatio
     return () => document.removeEventListener('keydown', handleEscape)
   }, [isVisible, onClose])
 
-  if (!isVisible) return null
+  if (!isVisible) {return null}
 
   return (
     <div 

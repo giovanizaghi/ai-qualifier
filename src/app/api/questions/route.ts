@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { 
+  successResponseWithPagination,
+  createdResponse,
+  handleApiError,
+  calculatePagination
+} from "@/lib/api/responses"
 import { 
   questionCreateSchema, 
   questionQuerySchema,
@@ -7,13 +14,7 @@ import {
   validateRequestBody,
   validateQueryParams
 } from "@/lib/api/validation"
-import { 
-  successResponseWithPagination,
-  createdResponse,
-  handleApiError,
-  calculatePagination
-} from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { prisma } from "@/lib/prisma"
 
 // GET /api/questions - List questions with pagination and filtering
 export async function GET(req: NextRequest) {

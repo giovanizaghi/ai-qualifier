@@ -11,13 +11,13 @@ export { performancePredictionService } from './performance-prediction';
 export * from './types';
 
 // Main AI Service Class that orchestrates all capabilities
-import { aiContentGenerator } from './content-generator';
-import { personalizedLearningService } from './personalized-learning';
 import { adaptiveQuestioningService } from './adaptive-questioning';
-import { intelligentTutoringService } from './intelligent-tutoring';
+import { aiContentGenerator } from './content-generator';
 import { contentRecommendationService } from './content-recommendation';
-import { performancePredictionService } from './performance-prediction';
+import { intelligentTutoringService } from './intelligent-tutoring';
 import { openAIClient } from './openai-client';
+import { performancePredictionService } from './performance-prediction';
+import { personalizedLearningService } from './personalized-learning';
 
 export class AIQualifierService {
   // Content Generation

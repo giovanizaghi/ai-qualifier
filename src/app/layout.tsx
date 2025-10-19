@@ -1,8 +1,9 @@
 import "./globals.css"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
-import { SonnerProvider } from "@/components/ui/sonner-provider"
+
 import { SessionProvider } from "@/components/providers/session-provider"
+import { SonnerProvider } from "@/components/ui/sonner-provider"
 
 const inter = Inter({ 
   subsets: ["latin"],

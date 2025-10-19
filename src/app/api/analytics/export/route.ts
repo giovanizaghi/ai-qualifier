@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
+
 import { 
   successResponse,
   handleApiError,
   badRequestResponse
 } from "@/lib/api/responses"
 import { auth } from "@/lib/auth"
-import { UserAnalyticsService } from "@/lib/user-analytics"
 import { DashboardService } from "@/lib/dashboard-service"
+import { UserAnalyticsService } from "@/lib/user-analytics"
 
 interface ExportRequest {
   type: 'progress-report' | 'performance-dashboard' | 'admin-analytics' | 'user-data'
@@ -103,7 +104,7 @@ async function generateProgressReportData(userId: string, timeframe: string, inc
   if (!includePersonalData) {
     delete report.user.email
     delete report.user.name
-    report.user.id = 'USER_' + report.user.id.slice(-8)
+    report.user.id = `USER_${  report.user.id.slice(-8)}`
   }
 
   return {
@@ -122,7 +123,7 @@ async function generatePerformanceDashboardData(userId: string, timeframe: strin
   return {
     generatedAt: new Date().toISOString(),
     timeframe,
-    userId: 'USER_' + userId.slice(-8), // Anonymized
+    userId: `USER_${  userId.slice(-8)}`, // Anonymized
     dashboard: dashboardData,
     categoryPerformance,
     qualificationProgress
@@ -160,7 +161,7 @@ async function generateUserData(userId: string, includePersonalData: boolean) {
 
   const userData = {
     generatedAt: new Date().toISOString(),
-    userId: includePersonalData ? userId : 'USER_' + userId.slice(-8),
+    userId: includePersonalData ? userId : `USER_${  userId.slice(-8)}`,
     learningPatterns: patterns,
     performanceInsights: insights,
     dashboardStats

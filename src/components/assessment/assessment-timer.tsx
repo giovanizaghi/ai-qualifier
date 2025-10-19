@@ -1,9 +1,10 @@
 "use client"
 
-import React, { useState, useEffect, useCallback } from "react"
 import { Clock, AlertTriangle, Play, Pause } from "lucide-react"
-import { Button } from "@/components/ui/button"
+import React, { useState, useEffect, useCallback } from "react"
+
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
 
 interface AssessmentTimerProps {
   totalTimeMinutes: number
@@ -197,7 +198,7 @@ export function TimeWarning({
   onDismiss?: () => void
   className?: string 
 }) {
-  if (remainingMinutes > 10) return null
+  if (remainingMinutes > 10) {return null}
 
   const isCritical = remainingMinutes <= 5
   

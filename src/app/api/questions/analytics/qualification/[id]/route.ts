@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { questionBankService } from "@/lib/question-bank"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponse,
   handleApiError,
   badRequestResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { prisma } from "@/lib/prisma"
+import { questionBankService } from "@/lib/question-bank"
 import { DifficultyLevel, QuestionType } from "@/types"
 
 interface QualificationAnalytics {
@@ -309,7 +310,7 @@ async function generateRecommendations(questions: any[], qualificationId: string
 
   // Analyze each question for issues
   for (const question of questions) {
-    if (question.timesUsed < 5) continue // Need sufficient data
+    if (question.timesUsed < 5) {continue} // Need sufficient data
 
     const analytics = await questionBankService.getQuestionAnalytics(question.id)
     

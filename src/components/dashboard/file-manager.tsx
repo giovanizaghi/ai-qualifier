@@ -1,14 +1,16 @@
 'use client'
 
-import { useState, useEffect } from 'react'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Progress } from '@/components/ui/progress'
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Upload, Download, Trash2, File, Image, FileText, Archive } from 'lucide-react'
+import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
+
 
 interface FileItem {
   key: string
@@ -58,7 +60,7 @@ export function FileManager() {
   }, [])
 
   const handleFileUpload = async (selectedFiles: FileList) => {
-    if (!selectedFiles || selectedFiles.length === 0) return
+    if (!selectedFiles || selectedFiles.length === 0) {return}
 
     setUploading(true)
     const filesToUpload = Array.from(selectedFiles)
@@ -174,7 +176,7 @@ export function FileManager() {
   }
 
   const handleFileDelete = async (fileKeys: string[]) => {
-    if (fileKeys.length === 0) return
+    if (fileKeys.length === 0) {return}
 
     try {
       setLoading(true)
@@ -208,24 +210,24 @@ export function FileManager() {
   }
 
   const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes'
+    if (bytes === 0) {return '0 Bytes'}
     const k = 1024
     const sizes = ['Bytes', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))  } ${  sizes[i]}`
   }
 
   const getFileIcon = (type: string) => {
-    if (type.startsWith('image/')) return <Image className="h-4 w-4" />
-    if (type === 'application/pdf') return <FileText className="h-4 w-4" />
-    if (type.includes('zip') || type.includes('rar')) return <Archive className="h-4 w-4" />
+    if (type.startsWith('image/')) {return <Image className="h-4 w-4" />}
+    if (type === 'application/pdf') {return <FileText className="h-4 w-4" />}
+    if (type.includes('zip') || type.includes('rar')) {return <Archive className="h-4 w-4" />}
     return <File className="h-4 w-4" />
   }
 
   const getFileTypeColor = (type: string): string => {
-    if (type.startsWith('image/')) return 'bg-green-100 text-green-800'
-    if (type === 'application/pdf') return 'bg-red-100 text-red-800'
-    if (type.includes('zip') || type.includes('rar')) return 'bg-purple-100 text-purple-800'
+    if (type.startsWith('image/')) {return 'bg-green-100 text-green-800'}
+    if (type === 'application/pdf') {return 'bg-red-100 text-red-800'}
+    if (type.includes('zip') || type.includes('rar')) {return 'bg-purple-100 text-purple-800'}
     return 'bg-gray-100 text-gray-800'
   }
 

@@ -170,26 +170,26 @@ class PerformanceMonitor {
 
     // LCP scoring (0-2.5s = good, 2.5-4s = needs improvement, >4s = poor)
     if (metrics.LCP) {
-      if (metrics.LCP > 4000) score -= 30;
-      else if (metrics.LCP > 2500) score -= 15;
+      if (metrics.LCP > 4000) {score -= 30;}
+      else if (metrics.LCP > 2500) {score -= 15;}
     }
 
     // FID scoring (0-100ms = good, 100-300ms = needs improvement, >300ms = poor)
     if (metrics.FID) {
-      if (metrics.FID > 300) score -= 25;
-      else if (metrics.FID > 100) score -= 10;
+      if (metrics.FID > 300) {score -= 25;}
+      else if (metrics.FID > 100) {score -= 10;}
     }
 
     // CLS scoring (0-0.1 = good, 0.1-0.25 = needs improvement, >0.25 = poor)
     if (metrics.CLS) {
-      if (metrics.CLS > 0.25) score -= 25;
-      else if (metrics.CLS > 0.1) score -= 10;
+      if (metrics.CLS > 0.25) {score -= 25;}
+      else if (metrics.CLS > 0.1) {score -= 10;}
     }
 
     // FCP scoring (0-1.8s = good, 1.8-3s = needs improvement, >3s = poor)
     if (metrics.FCP) {
-      if (metrics.FCP > 3000) score -= 20;
-      else if (metrics.FCP > 1800) score -= 10;
+      if (metrics.FCP > 3000) {score -= 20;}
+      else if (metrics.FCP > 1800) {score -= 10;}
     }
 
     return Math.max(0, score);
@@ -335,14 +335,14 @@ export function usePerformanceMonitor() {
 
 // Utility functions
 export function formatMetric(value: number | undefined, unit: string = 'ms'): string {
-  if (value === undefined) return 'N/A';
+  if (value === undefined) {return 'N/A';}
   return `${value.toFixed(2)}${unit}`;
 }
 
 export function getPerformanceGrade(score: number): { grade: string; color: string } {
-  if (score >= 90) return { grade: 'A', color: 'green' };
-  if (score >= 75) return { grade: 'B', color: 'yellow' };
-  if (score >= 60) return { grade: 'C', color: 'orange' };
+  if (score >= 90) {return { grade: 'A', color: 'green' };}
+  if (score >= 75) {return { grade: 'B', color: 'yellow' };}
+  if (score >= 60) {return { grade: 'C', color: 'orange' };}
   return { grade: 'D', color: 'red' };
 }
 

@@ -1,10 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Brain, Award, Users, TrendingUp, CheckCircle, Star } from "lucide-react";
 import Link from "next/link";
-import { auth } from "@/lib/auth";
+
 import { PWAInstallPrompt } from "@/components/pwa/install-prompt";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { auth } from "@/lib/auth";
 
 export default async function Home() {
   const session = await auth();

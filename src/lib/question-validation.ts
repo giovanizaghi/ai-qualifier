@@ -4,6 +4,7 @@
  */
 
 import { z } from "zod"
+
 import { QuestionType, DifficultyLevel } from "@/types"
 
 // Base validation schemas for question options based on type
@@ -257,8 +258,8 @@ export class QuestionDifficultyValidator {
     let score = 0
 
     // Length factor
-    if (content.length > 500) score += 20
-    else if (content.length > 200) score += 10
+    if (content.length > 500) {score += 20}
+    else if (content.length > 200) {score += 10}
 
     // Technical terms (basic heuristic)
     const technicalTerms = [
@@ -281,9 +282,9 @@ export class QuestionDifficultyValidator {
     }
 
     // Question complexity indicators
-    if (content.includes('explain') || content.includes('analyze')) score += 10
-    if (content.includes('compare') || content.includes('evaluate')) score += 15
-    if (content.includes('design') || content.includes('implement')) score += 20
+    if (content.includes('explain') || content.includes('analyze')) {score += 10}
+    if (content.includes('compare') || content.includes('evaluate')) {score += 15}
+    if (content.includes('design') || content.includes('implement')) {score += 20}
 
     return Math.min(score, 100)
   }
@@ -309,8 +310,8 @@ export class QuestionDifficultyValidator {
 
     if (type === QuestionType.CODING_CHALLENGE) {
       const testCaseCount = options?.testCases?.length || 0
-      if (testCaseCount > 5) baseComplexity += 10
-      if (options?.timeLimit < 300) baseComplexity += 10 // Short time limit increases difficulty
+      if (testCaseCount > 5) {baseComplexity += 10}
+      if (options?.timeLimit < 300) {baseComplexity += 10} // Short time limit increases difficulty
     }
 
     return Math.min(baseComplexity, 100)
@@ -342,9 +343,9 @@ export class QuestionDifficultyValidator {
   }
 
   private static complexityToDifficulty(complexity: number): DifficultyLevel {
-    if (complexity < 25) return DifficultyLevel.BEGINNER
-    if (complexity < 50) return DifficultyLevel.INTERMEDIATE
-    if (complexity < 75) return DifficultyLevel.ADVANCED
+    if (complexity < 25) {return DifficultyLevel.BEGINNER}
+    if (complexity < 50) {return DifficultyLevel.INTERMEDIATE}
+    if (complexity < 75) {return DifficultyLevel.ADVANCED}
     return DifficultyLevel.EXPERT
   }
 
@@ -513,7 +514,7 @@ export class QuestionContentValidator {
     const longer = str1.length > str2.length ? str1 : str2
     const shorter = str1.length > str2.length ? str2 : str1
     
-    if (longer.length === 0) return 1.0
+    if (longer.length === 0) {return 1.0}
     
     const editDistance = this.levenshteinDistance(longer, shorter)
     return (longer.length - editDistance) / longer.length

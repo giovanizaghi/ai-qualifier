@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { 
-  assessmentCreateSchema, 
-  assessmentQuerySchema,
-  validatePaginationParams,
-  validateRequestBody,
-  validateQueryParams
-} from "@/lib/api/validation"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponseWithPagination,
   createdResponse,
@@ -14,7 +8,14 @@ import {
   calculatePagination,
   badRequestResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { 
+  assessmentCreateSchema, 
+  assessmentQuerySchema,
+  validatePaginationParams,
+  validateRequestBody,
+  validateQueryParams
+} from "@/lib/api/validation"
+import { prisma } from "@/lib/prisma"
 
 // GET /api/assessments - List assessments with pagination and filtering
 export async function GET(req: NextRequest) {

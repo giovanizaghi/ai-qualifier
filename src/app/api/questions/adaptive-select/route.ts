@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+
 import { adaptiveQuestionSelector } from "@/lib/adaptive-selection"
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponse,
   handleApiError,
   badRequestResponse
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
-import { z } from "zod"
 import { DifficultyLevel, QuestionType } from "@/types"
 
 // Schema for adaptive question selection request

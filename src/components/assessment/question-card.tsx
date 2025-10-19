@@ -1,12 +1,13 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Question, QuestionType, DifficultyLevel } from "@/types"
 import { Clock, Flag, Star } from "lucide-react"
+import React, { useState, useEffect } from "react"
+
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Question, QuestionType, DifficultyLevel } from "@/types"
 
 interface QuestionCardProps {
   question: Question

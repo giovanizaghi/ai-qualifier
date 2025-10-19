@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server"
-import { questionBankService } from "@/lib/question-bank"
+
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 import { 
   successResponse,
   handleApiError
 } from "@/lib/api/responses"
-import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
+import { questionBankService } from "@/lib/question-bank"
 
 // GET /api/questions/categories/[qualificationId] - Get question categories for a qualification
 export async function GET(req: NextRequest, { params }: { params: Promise<{ qualificationId: string }> }) {

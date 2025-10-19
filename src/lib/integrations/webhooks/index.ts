@@ -1,5 +1,5 @@
-import { registerStripeWebhooks } from './stripe'
 import { registerGitHubWebhooks } from './github'
+import { registerStripeWebhooks } from './stripe'
 
 // Initialize all webhook handlers
 export function initializeWebhooks(): void {

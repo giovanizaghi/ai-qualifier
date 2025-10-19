@@ -1,13 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { BookmarkCheck, Calendar, Clock, Users } from 'lucide-react';
-import { Card } from '@/components/ui/card';
+import { useState, useEffect } from 'react';
+
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { BookmarkButton } from './bookmark-button';
-import { Qualification } from '@/types';
+import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { Qualification } from '@/types';
+
+import { BookmarkButton } from './bookmark-button';
 
 interface BookmarkWithQualification {
   id: string;

@@ -1,14 +1,15 @@
 import { NextRequest, NextResponse } from "next/server"
-import { UserAnalyticsService } from "@/lib/user-analytics"
-import { progressTrackingService } from "@/lib/progress-tracking"
-import { DashboardService } from "@/lib/dashboard-service"
+
 import { 
   successResponse,
   handleApiError,
   badRequestResponse
 } from "@/lib/api/responses"
 import { auth } from "@/lib/auth"
+import { DashboardService } from "@/lib/dashboard-service"
 import { prisma } from "@/lib/prisma"
+import { progressTrackingService } from "@/lib/progress-tracking"
+import { UserAnalyticsService } from "@/lib/user-analytics"
 
 interface DetailedProgressReport {
   user: {
@@ -118,7 +119,7 @@ export async function GET(req: NextRequest) {
     const targetUserId = searchParams.get('userId') // For admin access
 
     // Check if requesting data for another user (admin only)
-    let userId = session.user.id
+    const userId = session.user.id
     if (targetUserId && targetUserId !== session.user.id) {
       // TODO: Check if user has admin role
       // For now, only allow self-access
@@ -340,13 +341,13 @@ async function generateQualificationAnalytics(userId: string, qualificationId: s
 
 function calculateLearningVelocity(progress: any): number {
   // Calculate learning velocity based on progress rate
-  if (progress.timeSpent === 0) return 0
+  if (progress.timeSpent === 0) {return 0}
   return (progress.overallProgress / progress.timeSpent) * 60 // Progress per hour
 }
 
 function calculateConsistencyScore(data: any): number {
   // Calculate consistency score based on session duration variance
-  if (!data.average || !data.median) return 0
+  if (!data.average || !data.median) {return 0}
   const variance = Math.abs(data.average - data.median) / data.average
   return Math.max(0, 1 - variance) // Higher score = more consistent
 }

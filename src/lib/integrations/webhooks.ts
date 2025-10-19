@@ -1,5 +1,6 @@
-import { headers } from 'next/headers'
 import crypto from 'crypto'
+
+import { headers } from 'next/headers'
 
 // Webhook event types
 export interface WebhookEvent {
@@ -179,7 +180,7 @@ export async function processWebhook(
       event = {
         id: data.id || crypto.randomUUID(),
         type: data.type || 'unknown',
-        data: data,
+        data,
         timestamp: new Date().toISOString(),
         source,
         signature: headers['signature'] || headers['x-signature'] || headers['x-hub-signature-256'],

@@ -204,10 +204,10 @@ export class QualificationLevelsService {
   }
   
   private calculateConsistencyScore(categoryScores?: any): number {
-    if (!categoryScores || typeof categoryScores !== 'object') return 0.5;
+    if (!categoryScores || typeof categoryScores !== 'object') {return 0.5;}
     
     const scores = Object.values(categoryScores).filter(score => typeof score === 'number') as number[];
-    if (scores.length === 0) return 0.5;
+    if (scores.length === 0) {return 0.5;}
     
     const mean = scores.reduce((sum, score) => sum + score, 0) / scores.length;
     const variance = scores.reduce((sum, score) => sum + Math.pow(score - mean, 2), 0) / scores.length;
@@ -220,7 +220,7 @@ export class QualificationLevelsService {
   
   private calculateCategoryStrength(category: QualificationCategory, criteria: CriteriaEvaluation[]): number {
     // For now, simple average of criteria scores
-    if (criteria.length === 0) return 0.5;
+    if (criteria.length === 0) {return 0.5;}
     
     const averageScore = criteria.reduce((sum, c) => sum + c.score, 0) / criteria.length;
     return averageScore / 100; // Convert to 0-1 scale
@@ -478,7 +478,7 @@ export class QualificationLevelsService {
     currentScore: number
   ): number {
     
-    if (!nextLevel) return 0;
+    if (!nextLevel) {return 0;}
     
     const levelGap = this.getLevelGap(currentLevel, nextLevel);
     const baseTime = 20 * levelGap; // 20 hours per level gap
