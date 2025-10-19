@@ -135,6 +135,17 @@ export const assessmentResultCreateSchema = z.object({
   }))
 })
 
+export const assessmentResultQuerySchema = z.object({
+  page: z.string().transform(val => parseInt(val) || 1).pipe(z.number().min(1)),
+  limit: z.string().transform(val => parseInt(val) || 10).pipe(z.number().min(1).max(100)),
+  userId: z.string().optional(),
+  assessmentId: z.string().optional(),
+  status: z.enum(["NOT_STARTED", "IN_PROGRESS", "COMPLETED", "ABANDONED", "EXPIRED"]).optional(),
+  passed: z.string().transform(val => val === "true").optional(),
+  sortBy: z.enum(["score", "completedAt", "createdAt"]).default("createdAt"),
+  sortOrder: z.enum(["asc", "desc"]).default("desc")
+})
+
 // Utility functions for validation
 export function validatePaginationParams(searchParams: URLSearchParams) {
   const params = Object.fromEntries(searchParams)

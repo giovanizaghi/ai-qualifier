@@ -1,46 +1,36 @@
 import { NextRequest, NextResponse } from "next/server"
-import { z } from "zod"
 import { prisma } from "@/lib/prisma"
-import { auth } from "@/lib/auth"
-
-// Validation schemas
-const assessmentCreateSchema = z.object({
-  qualificationId: z.string().min(1, "Qualification ID is required"),
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  questionCount: z.number().min(1).default(50),
-  timeLimit: z.number().min(1).optional(),
-  randomizeQuestions: z.boolean().default(true),
-  randomizeAnswers: z.boolean().default(true),
-  showResults: z.boolean().default(true),
-  questionCategories: z.any().optional(),
-  difficultyMix: z.any().optional(),
-  isActive: z.boolean().default(true)
-})
-
-const assessmentQuerySchema = z.object({
-  page: z.string().transform(val => parseInt(val) || 1).pipe(z.number().min(1)),
-  limit: z.string().transform(val => parseInt(val) || 10).pipe(z.number().min(1).max(100)),
-  qualificationId: z.string().optional(),
-  isActive: z.string().transform(val => val === "true").optional(),
-  sortBy: z.enum(["title", "createdAt", "updatedAt"]).default("createdAt"),
-  sortOrder: z.enum(["asc", "desc"]).default("desc")
-})
+import { 
+  assessmentCreateSchema, 
+  assessmentQuerySchema,
+  validatePaginationParams,
+  validateRequestBody,
+  validateQueryParams
+} from "@/lib/api/validation"
+import { 
+  successResponseWithPagination,
+  createdResponse,
+  handleApiError,
+  calculatePagination,
+  badRequestResponse
+} from "@/lib/api/responses"
+import { protectApiRoute, rateLimitConfigs } from "@/lib/api/middleware"
 
 // GET /api/assessments - List assessments with pagination and filtering
 export async function GET(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url)
-    const params = Object.fromEntries(searchParams)
+    // Apply rate limiting
+    const protection = await protectApiRoute(req, {
+      rateLimit: rateLimitConfigs.api
+    })
     
-    // Set defaults for missing parameters
-    const queryParams = {
-      page: params.page || "1",
-      limit: params.limit || "10",
-      ...params
+    if (!protection.success) {
+      return protection.error
     }
-    
-    const query = assessmentQuerySchema.parse(queryParams)
+
+    const { searchParams } = new URL(req.url)
+    const params = validatePaginationParams(searchParams)
+    const query = validateQueryParams(assessmentQuerySchema, params)
 
     // Build where clause for filtering
     const where: any = {}
@@ -97,64 +87,31 @@ export async function GET(req: NextRequest) {
       prisma.assessment.count({ where })
     ])
 
-    const totalPages = Math.ceil(total / query.limit)
-    const hasNextPage = query.page < totalPages
-    const hasPrevPage = query.page > 1
+    const pagination = calculatePagination(query.page, query.limit, total)
 
-    return NextResponse.json({
-      success: true,
-      data: assessments,
-      pagination: {
-        page: query.page,
-        limit: query.limit,
-        total,
-        totalPages,
-        hasNextPage,
-        hasPrevPage
-      }
-    })
+    return successResponseWithPagination(assessments, pagination)
 
   } catch (error) {
-    console.error("Error fetching assessments:", error)
-    
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { 
-          success: false,
-          error: "Invalid query parameters", 
-          details: error.issues 
-        },
-        { status: 400 }
-      )
-    }
-
-    return NextResponse.json(
-      { 
-        success: false,
-        error: "Internal server error" 
-      },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 }
 
 // POST /api/assessments - Create new assessment
 export async function POST(req: NextRequest) {
   try {
-    const session = await auth()
+    // Apply authentication and rate limiting
+    const protection = await protectApiRoute(req, {
+      requireAuth: true,
+      requireRoles: ["ADMIN", "INSTRUCTOR"],
+      rateLimit: rateLimitConfigs.default
+    })
     
-    if (!session?.user) {
-      return NextResponse.json(
-        { 
-          success: false,
-          error: "Authentication required" 
-        },
-        { status: 401 }
-      )
+    if (!protection.success) {
+      return protection.error
     }
 
     const body = await req.json()
-    const validatedData = assessmentCreateSchema.parse(body)
+    const validatedData = validateRequestBody(assessmentCreateSchema, body)
 
     // Check if qualification exists
     const qualification = await prisma.qualification.findUnique({
@@ -162,13 +119,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (!qualification) {
-      return NextResponse.json(
-        { 
-          success: false,
-          error: "Qualification not found" 
-        },
-        { status: 400 }
-      )
+      return badRequestResponse("Qualification not found")
     }
 
     // Create assessment
@@ -199,35 +150,9 @@ export async function POST(req: NextRequest) {
       }
     })
 
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Assessment created successfully",
-        data: assessment
-      },
-      { status: 201 }
-    )
+    return createdResponse(assessment, "Assessment created successfully")
 
   } catch (error) {
-    console.error("Error creating assessment:", error)
-    
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { 
-          success: false,
-          error: "Validation failed", 
-          details: error.issues 
-        },
-        { status: 400 }
-      )
-    }
-
-    return NextResponse.json(
-      { 
-        success: false,
-        error: "Internal server error" 
-      },
-      { status: 500 }
-    )
+    return handleApiError(error)
   }
 }

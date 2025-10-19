@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
 import { 
-  assessmentUpdateSchema,
+  questionUpdateSchema,
   validateRequestBody
 } from "@/lib/api/validation"
 import { 
@@ -18,7 +18,7 @@ interface RouteParams {
   }>
 }
 
-// GET /api/assessments/[id] - Get single assessment
+// GET /api/questions/[id] - Get single question
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     // Apply rate limiting
@@ -32,20 +32,25 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
 
     const { id } = await params
 
-    const assessment = await prisma.assessment.findUnique({
+    const question = await prisma.question.findUnique({
       where: { id },
       select: {
         id: true,
         qualificationId: true,
         title: true,
-        description: true,
-        questionCount: true,
-        timeLimit: true,
-        randomizeQuestions: true,
-        randomizeAnswers: true,
-        showResults: true,
-        questionCategories: true,
-        difficultyMix: true,
+        content: true,
+        explanation: true,
+        type: true,
+        category: true,
+        difficulty: true,
+        tags: true,
+        options: true,
+        correctAnswers: true,
+        points: true,
+        timeEstimate: true,
+        timesUsed: true,
+        timesCorrect: true,
+        averageTime: true,
         isActive: true,
         createdAt: true,
         updatedAt: true,
@@ -55,32 +60,24 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
             title: true,
             slug: true,
             category: true,
-            difficulty: true,
-            passingScore: true,
-            estimatedDuration: true,
-            learningObjectives: true
-          }
-        },
-        _count: {
-          select: {
-            results: true
+            difficulty: true
           }
         }
       }
     })
 
-    if (!assessment) {
-      return notFoundResponse("Assessment")
+    if (!question) {
+      return notFoundResponse("Question")
     }
 
-    return successResponse(assessment)
+    return successResponse(question)
 
   } catch (error) {
     return handleApiError(error)
   }
 }
 
-// PUT /api/assessments/[id] - Update assessment
+// PUT /api/questions/[id] - Update question
 export async function PUT(req: NextRequest, { params }: RouteParams) {
   try {
     // Apply authentication and rate limiting
@@ -96,33 +93,38 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
 
     const { id } = await params
     const body = await req.json()
-    const validatedData = validateRequestBody(assessmentUpdateSchema, body)
+    const validatedData = validateRequestBody(questionUpdateSchema, body)
 
-    // Check if assessment exists
-    const existingAssessment = await prisma.assessment.findUnique({
+    // Check if question exists
+    const existingQuestion = await prisma.question.findUnique({
       where: { id }
     })
 
-    if (!existingAssessment) {
-      return notFoundResponse("Assessment")
+    if (!existingQuestion) {
+      return notFoundResponse("Question")
     }
 
-    // Update assessment
-    const assessment = await prisma.assessment.update({
+    // Update question
+    const question = await prisma.question.update({
       where: { id },
       data: validatedData,
       select: {
         id: true,
         qualificationId: true,
         title: true,
-        description: true,
-        questionCount: true,
-        timeLimit: true,
-        randomizeQuestions: true,
-        randomizeAnswers: true,
-        showResults: true,
-        questionCategories: true,
-        difficultyMix: true,
+        content: true,
+        explanation: true,
+        type: true,
+        category: true,
+        difficulty: true,
+        tags: true,
+        options: true,
+        correctAnswers: true,
+        points: true,
+        timeEstimate: true,
+        timesUsed: true,
+        timesCorrect: true,
+        averageTime: true,
         isActive: true,
         createdAt: true,
         updatedAt: true,
@@ -136,14 +138,14 @@ export async function PUT(req: NextRequest, { params }: RouteParams) {
       }
     })
 
-    return successResponse(assessment, "Assessment updated successfully")
+    return successResponse(question, "Question updated successfully")
 
   } catch (error) {
     return handleApiError(error)
   }
 }
 
-// DELETE /api/assessments/[id] - Delete assessment
+// DELETE /api/questions/[id] - Delete question
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
     // Apply authentication and rate limiting
@@ -159,35 +161,35 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
 
     const { id } = await params
 
-    // Check if assessment exists and has results
-    const assessment = await prisma.assessment.findUnique({
+    // Check if question exists and has dependencies
+    const question = await prisma.question.findUnique({
       where: { id },
       include: {
         _count: {
           select: {
-            results: true
+            questionResults: true
           }
         }
       }
     })
 
-    if (!assessment) {
-      return notFoundResponse("Assessment")
+    if (!question) {
+      return notFoundResponse("Question")
     }
 
-    // Check if assessment has results
-    if (assessment._count.results > 0) {
+    // Check if question has been used in assessments
+    if (question._count.questionResults > 0) {
       return badRequestResponse(
-        "Cannot delete assessment with existing results. Please remove assessment results first."
+        "Cannot delete question that has been used in assessments. Please deactivate instead."
       )
     }
 
-    // Delete assessment
-    await prisma.assessment.delete({
+    // Delete question
+    await prisma.question.delete({
       where: { id }
     })
 
-    return successResponse(null, "Assessment deleted successfully")
+    return successResponse(null, "Question deleted successfully")
 
   } catch (error) {
     return handleApiError(error)
