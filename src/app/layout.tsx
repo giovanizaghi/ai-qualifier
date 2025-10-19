@@ -1,5 +1,5 @@
 import "./globals.css"
-import type { Metadata } from "next"
+import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 
 import { SessionProvider } from "@/components/providers/session-provider"
@@ -10,6 +10,12 @@ const inter = Inter({
   display: 'swap',
   preload: true,
 })
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+}
 
 export const metadata: Metadata = {
   title: "AI Qualifier",
@@ -43,11 +49,6 @@ export const metadata: Metadata = {
     title: 'AI Qualifier - Master AI Skills',
     description: 'Elevate your AI expertise through personalized qualifications and adaptive testing.',
     creator: '@aiqualifier', // Update with your Twitter handle
-  },
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 5,
   },
 }
 
