@@ -43,6 +43,7 @@ model User {
   bookmarks         Bookmark[]
   achievements      Achievement[]
   feedback          Feedback[]
+  analyticsEvents   UserAnalytics[]
   
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -365,6 +366,78 @@ model Feedback {
   updatedAt       DateTime  @updatedAt
   
   @@map("feedback")
+}
+
+// Analytics and Reporting
+model UserAnalytics {
+  id              String    @id @default(cuid())
+  userId          String
+  sessionId       String
+  
+  // Event data
+  eventType       String    // AnalyticsEventType
+  timestamp       DateTime  @default(now())
+  data            Json      // Event-specific data
+  
+  // Request metadata
+  source          String    @default("web") // 'web' | 'mobile' | 'api'
+  userAgent       String?
+  ipAddress       String?
+  
+  // Page/location context
+  page            String?
+  referrer        String?
+  
+  // Relations
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([userId, timestamp])
+  @@index([eventType, timestamp])
+  @@index([sessionId])
+  @@map("user_analytics")
+}
+
+model SystemMetrics {
+  id              String    @id @default(cuid())
+  metricType      String    // Type of metric being tracked
+  timestamp       DateTime  @default(now())
+  value           Float     // Numeric value of the metric
+  metadata        Json?     // Additional metric data
+  
+  // Aggregation level
+  aggregationLevel String   // 'hourly', 'daily', 'weekly', 'monthly'
+  timeframe       DateTime  // The time period this metric represents
+  
+  createdAt       DateTime  @default(now())
+  
+  @@index([metricType, timeframe])
+  @@index([aggregationLevel, timeframe])
+  @@map("system_metrics")
+}
+
+model UserBehaviorPattern {
+  id              String    @id @default(cuid())
+  userId          String
+  patternType     String    // Type of behavior pattern
+  
+  // Pattern data
+  data            Json      // Detailed pattern information
+  confidence      Float     // Confidence level in pattern (0-1)
+  frequency       Int       // How often this pattern occurs
+  
+  // Timeframe
+  detectedAt      DateTime  @default(now())
+  lastSeenAt      DateTime  @default(now())
+  
+  // Analysis metadata
+  analysisVersion String    @default("1.0")
+  isActive        Boolean   @default(true)
+  
+  @@index([userId, patternType])
+  @@index([detectedAt])
+  @@map("user_behavior_patterns")
 }
 
 // Enums

@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import type { User, Assessment, UserProgress } from '@/types';
 
+// Export analytics hook
+export { useAnalytics } from './use-analytics';
+
 // Hook for managing local storage
 export function useLocalStorage<T>(key: string, initialValue: T) {
   const [storedValue, setStoredValue] = useState<T>(() => {
