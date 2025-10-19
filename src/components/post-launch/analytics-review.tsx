@@ -157,7 +157,7 @@ export function PostLaunchAnalytics({ className }: PostLaunchAnalyticsProps) {
         })
       })
 
-      if (!response.ok) throw new Error('Export failed')
+      if (!response.ok) {throw new Error('Export failed')}
 
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
@@ -213,7 +213,7 @@ export function PostLaunchAnalytics({ className }: PostLaunchAnalyticsProps) {
     )
   }
 
-  if (!data) return null
+  if (!data) {return null}
 
   return (
     <div className={className}>

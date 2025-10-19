@@ -22,8 +22,8 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 interface SystemMetrics {
   uptime: number
@@ -118,19 +118,19 @@ export function PostLaunchMonitoring({ className }: PostLaunchMonitoringProps) {
     }
 
     return () => {
-      if (interval) clearInterval(interval)
+      if (interval) {clearInterval(interval)}
     }
   }, [timeRange, autoRefresh])
 
   const getHealthColor = (value: number, thresholds: { good: number; warning: number }) => {
-    if (value <= thresholds.good) return 'text-green-600'
-    if (value <= thresholds.warning) return 'text-yellow-600'
+    if (value <= thresholds.good) {return 'text-green-600'}
+    if (value <= thresholds.warning) {return 'text-yellow-600'}
     return 'text-red-600'
   }
 
   const getHealthStatus = (value: number, thresholds: { good: number; warning: number }) => {
-    if (value <= thresholds.good) return 'healthy'
-    if (value <= thresholds.warning) return 'warning'
+    if (value <= thresholds.good) {return 'healthy'}
+    if (value <= thresholds.warning) {return 'warning'}
     return 'critical'
   }
 
@@ -181,7 +181,7 @@ export function PostLaunchMonitoring({ className }: PostLaunchMonitoringProps) {
     )
   }
 
-  if (!data) return null
+  if (!data) {return null}
 
   const criticalAlerts = data.alerts.filter(alert => alert.type === 'critical' && !alert.resolved)
   const warningAlerts = data.alerts.filter(alert => alert.type === 'warning' && !alert.resolved)

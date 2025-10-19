@@ -231,7 +231,7 @@ export function FutureIterations({ className }: FutureIterationsProps) {
     )
   }
 
-  if (!data) return null
+  if (!data) {return null}
 
   return (
     <div className={className}>

@@ -23,9 +23,9 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
 
 interface Issue {
   id: string
@@ -84,13 +84,13 @@ export function IssueTracking({ className }: IssueTrackingProps) {
   const fetchIssues = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/issues?' + new URLSearchParams({
+      const response = await fetch(`/api/issues?${  new URLSearchParams({
         search: searchTerm,
         status: statusFilter,
         severity: severityFilter,
         type: typeFilter,
         limit: '50'
-      }))
+      })}`)
       
       if (!response.ok) {
         throw new Error(`Failed to fetch issues: ${response.statusText}`)
@@ -147,10 +147,10 @@ export function IssueTracking({ className }: IssueTrackingProps) {
     const now = new Date()
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))
     
-    if (diffInMinutes < 60) return `${diffInMinutes}m ago`
+    if (diffInMinutes < 60) {return `${diffInMinutes}m ago`}
     
     const diffInHours = Math.floor(diffInMinutes / 60)
-    if (diffInHours < 24) return `${diffInHours}h ago`
+    if (diffInHours < 24) {return `${diffInHours}h ago`}
     
     const diffInDays = Math.floor(diffInHours / 24)
     return `${diffInDays}d ago`

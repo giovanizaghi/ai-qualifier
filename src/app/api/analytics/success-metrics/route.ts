@@ -396,7 +396,7 @@ async function getBusinessMetrics(startDate: Date): Promise<BusinessMetrics> {
     },
     qualifications: {
       completionRate: assessmentResults.length > 0 ? (completedAssessments.length / assessmentResults.length) * 100 : 70,
-      averageScore: averageScore,
+      averageScore,
       certificatesIssued: Math.floor(completedAssessments.length * 0.8) // Assume 80% of completed assessments result in certificates
     }
   }

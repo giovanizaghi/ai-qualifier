@@ -155,9 +155,9 @@ export function SuccessMetrics({ className }: SuccessMetricsProps) {
   }
 
   const formatValue = (value: number, unit: string) => {
-    if (unit === '%') return `${value.toFixed(1)}%`
-    if (unit === '$') return `$${value.toLocaleString()}`
-    if (unit === 'days') return `${value} days`
+    if (unit === '%') {return `${value.toFixed(1)}%`}
+    if (unit === '$') {return `$${value.toLocaleString()}`}
+    if (unit === 'days') {return `${value} days`}
     return value.toLocaleString()
   }
 
@@ -179,7 +179,7 @@ export function SuccessMetrics({ className }: SuccessMetricsProps) {
         })
       })
 
-      if (!response.ok) throw new Error('Export failed')
+      if (!response.ok) {throw new Error('Export failed')}
 
       const blob = await response.blob()
       const url = URL.createObjectURL(blob)
@@ -235,7 +235,7 @@ export function SuccessMetrics({ className }: SuccessMetricsProps) {
     )
   }
 
-  if (!data) return null
+  if (!data) {return null}
 
   const filteredMetrics = selectedCategory === 'all' 
     ? data.metrics 
