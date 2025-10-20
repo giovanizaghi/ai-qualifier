@@ -5,6 +5,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header"
 import { DashboardShell } from "@/components/dashboard/dashboard-shell"
 import { ProfileForm } from "@/components/profile/profile-form"
 import { auth } from "@/lib/auth"
+import { prisma } from "@/lib/prisma"
 
 export const metadata: Metadata = {
   title: "Profile | AI Qualifier",
@@ -18,6 +19,29 @@ export default async function ProfilePage() {
     redirect("/auth/signin")
   }
 
+  // Fetch full user data from database
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      firstName: true,
+      lastName: true,
+      bio: true,
+      linkedInUrl: true,
+      githubUrl: true,
+      portfolioUrl: true,
+      timezone: true,
+      preferredLanguage: true,
+      image: true,
+    },
+  })
+
+  if (!user) {
+    redirect("/auth/signin")
+  }
+
   return (
     <DashboardShell>
       <DashboardHeader
@@ -26,7 +50,7 @@ export default async function ProfilePage() {
       />
       
       <div className="max-w-2xl">
-        <ProfileForm user={session.user} />
+        <ProfileForm user={user} />
       </div>
     </DashboardShell>
   )

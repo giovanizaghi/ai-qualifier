@@ -78,20 +78,20 @@ This document outlines the remaining tasks to complete the AI Qualifier web appl
   - Start/continue button
 
 ### 1.4 User Profile & Settings
-- [ ] **Profile Settings Enhancement** (`/profile/page.tsx`)
+- [x] **Profile Settings Enhancement** (`/profile/page.tsx`)
   - Personal information management
   - Learning preferences
   - Notification settings
   - Privacy controls
   - Account deletion option
 
-- [ ] **Achievement Gallery** (`/profile/achievements/page.tsx`)
+- [x] **Achievement Gallery** (`/profile/achievements/page.tsx`)
   - All earned badges and certificates
   - Progress toward upcoming achievements
   - Share options
   - Achievement details and criteria
 
-- [ ] **Study History** (`/profile/history/page.tsx`)
+- [x] **Study History** (`/profile/history/page.tsx`)
   - Detailed learning activity log
   - Time spent on each topic
   - Performance trends over time
