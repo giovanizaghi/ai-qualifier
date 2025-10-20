@@ -5,3 +5,9 @@ export { PerformanceAnalytics } from './performance-analytics'
 export { AchievementSystem } from './achievement-system'
 export { LearningPathVisualization } from './learning-path-visualization'
 export { PersonalizedRecommendations } from './personalized-recommendations'
+export { 
+  NewUserDashboardEmptyState,
+  NoActiveProgressEmptyState,
+  NoAchievementsEmptyState
+} from './empty-states'
+export { DashboardEmptyStateTest } from './empty-state-test'
