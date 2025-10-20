@@ -9,6 +9,13 @@ import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
 
 interface DashboardContentProps {
   user: User
@@ -50,6 +57,8 @@ export default function DashboardContent({ user }: DashboardContentProps) {
   const [recentRuns, setRecentRuns] = useState<QualificationRun[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  
+  const ITEMS_PER_PAGE = 4
 
   // Helper function to get status badge variant and label
   const getStatusInfo = (status: string) => {
@@ -161,9 +170,6 @@ export default function DashboardContent({ user }: DashboardContentProps) {
     )
   }
 
-  const primaryCompany = companies[0]
-  const primaryIcp = primaryCompany.icps[0]
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 p-8">
       <div className="container mx-auto max-w-6xl space-y-8">
@@ -187,46 +193,132 @@ export default function DashboardContent({ user }: DashboardContentProps) {
           </Alert>
         )}
 
-        {/* Company Overview */}
-        <Card className="border-2">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-2xl flex items-center gap-2">
-                  <Building2 className="w-6 h-6 text-primary" />
-                  {primaryCompany.name || primaryCompany.domain}
-                </CardTitle>
-                <CardDescription className="mt-2">
-                  {primaryCompany.description || `Company domain: ${primaryCompany.domain}`}
-                </CardDescription>
-              </div>
-              <Button variant="outline" size="sm" asChild>
-                <Link href={`/companies/${primaryCompany.id}`}>View Details</Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-wrap gap-2">
-              {primaryCompany.industry && (
-                <Badge variant="secondary">{primaryCompany.industry}</Badge>
-              )}
-              <Badge variant="outline">{primaryCompany.icps.length} ICP{primaryCompany.icps.length !== 1 ? 's' : ''}</Badge>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Companies Carousel */}
+        <div className="relative px-12">
+          <Carousel
+            opts={{
+              align: "start",
+              loop: false,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              {(() => {
+                // Calculate total pages needed
+                const totalPages = Math.ceil(companies.length / ITEMS_PER_PAGE)
+                const pages = []
+
+                // Create pages for companies
+                for (let i = 0; i < totalPages; i++) {
+                  const startIdx = i * ITEMS_PER_PAGE
+                  const endIdx = Math.min(startIdx + ITEMS_PER_PAGE, companies.length)
+                  const pageCompanies = companies.slice(startIdx, endIdx)
+                  const isLastPage = i === totalPages - 1
+                  const hasSpaceForAddCard = pageCompanies.length < ITEMS_PER_PAGE
+
+                  pages.push(
+                    <CarouselItem key={`page-${i}`}>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {pageCompanies.map((company) => (
+                          <Card key={company.id} className="border-2 h-full">
+                            <CardHeader>
+                              <div className="flex items-start justify-between gap-2">
+                                <div className="min-w-0 flex-1">
+                                  <CardTitle className="text-lg flex items-center gap-2 mb-2">
+                                    <Building2 className="w-5 h-5 text-primary shrink-0" />
+                                    <span className="truncate">{company.name || company.domain}</span>
+                                  </CardTitle>
+                                  <CardDescription className="line-clamp-2 min-h-[2.5rem]">
+                                    {company.description || `Company domain: ${company.domain}`}
+                                  </CardDescription>
+                                </div>
+                              </div>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                              <div className="flex flex-wrap gap-2">
+                                {company.industry && (
+                                  <Badge variant="secondary" className="text-xs">{company.industry}</Badge>
+                                )}
+                                <Badge variant="outline" className="text-xs">
+                                  {company.icps.length} ICP{company.icps.length !== 1 ? 's' : ''}
+                                </Badge>
+                              </div>
+                              <Button variant="outline" size="sm" className="w-full" asChild>
+                                <Link href={`/companies/${company.id}`}>View Details</Link>
+                              </Button>
+                            </CardContent>
+                          </Card>
+                        ))}
+                        
+                        {/* Add Company Card - only if there's space on this page */}
+                        {isLastPage && hasSpaceForAddCard && (
+                          <Link href="/onboarding">
+                            <Card className="border-2 border-dashed h-full hover:border-primary/50 transition-colors cursor-pointer flex items-center justify-center min-h-[250px]">
+                              <CardContent className="py-8 text-center">
+                                <div className="flex justify-center mb-4">
+                                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                    <Plus className="w-6 h-6 text-primary" />
+                                  </div>
+                                </div>
+                                <h3 className="font-semibold mb-2">Add Company</h3>
+                                <p className="text-sm text-muted-foreground">
+                                  Analyze a new domain
+                                </p>
+                              </CardContent>
+                            </Card>
+                          </Link>
+                        )}
+                      </div>
+                    </CarouselItem>
+                  )
+                }
+
+                // If last page is full (4 companies), add a new page with only the "Add Company" card
+                const lastPageCompanyCount = companies.length % ITEMS_PER_PAGE
+                if (lastPageCompanyCount === 0 && companies.length > 0) {
+                  pages.push(
+                    <CarouselItem key="add-company-page">
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <Link href="/onboarding">
+                          <Card className="border-2 border-dashed h-full hover:border-primary/50 transition-colors cursor-pointer flex items-center justify-center min-h-[250px]">
+                            <CardContent className="py-8 text-center">
+                              <div className="flex justify-center mb-4">
+                                <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <Plus className="w-6 h-6 text-primary" />
+                                </div>
+                              </div>
+                              <h3 className="font-semibold mb-2">Add Company</h3>
+                              <p className="text-sm text-muted-foreground">
+                                Analyze a new domain
+                              </p>
+                            </CardContent>
+                          </Card>
+                        </Link>
+                      </div>
+                    </CarouselItem>
+                  )
+                }
+
+                return pages
+              })()}
+            </CarouselContent>
+            <CarouselPrevious />
+            <CarouselNext />
+          </Carousel>
+        </div>
 
         {/* ICP Summary */}
-        {primaryIcp && (
+        {companies.length > 0 && companies[0].icps.length > 0 && (
           <Card className="border-2 border-primary/50">
             <CardHeader>
               <CardTitle className="text-xl flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-primary" />
                 Your Ideal Customer Profile
               </CardTitle>
-              <CardDescription>{primaryIcp.title}</CardDescription>
+              <CardDescription>{companies[0].icps[0].title}</CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-sm mb-4">{primaryIcp.description}</p>
+              <p className="text-sm mb-4">{companies[0].icps[0].description}</p>
               <Button asChild>
                 <Link href="/qualify">
                   <TrendingUp className="w-4 h-4 mr-2" />
