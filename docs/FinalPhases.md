@@ -64,13 +64,13 @@ This document outlines the remaining tasks to complete the AI Qualifier web appl
   - Achievement milestones
 
 ### 1.3 Learning Paths Enhancement
-- [ ] **Learning Paths List Page** (`/learning-paths/page.tsx`)
+- [x] **Learning Paths List Page** (`/learning-paths/page.tsx`)
   - Browse all available learning paths
   - Personal recommendations
   - Filter by topic, difficulty, duration
   - Empty state for new users
 
-- [ ] **Learning Path Details Enhancement** (`/learning-paths/[id]/page.tsx`)
+- [x] **Learning Path Details Enhancement** (`/learning-paths/[id]/page.tsx`)
   - Complete path overview
   - Step-by-step progression
   - Prerequisites and outcomes
