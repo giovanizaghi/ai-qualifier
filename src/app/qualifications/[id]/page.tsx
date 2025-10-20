@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Progress } from '@/components/ui/progress'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { EnrollmentDialog } from '@/components/qualifications/enrollment-dialog'
 import { cn } from '@/lib/utils'
 import { Qualification, Assessment, QualificationCategory, DifficultyLevel } from '@/types'
 
@@ -63,6 +64,7 @@ export default function QualificationDetailsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [enrolling, setEnrolling] = useState(false)
+  const [showEnrollDialog, setShowEnrollDialog] = useState(false)
 
   useEffect(() => {
     if (qualificationId) {
@@ -299,17 +301,13 @@ export default function QualificationDetailsPage() {
                     </div>
                     
                     <Button 
-                      onClick={handleEnrollment}
+                      onClick={() => setShowEnrollDialog(true)}
                       disabled={enrolling}
                       className="w-full gap-2"
                       size="lg"
                     >
-                      {enrolling ? (
-                        <Spinner className="w-4 h-4" />
-                      ) : (
-                        <Play className="w-4 h-4" />
-                      )}
-                      {enrolling ? 'Enrolling...' : 'Start Qualification'}
+                      <Play className="w-4 h-4" />
+                      Start Qualification
                     </Button>
                   </>
                 )}
@@ -671,6 +669,16 @@ export default function QualificationDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Enrollment Dialog */}
+      {qualification && (
+        <EnrollmentDialog
+          open={showEnrollDialog}
+          onOpenChange={setShowEnrollDialog}
+          qualification={qualification}
+          onEnroll={handleEnrollment}
+        />
+      )}
     </div>
   )
 }

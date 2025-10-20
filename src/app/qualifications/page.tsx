@@ -1,6 +1,6 @@
 "use client"
 
-import { Search, Filter, Grid, List, BookOpen, Clock, Users, Award, Target, TrendingUp } from 'lucide-react'
+import { Search, Filter, Grid, List, BookOpen, Clock, Users, Award, Target, TrendingUp, ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
@@ -178,6 +178,15 @@ export default function QualificationsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
+          <Button
+            variant="ghost"
+            onClick={() => router.push('/dashboard')}
+            className="mb-4 gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back to Dashboard
+          </Button>
+          
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
             Qualifications
           </h1>
