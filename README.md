@@ -2,7 +2,7 @@
 
 ## 🎥 Demo Video
 
-[![AI Qualifier Demo](https://img.youtube.com/vi/hUkq3k-VAvU/maxresdefault.jpg)](https://youtu.be/hUkq3k-VAvU)
+[![AI Qualifier Demo](https://i9.ytimg.com/vi/hUkq3k-VAvU/mq2.jpg?sqp=CLjQ2ccG-oaymwEmCMACELQB8quKqQMa8AEB-AHUBoAC4AOKAgwIABABGFogWihlMA8=&rs=AOn4CLCvx3WkdONMAy7bW3oZxVrw0xc3vg)](https://youtu.be/hUkq3k-VAvU)
 
 *Click the image above to watch a 5-minute walkthrough of the AI Qualifier system*
 
