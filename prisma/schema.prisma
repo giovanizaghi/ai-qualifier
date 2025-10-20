@@ -1,9 +1,7 @@
-// AI Qualifier Database Schema
-// Comprehensive schema for AI qualification assessment platform
+// ICP Qualifier Database Schema - Technical Assignment
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -11,47 +9,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User Management
+// ========================================
+// User Management & Authentication
+// ========================================
+
 model User {
   id                String    @id @default(cuid())
   email             String    @unique
   emailVerified     DateTime?
   name              String?
   image             String?
-  password          String?   // For email/password auth
+  password          String?
   role              Role      @default(USER)
   
-  // Profile information
-  firstName         String?
-  lastName          String?
-  bio               String?
-  linkedInUrl       String?
-  githubUrl         String?
-  portfolioUrl      String?
-  
-  // Account settings
   isActive          Boolean   @default(true)
   lastLoginAt       DateTime?
-  timezone          String?   @default("UTC")
-  preferredLanguage String?   @default("en")
-  
-  // Subscription and billing
-  stripeCustomerId     String?
-  subscriptionId       String?
-  subscriptionStatus   String?
-  subscriptionPriceId  String?
-  subscriptionStartDate DateTime?
-  subscriptionEndDate   DateTime?
   
   // Relations
   accounts          Account[]
   sessions          Session[]
-  assessmentResults AssessmentResult[]
-  qualificationProgress QualificationProgress[]
-  bookmarks         Bookmark[]
-  achievements      Achievement[]
-  feedback          Feedback[]
-  analyticsEvents   UserAnalytics[]
+  companies         Company[]
+  qualificationRuns QualificationRun[]
   
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
@@ -59,7 +37,6 @@ model User {
   @@map("users")
 }
 
-// NextAuth.js models
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -99,510 +76,141 @@ model VerificationToken {
   @@map("verification_tokens")
 }
 
-// Core Qualification System
-model Qualification {
-  id                String    @id @default(cuid())
-  title             String
-  description       String
-  slug              String    @unique
-  shortDescription  String?
+// ========================================
+// ICP Qualifier Core Models
+// ========================================
+
+// Company Profile - User's company that we analyze
+model Company {
+  id          String   @id @default(cuid())
+  userId      String
+  domain      String   @unique
+  name        String?
+  description String?  @db.Text
+  industry    String?
+  size        String?
   
-  // Qualification metadata
-  category          QualificationCategory
-  difficulty        DifficultyLevel
-  estimatedDuration Int       // in minutes
-  prerequisites     String[]  // Array of qualification IDs or skills
-  tags              String[]
-  
-  // Scoring and assessment
-  passingScore      Int       @default(70)
-  totalQuestions    Int       @default(50)
-  timeLimit         Int?      // in minutes, null = no time limit
-  allowRetakes      Boolean   @default(true)
-  retakeCooldown    Int?      // hours between retakes
-  
-  // Content and structure
-  learningObjectives String[]
-  syllabus          Json?     // Detailed curriculum structure
-  
-  // Status and visibility
-  isActive          Boolean   @default(true)
-  isPublished       Boolean   @default(false)
-  version           String    @default("1.0")
+  // Scraped/Analyzed Data (JSON)
+  websiteData Json?    // Raw scraped data
+  aiAnalysis  Json?    // AI summary
   
   // Relations
-  assessments       Assessment[]
-  questions         Question[]
-  qualificationProgress QualificationProgress[]
-  bookmarks         Bookmark[]
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  icps        ICP[]
   
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   
-  @@map("qualifications")
+  @@map("companies")
 }
 
-model Assessment {
-  id              String    @id @default(cuid())
-  qualificationId String
-  title           String
-  description     String?
+// Ideal Customer Profile - AI-generated ICP for a company
+model ICP {
+  id          String   @id @default(cuid())
+  companyId   String
   
-  // Assessment configuration
-  questionCount   Int       @default(50)
-  timeLimit       Int?      // in minutes
-  randomizeQuestions Boolean @default(true)
-  randomizeAnswers   Boolean @default(true)
-  showResults     Boolean   @default(true)
+  title       String
+  description String   @db.Text
   
-  // Question selection criteria
-  questionCategories Json?  // Breakdown by category/topic
-  difficultyMix      Json?  // Distribution of question difficulties
+  // Structured ICP Data
+  buyerPersonas     Json  // Array of personas with roles, pain points
+  companySize       Json  // Min/max employees, revenue ranges
+  industries        String[]
+  geographicRegions String[]
+  fundingStages     String[]
+  
+  // AI Generation Details
+  generatedBy String?  // AI model used
+  prompt      String?  @db.Text
   
   // Relations
-  qualification   Qualification @relation(fields: [qualificationId], references: [id], onDelete: Cascade)
-  results         AssessmentResult[]
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  qualificationRuns QualificationRun[]
   
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   
-  @@map("assessments")
+  @@map("icps")
 }
 
-model Question {
-  id              String    @id @default(cuid())
-  qualificationId String
+// Qualification Run - Batch of prospects being qualified
+model QualificationRun {
+  id          String   @id @default(cuid())
+  icpId       String
+  userId      String
   
-  // Question content
-  title           String
-  content         String    @db.Text
-  explanation     String?   @db.Text
-  
-  // Question metadata
-  type            QuestionType
-  category        String    // Topic/category within qualification
-  difficulty      DifficultyLevel
-  tags            String[]
-  
-  // Question configuration
-  options         Json      // Answer options for multiple choice, etc.
-  correctAnswers  String[]  // Correct answer(s)
-  points          Int       @default(1)
-  timeEstimate    Int?      // estimated time in seconds
-  
-  // Analytics and quality
-  timesUsed       Int       @default(0)
-  timesCorrect    Int       @default(0)
-  averageTime     Float?    // average time to answer in seconds
+  status      RunStatus @default(PENDING)
+  totalProspects Int   @default(0)
+  completed   Int      @default(0)
   
   // Relations
-  qualification   Qualification @relation(fields: [qualificationId], references: [id], onDelete: Cascade)
-  questionResults QuestionResult[]
+  icp         ICP      @relation(fields: [icpId], references: [id], onDelete: Cascade)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  results     ProspectQualification[]
   
-  isActive        Boolean   @default(true)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
   
-  @@map("questions")
+  @@map("qualification_runs")
 }
 
-model AssessmentResult {
-  id              String    @id @default(cuid())
-  userId          String
-  assessmentId    String
+// Prospect Qualification Result - Individual prospect qualification
+model ProspectQualification {
+  id              String   @id @default(cuid())
+  runId           String
   
-  // Result data
-  score           Float     // percentage score 0-100
-  totalQuestions  Int
-  correctAnswers  Int
-  incorrectAnswers Int
-  skippedQuestions Int      @default(0)
+  domain          String
+  companyName     String?
   
-  // Timing information
-  startedAt       DateTime
-  completedAt     DateTime?
-  timeSpent       Int?      // total time in seconds
+  // Analysis Data
+  companyData     Json?    // Scraped/analyzed data
   
-  // Status and metadata
-  status          AssessmentStatus @default(IN_PROGRESS)
-  passed          Boolean   @default(false)
-  certificateId   String?   @unique
+  // Qualification Results
+  score           Float    // 0-100
+  fitLevel        FitLevel // EXCELLENT, GOOD, FAIR, POOR
+  reasoning       String   @db.Text
+  matchedCriteria Json     // What matched from ICP
+  gaps            Json     // What didn't match
   
-  // Additional data
-  categoryScores  Json?     // Breakdown by question category
-  metadata        Json?     // Additional assessment data
+  // Processing
+  status          ProspectStatus @default(PENDING)
+  error           String?  @db.Text
   
   // Relations
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  assessment      Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
-  questionResults QuestionResult[]
+  run             QualificationRun @relation(fields: [runId], references: [id], onDelete: Cascade)
   
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  createdAt       DateTime @default(now())
+  analyzedAt      DateTime?
   
-  @@map("assessment_results")
+  @@map("prospect_qualifications")
 }
 
-model QuestionResult {
-  id                String    @id @default(cuid())
-  assessmentResultId String
-  questionId        String
-  
-  // Response data
-  userAnswer        String[]  // User's selected answer(s)
-  isCorrect         Boolean
-  points            Int       @default(0)
-  timeSpent         Int?      // time spent on this question in seconds
-  
-  // Additional data
-  confidence        Int?      // User's confidence level 1-5
-  flaggedForReview  Boolean   @default(false)
-  
-  // Relations
-  assessmentResult  AssessmentResult @relation(fields: [assessmentResultId], references: [id], onDelete: Cascade)
-  question          Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  
-  createdAt         DateTime  @default(now())
-  
-  @@unique([assessmentResultId, questionId])
-  @@map("question_results")
-}
-
-// Progress Tracking
-model QualificationProgress {
-  id                String    @id @default(cuid())
-  userId            String
-  qualificationId   String
-  
-  // Progress data
-  status            ProgressStatus @default(NOT_STARTED)
-  completionPercentage Float   @default(0)
-  
-  // Study tracking
-  studyTimeMinutes  Int       @default(0)
-  lastStudiedAt     DateTime?
-  
-  // Attempt tracking
-  attempts          Int       @default(0)
-  bestScore         Float?    // best score achieved
-  lastAttemptScore  Float?
-  lastAttemptAt     DateTime?
-  
-  // Learning path
-  currentTopic      String?
-  completedTopics   String[]
-  
-  // Relations
-  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  qualification     Qualification @relation(fields: [qualificationId], references: [id], onDelete: Cascade)
-  
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  
-  @@unique([userId, qualificationId])
-  @@map("qualification_progress")
-}
-
-// User Engagement
-model Bookmark {
-  id              String    @id @default(cuid())
-  userId          String
-  qualificationId String
-  
-  // Relations
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  qualification   Qualification @relation(fields: [qualificationId], references: [id], onDelete: Cascade)
-  
-  createdAt       DateTime  @default(now())
-  
-  @@unique([userId, qualificationId])
-  @@map("bookmarks")
-}
-
-model Achievement {
-  id              String    @id @default(cuid())
-  userId          String
-  
-  // Achievement data
-  type            AchievementType
-  title           String
-  description     String
-  iconUrl         String?
-  
-  // Achievement metadata
-  category        String    // e.g., "completion", "streak", "performance"
-  value           Int?      // numeric value associated with achievement
-  qualificationId String?   // if achievement is qualification-specific
-  
-  // Relations
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  earnedAt        DateTime  @default(now())
-  
-  @@map("achievements")
-}
-
-// Feedback System
-model Feedback {
-  id              String    @id @default(cuid())
-  userId          String?   // Optional - anonymous feedback allowed
-  
-  // Feedback data
-  type            FeedbackType
-  priority        FeedbackPriority @default(MEDIUM)
-  title           String
-  description     String    @db.Text
-  rating          Int?      // 1-5 stars for general feedback
-  email           String?
-  
-  // Status and processing
-  status          FeedbackStatus @default(OPEN)
-  adminNotes      String?   @db.Text
-  assignedTo      String?   // Admin user ID
-  resolvedAt      DateTime?
-  
-  // Context and metadata
-  context         Json?     // Page, user agent, qualification, assessment, etc.
-  ipAddress       String?
-  tags            String[]  // For categorization
-  
-  // Relations
-  user            User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  @@map("feedback")
-}
-
-// Analytics and Reporting
-model UserAnalytics {
-  id              String    @id @default(cuid())
-  userId          String
-  sessionId       String
-  
-  // Event data
-  eventType       String    // AnalyticsEventType
-  timestamp       DateTime  @default(now())
-  data            Json      // Event-specific data
-  
-  // Request metadata
-  source          String    @default("web") // 'web' | 'mobile' | 'api'
-  userAgent       String?
-  ipAddress       String?
-  
-  // Page/location context
-  page            String?
-  referrer        String?
-  
-  // Relations
-  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  createdAt       DateTime  @default(now())
-  
-  @@index([userId, timestamp])
-  @@index([eventType, timestamp])
-  @@index([sessionId])
-  @@map("user_analytics")
-}
-
-model SystemMetrics {
-  id              String    @id @default(cuid())
-  metricType      String    // Type of metric being tracked
-  timestamp       DateTime  @default(now())
-  value           Float     // Numeric value of the metric
-  metadata        Json?     // Additional metric data
-  
-  // Aggregation level
-  aggregationLevel String   // 'hourly', 'daily', 'weekly', 'monthly'
-  timeframe       DateTime  // The time period this metric represents
-  
-  createdAt       DateTime  @default(now())
-  
-  @@index([metricType, timeframe])
-  @@index([aggregationLevel, timeframe])
-  @@map("system_metrics")
-}
-
-model UserBehaviorPattern {
-  id              String    @id @default(cuid())
-  userId          String
-  patternType     String    // Type of behavior pattern
-  
-  // Pattern data
-  data            Json      // Detailed pattern information
-  confidence      Float     // Confidence level in pattern (0-1)
-  frequency       Int       // How often this pattern occurs
-  
-  // Timeframe
-  detectedAt      DateTime  @default(now())
-  lastSeenAt      DateTime  @default(now())
-  
-  // Analysis metadata
-  analysisVersion String    @default("1.0")
-  isActive        Boolean   @default(true)
-  
-  @@index([userId, patternType])
-  @@index([detectedAt])
-  @@map("user_behavior_patterns")
-}
-
+// ========================================
 // Enums
+// ========================================
+
 enum Role {
   USER
   ADMIN
-  INSTRUCTOR
 }
 
-enum QualificationCategory {
-  ARTIFICIAL_INTELLIGENCE
-  MACHINE_LEARNING
-  DATA_SCIENCE
-  SOFTWARE_ENGINEERING
-  CLOUD_COMPUTING
-  CYBERSECURITY
-  BLOCKCHAIN
-  MOBILE_DEVELOPMENT
-  WEB_DEVELOPMENT
-  DEVOPS
-  PRODUCT_MANAGEMENT
-  UX_UI_DESIGN
-  BUSINESS_ANALYSIS
-  PROJECT_MANAGEMENT
-  DIGITAL_MARKETING
-  OTHER
-}
-
-enum DifficultyLevel {
-  BEGINNER
-  INTERMEDIATE
-  ADVANCED
-  EXPERT
-}
-
-enum QuestionType {
-  MULTIPLE_CHOICE
-  MULTIPLE_SELECT
-  TRUE_FALSE
-  FILL_IN_BLANK
-  CODING_CHALLENGE
-  DRAG_AND_DROP
-  MATCHING
-  ESSAY
-}
-
-enum AssessmentStatus {
-  NOT_STARTED
-  IN_PROGRESS
+enum RunStatus {
+  PENDING
+  PROCESSING
   COMPLETED
-  ABANDONED
-  EXPIRED
+  FAILED
 }
 
-enum ProgressStatus {
-  NOT_STARTED
-  IN_PROGRESS
+enum ProspectStatus {
+  PENDING
+  ANALYZING
   COMPLETED
-  PAUSED
+  FAILED
 }
 
-enum AchievementType {
-  FIRST_QUALIFICATION
-  QUALIFICATION_COMPLETED
-  PERFECT_SCORE
-  QUICK_LEARNER
-  CONSISTENT_LEARNER
-  STREAK_ACHIEVEMENT
-  CATEGORY_EXPERT
-  IMPROVEMENT_MILESTONE
-  COMMUNITY_CONTRIBUTOR
-}
-
-enum FeedbackType {
-  BUG
-  FEATURE
-  IMPROVEMENT
-  GENERAL
-  CONTENT
-}
-
-enum FeedbackPriority {
-  LOW
-  MEDIUM
-  HIGH
-  CRITICAL
-}
-
-enum FeedbackStatus {
-  OPEN
-  IN_PROGRESS
-  RESOLVED
-  CLOSED
-  REJECTED
-}
-
-// User Acceptance Testing Models
-model UserTestingSession {
-  id              String    @id @default(cuid())
-  sessionId       String    @unique @default(cuid())
-  scenarioId      String
-  userId          String?
-  userPersona     String    // 'new_user', 'intermediate_user', 'expert_user', 'administrator'
-  device          String    // 'desktop', 'tablet', 'mobile'
-  browser         String
-  startTime       DateTime  @default(now())
-  endTime         DateTime?
-  status          String    @default("in_progress") // 'in_progress', 'completed', 'abandoned'
-  metadata        Json?
-  
-  // Relations
-  taskCompletions TaskCompletion[]
-  feedback        UserTestingFeedback[]
-  
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-  
-  @@map("user_testing_sessions")
-}
-
-model TaskCompletion {
-  id                  String    @id @default(cuid())
-  sessionId           String
-  taskId              String
-  scenarioId          String
-  startTime           DateTime  @default(now())
-  endTime             DateTime?
-  status              String    @default("not_started") // 'not_started', 'in_progress', 'completed', 'failed', 'skipped'
-  completionTime      Int?      // in seconds
-  errorCount          Int       @default(0)
-  helpRequests        Int       @default(0)
-  notes               String?   @db.Text
-  
-  // Relations
-  session             UserTestingSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
-  
-  createdAt           DateTime  @default(now())
-  updatedAt           DateTime  @updatedAt
-  
-  @@map("task_completions")
-}
-
-model UserTestingFeedback {
-  id              String    @id @default(cuid())
-  sessionId       String
-  scenarioId      String
-  taskId          String
-  feedbackType    String    // 'rating', 'comment', 'bug_report', 'suggestion'
-  rating          Int?      // 1-5 scale
-  comment         String?   @db.Text
-  timestamp       DateTime  @default(now())
-  metadata        Json?
-  
-  // Relations
-  session         UserTestingSession @relation(fields: [sessionId], references: [sessionId], onDelete: Cascade)
-  
-  createdAt       DateTime  @default(now())
-  
-  @@map("user_testing_feedback")
+enum FitLevel {
+  EXCELLENT  // 80-100
+  GOOD       // 60-79
+  FAIR       // 40-59
+  POOR       // 0-39
 }
