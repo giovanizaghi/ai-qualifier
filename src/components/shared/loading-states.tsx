@@ -1,8 +1,9 @@
 "use client";
 
-import { Loader2 } from "lucide-react";
+import { Loader2, Brain, Search, CheckCircle2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { Progress } from "@/components/ui/progress";
 
 interface LoadingStateProps {
   message?: string;
@@ -78,6 +79,126 @@ export function LoadingDots({ className }: LoadingDotsProps) {
       <div className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></div>
       <div className="h-2 w-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></div>
       <div className="h-2 w-2 bg-primary rounded-full animate-bounce"></div>
+    </div>
+  );
+}
+
+interface AnalysisLoadingProps {
+  domain?: string;
+  stage?: 'fetching' | 'analyzing' | 'generating' | 'complete';
+  className?: string;
+}
+
+export function AnalysisLoading({ domain, stage = 'fetching', className }: AnalysisLoadingProps) {
+  const stages = [
+    { key: 'fetching', label: 'Fetching website data', icon: Search, active: stage === 'fetching' },
+    { key: 'analyzing', label: 'Analyzing content', icon: Brain, active: stage === 'analyzing' },
+    { key: 'generating', label: 'Generating ICP', icon: Brain, active: stage === 'generating' },
+  ];
+
+  return (
+    <Card className={className}>
+      <CardContent className="pt-6">
+        <div className="space-y-6">
+          <div className="text-center">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 mb-4">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+            </div>
+            {domain && (
+              <p className="text-sm font-medium mb-1">Analyzing {domain}</p>
+            )}
+            <p className="text-xs text-muted-foreground">This may take a few moments...</p>
+          </div>
+
+          <div className="space-y-3">
+            {stages.map((s) => {
+              const Icon = s.icon;
+              const isComplete = stages.findIndex(st => st.key === stage) > stages.findIndex(st => st.key === s.key);
+              
+              return (
+                <div key={s.key} className="flex items-center gap-3">
+                  <div className={cn(
+                    "flex h-8 w-8 items-center justify-center rounded-full border-2",
+                    isComplete && "border-green-500 bg-green-50",
+                    s.active && "border-primary bg-primary/10",
+                    !s.active && !isComplete && "border-muted bg-muted/50"
+                  )}>
+                    {isComplete ? (
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                    ) : (
+                      <Icon className={cn(
+                        "h-4 w-4",
+                        s.active && "animate-pulse text-primary",
+                        !s.active && "text-muted-foreground"
+                      )} />
+                    )}
+                  </div>
+                  <span className={cn(
+                    "text-sm",
+                    s.active && "font-medium text-foreground",
+                    isComplete && "text-green-600",
+                    !s.active && !isComplete && "text-muted-foreground"
+                  )}>
+                    {s.label}
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+interface QualificationProgressProps {
+  total: number;
+  completed: number;
+  current?: string;
+  className?: string;
+}
+
+export function QualificationProgress({ total, completed, current, className }: QualificationProgressProps) {
+  const progress = (completed / total) * 100;
+
+  return (
+    <Card className={className}>
+      <CardContent className="pt-6">
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-lg">Qualifying Prospects</h3>
+              <p className="text-sm text-muted-foreground">
+                {completed} of {total} complete
+              </p>
+            </div>
+            <LoadingSpinner size="lg" />
+          </div>
+
+          <Progress value={progress} className="h-2" />
+
+          {current && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <LoadingDots />
+              <span>Currently analyzing: {current}</span>
+            </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+interface InlineLoadingProps {
+  text?: string;
+  className?: string;
+}
+
+export function InlineLoading({ text = "Loading", className }: InlineLoadingProps) {
+  return (
+    <div className={cn("inline-flex items-center gap-2", className)}>
+      <LoadingSpinner size="sm" />
+      <span className="text-sm text-muted-foreground">{text}</span>
     </div>
   );
 }
