@@ -42,21 +42,21 @@ This document outlines the remaining tasks to complete the AI Qualifier web appl
   - Retake options
 
 ### 1.2 Qualifications System
-- [ ] **Qualifications Browse Page** (`/qualifications/page.tsx`)
+- [x] **Qualifications Browse Page** (`/qualifications/page.tsx`)
   - Available qualifications catalog
   - Progress indicators for each qualification
   - Filter by category, level, provider
   - Search and sort functionality
   - Empty state for new users
 
-- [ ] **Qualification Details Page** (`/qualifications/[id]/page.tsx`)
+- [x] **Qualification Details Page** (`/qualifications/[id]/page.tsx`)
   - Qualification overview and requirements
   - Learning path visualization
   - Required assessments list
   - Progress tracking
   - Enrollment/start button
 
-- [ ] **Qualification Progress Page** (`/qualifications/[id]/progress/page.tsx`)
+- [x] **Qualification Progress Page** (`/qualifications/[id]/progress/page.tsx`)
   - Current progress visualization
   - Completed vs remaining assessments
   - Next recommended steps
@@ -100,40 +100,40 @@ This document outlines the remaining tasks to complete the AI Qualifier web appl
 ## Phase 2: Empty States & UX Polish (Priority: High)
 
 ### 2.1 Dashboard Empty States
-- [x] **New User Dashboard**
+- [ ] **New User Dashboard**
   - Welcome message and onboarding flow
   - Suggested first steps
   - Quick start guide
   - Sample qualification recommendations
 
-- [x] **No Active Progress**
+- [ ] **No Active Progress**
   - Encourage starting first assessment
   - Browse qualifications CTA
   - Popular learning paths showcase
 
-- [x] **No Achievements**
+- [ ] **No Achievements**
   - Explain achievement system
   - Show available badges
   - Motivational messaging
 
 ### 2.2 Assessment System Empty States
-- [x] **No Available Assessments**
+- [ ] **No Available Assessments**
   - Coming soon message
   - Subscribe for updates
   - Alternative learning resources
 
-- [x] **No Assessment History**
+- [ ] **No Assessment History**
   - Take your first assessment CTA
   - Browse assessments button
   - Benefits of taking assessments
 
 ### 2.3 Learning Path Empty States
-- [x] **No Learning Paths Started**
+- [ ] **No Learning Paths Started**
   - Browse available paths
   - Personalized recommendations
   - Benefits explanation
 
-- [x] **Completed All Paths**
+- [ ] **Completed All Paths**
   - Congratulations message
   - Advanced/new content teaser
   - Community features

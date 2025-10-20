@@ -119,15 +119,15 @@ export default function AssessmentDetailsPage() {
   }
 
   const formatDuration = (minutes?: number) => {
-    if (!minutes) return 'No time limit'
-    if (minutes < 60) return `${minutes} min`
+    if (!minutes) {return 'No time limit'}
+    if (minutes < 60) {return `${minutes} min`}
     const hours = Math.floor(minutes / 60)
     const remainingMinutes = minutes % 60
     return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}m` : ''}`
   }
 
   const formatDate = (date?: string | Date) => {
-    if (!date) return ''
+    if (!date) {return ''}
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',

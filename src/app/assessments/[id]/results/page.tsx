@@ -92,7 +92,7 @@ export default function AssessmentResultsPage() {
   }
 
   const formatDate = (date?: string | Date) => {
-    if (!date) return ''
+    if (!date) {return ''}
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -102,7 +102,7 @@ export default function AssessmentResultsPage() {
   }
 
   const formatTime = (seconds?: number) => {
-    if (!seconds) return 'N/A'
+    if (!seconds) {return 'N/A'}
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
     return `${minutes}m ${remainingSeconds}s`
@@ -122,7 +122,7 @@ export default function AssessmentResultsPage() {
   }
 
   const getCategoryBreakdown = (result: AssessmentResult): CategoryBreakdown[] => {
-    if (!result.categoryScores) return []
+    if (!result.categoryScores) {return []}
     
     const colors = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#F97316']
     
@@ -135,8 +135,8 @@ export default function AssessmentResultsPage() {
   }
 
   const getScoreColor = (score: number, passingScore: number) => {
-    if (score >= passingScore) return 'text-green-600'
-    if (score >= passingScore * 0.8) return 'text-yellow-600'
+    if (score >= passingScore) {return 'text-green-600'}
+    if (score >= passingScore * 0.8) {return 'text-yellow-600'}
     return 'text-red-600'
   }
 

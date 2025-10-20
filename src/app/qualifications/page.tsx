@@ -1,6 +1,6 @@
 "use client"
 
-import { Search, Filter, Grid, List, BookOpen, Clock, Users } from 'lucide-react'
+import { Search, Filter, Grid, List, BookOpen, Clock, Users, Award, Target, TrendingUp } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
@@ -8,58 +8,64 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Progress } from '@/components/ui/progress'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Spinner } from '@/components/ui/spinner'
 import { cn } from '@/lib/utils'
-import { Assessment, DifficultyLevel, QualificationCategory } from '@/types'
+import { Qualification, QualificationCategory, DifficultyLevel } from '@/types'
 
-interface AssessmentWithQualification extends Assessment {
-  qualification: {
-    id: string
-    title: string
-    slug: string
-    category: QualificationCategory
-    difficulty: DifficultyLevel
-  }
+interface QualificationWithProgress extends Qualification {
   _count: {
-    results: number
+    assessments: number
+    questions: number
+    qualificationProgress: number
+  }
+  userProgress?: {
+    id: string
+    completionPercentage: number
+    status: 'NOT_STARTED' | 'IN_PROGRESS' | 'COMPLETED'
+    studyTimeMinutes: number
+    bestScore?: number
+    lastStudiedAt?: Date
   }
 }
 
-interface AssessmentFilters {
+interface QualificationFilters {
   search: string
   category?: QualificationCategory
   difficulty?: DifficultyLevel
-  timeLimit?: 'short' | 'medium' | 'long' // <30min, 30-60min, >60min
-  status: 'all' | 'available' | 'taken'
+  provider?: string
+  status: 'all' | 'not-started' | 'in-progress' | 'completed'
 }
 
-export default function AssessmentsPage() {
+export default function QualificationsPage() {
   const router = useRouter()
-  const [assessments, setAssessments] = useState<AssessmentWithQualification[]>([])
+  const [qualifications, setQualifications] = useState<QualificationWithProgress[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
   const [showFilters, setShowFilters] = useState(false)
+  const [sortBy, setSortBy] = useState<'title' | 'difficulty' | 'popularity' | 'progress'>('title')
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
   
-  const [filters, setFilters] = useState<AssessmentFilters>({
+  const [filters, setFilters] = useState<QualificationFilters>({
     search: '',
     status: 'all'
   })
 
   useEffect(() => {
-    fetchAssessments()
+    fetchQualifications()
   }, [])
 
-  const fetchAssessments = async () => {
+  const fetchQualifications = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/assessments')
+      const response = await fetch('/api/qualifications?limit=50&includeProgress=true')
       if (!response.ok) {
-        throw new Error('Failed to fetch assessments')
+        throw new Error('Failed to fetch qualifications')
       }
       const data = await response.json()
-      setAssessments(data.data || [])
+      setQualifications(data.data || [])
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred')
     } finally {
@@ -67,49 +73,73 @@ export default function AssessmentsPage() {
     }
   }
 
-  const filteredAssessments = assessments.filter(assessment => {
-    // Search filter
-    if (filters.search.trim()) {
-      const searchTerm = filters.search.toLowerCase()
-      if (
-        !assessment.title.toLowerCase().includes(searchTerm) &&
-        !assessment.description?.toLowerCase().includes(searchTerm) &&
-        !assessment.qualification.title.toLowerCase().includes(searchTerm)
-      ) {
+  const filteredAndSortedQualifications = qualifications
+    .filter(qualification => {
+      // Search filter
+      if (filters.search.trim()) {
+        const searchTerm = filters.search.toLowerCase()
+        if (
+          !qualification.title.toLowerCase().includes(searchTerm) &&
+          !qualification.description.toLowerCase().includes(searchTerm) &&
+          !qualification.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+        ) {
+          return false
+        }
+      }
+
+      // Category filter
+      if (filters.category && qualification.category !== filters.category) {
         return false
       }
-    }
 
-    // Category filter
-    if (filters.category && assessment.qualification.category !== filters.category) {
-      return false
-    }
+      // Difficulty filter
+      if (filters.difficulty && qualification.difficulty !== filters.difficulty) {
+        return false
+      }
 
-    // Difficulty filter
-    if (filters.difficulty && assessment.qualification.difficulty !== filters.difficulty) {
-      return false
-    }
+      // Status filter
+      if (filters.status !== 'all') {
+        const userProgress = qualification.userProgress
+        switch (filters.status) {
+          case 'not-started':
+            if (userProgress && userProgress.status !== 'NOT_STARTED') return false
+            break
+          case 'in-progress':
+            if (!userProgress || userProgress.status !== 'IN_PROGRESS') return false
+            break
+          case 'completed':
+            if (!userProgress || userProgress.status !== 'COMPLETED') return false
+            break
+        }
+      }
 
-    // Time limit filter
-    if (filters.timeLimit) {
-      const timeLimit = assessment.timeLimit || 0
-      switch (filters.timeLimit) {
-        case 'short':
-          if (timeLimit === 0 || timeLimit > 30) {return false}
+      return true
+    })
+    .sort((a, b) => {
+      let comparison = 0
+      
+      switch (sortBy) {
+        case 'title':
+          comparison = a.title.localeCompare(b.title)
           break
-        case 'medium':
-          if (timeLimit <= 30 || timeLimit > 60) {return false}
+        case 'difficulty':
+          const difficultyOrder = { 'BEGINNER': 1, 'INTERMEDIATE': 2, 'ADVANCED': 3, 'EXPERT': 4 }
+          comparison = (difficultyOrder[a.difficulty] || 0) - (difficultyOrder[b.difficulty] || 0)
           break
-        case 'long':
-          if (timeLimit <= 60) {return false}
+        case 'popularity':
+          comparison = (b._count.qualificationProgress || 0) - (a._count.qualificationProgress || 0)
+          break
+        case 'progress':
+          const aProgress = a.userProgress?.completionPercentage || 0
+          const bProgress = b.userProgress?.completionPercentage || 0
+          comparison = bProgress - aProgress
           break
       }
-    }
+      
+      return sortOrder === 'desc' ? -comparison : comparison
+    })
 
-    return true
-  })
-
-  const updateFilter = (key: keyof AssessmentFilters, value: any) => {
+  const updateFilter = (key: keyof QualificationFilters, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
@@ -120,7 +150,7 @@ export default function AssessmentsPage() {
     })
   }
 
-  const hasActiveFilters = Boolean(filters.search || filters.category || filters.difficulty || filters.timeLimit)
+  const hasActiveFilters = Boolean(filters.search || filters.category || filters.difficulty || filters.status !== 'all')
 
   if (error) {
     return (
@@ -128,13 +158,13 @@ export default function AssessmentsPage() {
         <Card className="max-w-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-red-600">
-              <BookOpen className="w-5 h-5" />
-              Error Loading Assessments
+              <Award className="w-5 h-5" />
+              Error Loading Qualifications
             </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-gray-600 dark:text-gray-400 mb-4">{error}</p>
-            <Button onClick={fetchAssessments} className="w-full">
+            <Button onClick={fetchQualifications} className="w-full">
               Try Again
             </Button>
           </CardContent>
@@ -149,11 +179,12 @@ export default function AssessmentsPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-            Assessments
+            Qualifications
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl">
-            Test your knowledge and skills across various AI and technology domains. 
-            Choose from our curated collection of assessments to validate your expertise.
+            Explore and pursue professional qualifications to validate your expertise. 
+            Each qualification consists of multiple assessments and learning paths designed 
+            to comprehensively evaluate your skills.
           </p>
         </div>
 
@@ -166,7 +197,7 @@ export default function AssessmentsPage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                   <Input
-                    placeholder="Search assessments, qualifications, or topics..."
+                    placeholder="Search qualifications, topics, or tags..."
                     value={filters.search}
                     onChange={(e) => updateFilter('search', e.target.value)}
                     className="pl-10"
@@ -208,7 +239,7 @@ export default function AssessmentsPage() {
               {/* Filters Panel */}
               {showFilters && (
                 <div className="border-t pt-4">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                     <div>
                       <label className="block text-sm font-medium mb-2">Category</label>
                       <Select
@@ -256,28 +287,51 @@ export default function AssessmentsPage() {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-2">Duration</label>
+                      <label className="block text-sm font-medium mb-2">Your Progress</label>
                       <Select
-                        value={filters.timeLimit || ''}
-                        onValueChange={(value) => 
-                          updateFilter('timeLimit', value || undefined)
-                        }
+                        value={filters.status}
+                        onValueChange={(value) => updateFilter('status', value)}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Any duration" />
+                          <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Any duration</SelectItem>
-                          <SelectItem value="short">Short (≤30 min)</SelectItem>
-                          <SelectItem value="medium">Medium (30-60 min)</SelectItem>
-                          <SelectItem value="long">Long (&gt;60 min)</SelectItem>
+                          <SelectItem value="all">All qualifications</SelectItem>
+                          <SelectItem value="not-started">Not started</SelectItem>
+                          <SelectItem value="in-progress">In progress</SelectItem>
+                          <SelectItem value="completed">Completed</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
 
-                    <div className="flex items-end">
+                    <div>
+                      <label className="block text-sm font-medium mb-2">Sort by</label>
+                      <Select value={sortBy} onValueChange={(value: any) => setSortBy(value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="title">Title</SelectItem>
+                          <SelectItem value="difficulty">Difficulty</SelectItem>
+                          <SelectItem value="popularity">Popularity</SelectItem>
+                          <SelectItem value="progress">Your Progress</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="block text-sm font-medium mb-2">Order</label>
+                      <Select value={sortOrder} onValueChange={(value: any) => setSortOrder(value)}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="asc">Ascending</SelectItem>
+                          <SelectItem value="desc">Descending</SelectItem>
+                        </SelectContent>
+                      </Select>
                       {hasActiveFilters && (
-                        <Button variant="outline" onClick={clearFilters} className="w-full">
+                        <Button variant="outline" onClick={clearFilters} size="sm">
                           Clear All
                         </Button>
                       )}
@@ -295,7 +349,7 @@ export default function AssessmentsPage() {
             {loading ? (
               <div className="h-4 w-32 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
             ) : (
-              `${filteredAssessments.length} assessment${filteredAssessments.length !== 1 ? 's' : ''} found`
+              `${filteredAndSortedQualifications.length} qualification${filteredAndSortedQualifications.length !== 1 ? 's' : ''} found`
             )}
           </div>
         </div>
@@ -317,6 +371,7 @@ export default function AssessmentsPage() {
                   <div className="space-y-2">
                     <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                     <div className="h-4 w-1/3 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    <div className="h-2 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
                   </div>
                 </CardContent>
               </Card>
@@ -324,10 +379,10 @@ export default function AssessmentsPage() {
           </div>
         )}
 
-        {/* Assessments Grid/List */}
+        {/* Qualifications Grid/List */}
         {!loading && (
           <>
-            {filteredAssessments.length === 0 ? (
+            {filteredAndSortedQualifications.length === 0 ? (
               <EmptyState
                 hasActiveFilters={hasActiveFilters}
                 onClearFilters={clearFilters}
@@ -338,12 +393,12 @@ export default function AssessmentsPage() {
                   ? "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                   : "space-y-4"
               )}>
-                {filteredAssessments.map((assessment) => (
-                  <AssessmentCard
-                    key={assessment.id}
-                    assessment={assessment}
+                {filteredAndSortedQualifications.map((qualification) => (
+                  <QualificationCard
+                    key={qualification.id}
+                    qualification={qualification}
                     variant={viewMode}
-                    onNavigate={(assessmentId: string) => router.push(`/assessments/${assessmentId}`)}
+                    onNavigate={(qualificationId: string) => router.push(`/qualifications/${qualificationId}`)}
                   />
                 ))}
               </div>
@@ -355,14 +410,14 @@ export default function AssessmentsPage() {
   )
 }
 
-function AssessmentCard({ 
-  assessment, 
+function QualificationCard({ 
+  qualification, 
   variant = 'grid',
   onNavigate
 }: { 
-  assessment: AssessmentWithQualification
+  qualification: QualificationWithProgress
   variant?: 'grid' | 'list'
-  onNavigate?: (assessmentId: string) => void
+  onNavigate?: (qualificationId: string) => void
 }) {
   const getDifficultyColor = (difficulty: DifficultyLevel) => {
     switch (difficulty) {
@@ -374,20 +429,34 @@ function AssessmentCard({
     }
   }
 
-  const formatDuration = (minutes?: number) => {
-    if (!minutes) {return 'No time limit'}
-    if (minutes < 60) {return `${minutes} min`}
+  const getCategoryDisplayName = (category: QualificationCategory) => {
+    return category.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, l => l.toUpperCase())
+  }
+
+  const getStatusColor = (status?: string) => {
+    switch (status) {
+      case 'COMPLETED': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200'
+      case 'IN_PROGRESS': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+    }
+  }
+
+  const formatDuration = (minutes: number) => {
+    if (minutes < 60) return `${minutes} min`
     const hours = Math.floor(minutes / 60)
     const remainingMinutes = minutes % 60
     return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}m` : ''}`
   }
 
+  const userProgress = qualification.userProgress
+  const hasProgress = userProgress && userProgress.completionPercentage > 0
+
   if (variant === 'list') {
     return (
       <Card 
         className="hover:shadow-md transition-shadow cursor-pointer" 
-        data-testid="assessment-card"
-        onClick={() => onNavigate?.(assessment.id)}
+        data-testid="qualification-card"
+        onClick={() => onNavigate?.(qualification.id)}
       >
         <CardContent className="p-6">
           <div className="flex items-start justify-between">
@@ -395,42 +464,61 @@ function AssessmentCard({
               <div className="flex items-start gap-4">
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                    {assessment.title}
+                    {qualification.title}
                   </h3>
                   <p className="text-gray-600 dark:text-gray-400 mb-3 line-clamp-2">
-                    {assessment.description}
+                    {qualification.description}
                   </p>
-                  <div className="text-sm text-gray-500 dark:text-gray-500 mb-3">
-                    {assessment.qualification.title}
+                  <div className="flex items-center gap-2 mb-3">
+                    <Badge className={getDifficultyColor(qualification.difficulty)}>
+                      {qualification.difficulty.toLowerCase()}
+                    </Badge>
+                    <span className="text-sm text-gray-500">
+                      {getCategoryDisplayName(qualification.category)}
+                    </span>
                   </div>
+                  
+                  {hasProgress && (
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between text-sm mb-1">
+                        <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                        <span className="font-medium">{userProgress.completionPercentage}%</span>
+                      </div>
+                      <Progress value={userProgress.completionPercentage} className="h-2" />
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-4 text-sm text-gray-600 dark:text-gray-400">
                     <div className="flex items-center gap-1">
                       <BookOpen className="h-4 w-4" />
-                      {assessment.questionCount} questions
+                      {qualification._count.assessments} assessments
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      {formatDuration(assessment.timeLimit)}
+                      {formatDuration(qualification.estimatedDuration)}
                     </div>
                     <div className="flex items-center gap-1">
                       <Users className="h-4 w-4" />
-                      {assessment._count.results} taken
+                      {qualification._count.qualificationProgress} enrolled
                     </div>
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <Badge className={getDifficultyColor(assessment.qualification.difficulty)}>
-                    {assessment.qualification.difficulty.toLowerCase()}
-                  </Badge>
+                  {userProgress && (
+                    <Badge className={getStatusColor(userProgress.status)}>
+                      {userProgress.status === 'IN_PROGRESS' ? 'In Progress' : 
+                       userProgress.status === 'COMPLETED' ? 'Completed' : 'Not Started'}
+                    </Badge>
+                  )}
                   <Button 
                     size="sm" 
                     className="min-w-[100px]"
                     onClick={(e) => {
                       e.stopPropagation()
-                      onNavigate?.(assessment.id)
+                      onNavigate?.(qualification.id)
                     }}
                   >
-                    Start Assessment
+                    {hasProgress ? 'Continue' : 'Start'}
                   </Button>
                 </div>
               </div>
@@ -444,43 +532,65 @@ function AssessmentCard({
   return (
     <Card 
       className="hover:shadow-md transition-shadow cursor-pointer" 
-      data-testid="assessment-card"
-      onClick={() => onNavigate?.(assessment.id)}
+      data-testid="qualification-card"
+      onClick={() => onNavigate?.(qualification.id)}
     >
       <CardHeader>
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <CardTitle className="text-lg mb-2 line-clamp-2">
-              {assessment.title}
+              {qualification.title}
             </CardTitle>
-            <Badge className={getDifficultyColor(assessment.qualification.difficulty)}>
-              {assessment.qualification.difficulty.toLowerCase()}
-            </Badge>
+            <div className="flex items-center gap-2 mb-2">
+              <Badge className={getDifficultyColor(qualification.difficulty)}>
+                {qualification.difficulty.toLowerCase()}
+              </Badge>
+              {userProgress && (
+                <Badge className={getStatusColor(userProgress.status)}>
+                  {userProgress.status === 'IN_PROGRESS' ? 'In Progress' : 
+                   userProgress.status === 'COMPLETED' ? 'Completed' : 'Not Started'}
+                </Badge>
+              )}
+            </div>
           </div>
         </div>
         <CardDescription className="line-clamp-3">
-          {assessment.description}
+          {qualification.description}
         </CardDescription>
         <div className="text-sm text-gray-500 dark:text-gray-500">
-          {assessment.qualification.title}
+          {getCategoryDisplayName(qualification.category)}
         </div>
       </CardHeader>
       <CardContent>
         <div className="space-y-3">
+          {hasProgress && (
+            <div>
+              <div className="flex items-center justify-between text-sm mb-1">
+                <span className="text-gray-600 dark:text-gray-400">Progress</span>
+                <span className="font-medium">{userProgress.completionPercentage}%</span>
+              </div>
+              <Progress value={userProgress.completionPercentage} className="h-2" />
+            </div>
+          )}
+          
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
             <div className="flex items-center gap-1">
               <BookOpen className="h-4 w-4" />
-              {assessment.questionCount} questions
+              {qualification._count.assessments} assessments
             </div>
             <div className="flex items-center gap-1">
               <Clock className="h-4 w-4" />
-              {formatDuration(assessment.timeLimit)}
+              {formatDuration(qualification.estimatedDuration)}
             </div>
           </div>
           <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
             <div className="flex items-center gap-1">
               <Users className="h-4 w-4" />
-              {assessment._count.results} taken
+              {qualification._count.qualificationProgress} enrolled
+            </div>
+            <div className="flex items-center gap-1">
+              <Target className="h-4 w-4" />
+              {qualification.passingScore}% to pass
             </div>
           </div>
           <Button 
@@ -488,10 +598,10 @@ function AssessmentCard({
             size="sm"
             onClick={(e) => {
               e.stopPropagation()
-              onNavigate?.(assessment.id)
+              onNavigate?.(qualification.id)
             }}
           >
-            Start Assessment
+            {hasProgress ? 'Continue' : 'Start Qualification'}
           </Button>
         </div>
       </CardContent>
@@ -509,22 +619,32 @@ function EmptyState({
   return (
     <Card className="p-8 text-center">
       <div className="space-y-4">
-        <BookOpen className="h-12 w-12 text-gray-400 mx-auto" />
+        <Award className="h-12 w-12 text-gray-400 mx-auto" />
         <div className="space-y-2">
           <h3 className="text-lg font-semibold">
-            {hasActiveFilters ? 'No assessments found' : 'No assessments available'}
+            {hasActiveFilters ? 'No qualifications found' : 'Welcome to Qualifications'}
           </h3>
           <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
             {hasActiveFilters 
               ? 'Try adjusting your search terms or filters to find what you\'re looking for.'
-              : 'New assessments are being added regularly. Check back soon for new challenges!'
+              : 'Start your learning journey by exploring our comprehensive qualification programs. Each qualification is designed to help you master specific skills and validate your expertise.'
             }
           </p>
         </div>
-        {hasActiveFilters && (
+        {hasActiveFilters ? (
           <Button variant="outline" onClick={onClearFilters}>
             Clear all filters
           </Button>
+        ) : (
+          <div className="space-y-2">
+            <p className="text-sm text-gray-500">Popular categories to get started:</p>
+            <div className="flex flex-wrap gap-2 justify-center">
+              <Badge variant="outline" className="cursor-pointer">Artificial Intelligence</Badge>
+              <Badge variant="outline" className="cursor-pointer">Web Development</Badge>
+              <Badge variant="outline" className="cursor-pointer">Data Science</Badge>
+              <Badge variant="outline" className="cursor-pointer">Cloud Computing</Badge>
+            </div>
+          </div>
         )}
       </div>
     </Card>

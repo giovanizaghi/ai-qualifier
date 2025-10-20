@@ -2,6 +2,7 @@
 
 import { User, Settings, LogOut, Home, Menu, X } from "lucide-react"
 import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { signOut, useSession } from "next-auth/react"
 import { useState } from "react"
 
@@ -22,6 +23,7 @@ interface DashboardShellProps {
 
 export function DashboardShell({ children }: DashboardShellProps) {
   const { data: session } = useSession()
+  const pathname = usePathname()
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const handleSignOut = () => {
@@ -47,14 +49,14 @@ export function DashboardShell({ children }: DashboardShellProps) {
               <Link 
                 href="/dashboard" 
                 className="transition-colors hover:text-foreground/80 focus-enhanced"
-                aria-current={typeof window !== 'undefined' && window.location.pathname === '/dashboard' ? 'page' : undefined}
+                aria-current={pathname === '/dashboard' ? 'page' : undefined}
               >
                 Dashboard
               </Link>
               <Link 
                 href="/qualifications" 
                 className="transition-colors hover:text-foreground/80 focus-enhanced"
-                aria-current={typeof window !== 'undefined' && window.location.pathname === '/qualifications' ? 'page' : undefined}
+                aria-current={pathname === '/qualifications' ? 'page' : undefined}
               >
                 Qualifications
               </Link>
@@ -152,7 +154,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 href="/dashboard" 
                 className="block px-2 py-2 text-sm font-medium transition-colors hover:text-foreground/80 rounded-md hover:bg-accent focus-enhanced"
                 onClick={closeMobileMenu}
-                aria-current={typeof window !== 'undefined' && window.location.pathname === '/dashboard' ? 'page' : undefined}
+                aria-current={pathname === '/dashboard' ? 'page' : undefined}
               >
                 Dashboard
               </Link>
@@ -160,7 +162,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
                 href="/qualifications" 
                 className="block px-2 py-2 text-sm font-medium transition-colors hover:text-foreground/80 rounded-md hover:bg-accent focus-enhanced"
                 onClick={closeMobileMenu}
-                aria-current={typeof window !== 'undefined' && window.location.pathname === '/qualifications' ? 'page' : undefined}
+                aria-current={pathname === '/qualifications' ? 'page' : undefined}
               >
                 Qualifications
               </Link>

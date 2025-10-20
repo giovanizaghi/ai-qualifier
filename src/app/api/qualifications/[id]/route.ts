@@ -53,6 +53,9 @@ interface RouteParams {
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const { id } = await params
+    const { searchParams } = new URL(req.url)
+    const includeAssessments = searchParams.get('includeAssessments') === 'true'
+    const includeProgress = searchParams.get('includeProgress') === 'true'
 
     const qualification = await prisma.qualification.findUnique({
       where: { id },
