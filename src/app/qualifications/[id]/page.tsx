@@ -4,13 +4,13 @@ import { ArrowLeft, BookOpen, Clock, Users, Award, Play, Target, TrendingUp, Che
 import { useParams, useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
+import { EnrollmentDialog } from '@/components/qualifications/enrollment-dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { EnrollmentDialog } from '@/components/qualifications/enrollment-dialog'
 import { cn } from '@/lib/utils'
 import { Qualification, Assessment, QualificationCategory, DifficultyLevel } from '@/types'
 
