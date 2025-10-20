@@ -9,11 +9,11 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-import { cn } from '@/lib/utils'
 import { 
   getMockLearningPathsWithProgress, 
   filterMockLearningPaths 
 } from '@/lib/mock-learning-paths'
+import { cn } from '@/lib/utils'
 import { 
   LearningPathWithProgress, 
   LearningPathFilters, 

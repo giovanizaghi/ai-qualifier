@@ -11,6 +11,7 @@ import {
   ProgressStatus as LPProgressStatus,
   StepStatus 
 } from '@/types/learning-paths'
+
 import { 
   ProgressAnalytics, 
   ProgressMilestone, 
@@ -124,7 +125,7 @@ export class LearningPathProgressIntegration {
    * Calculate overall progress across all learning paths
    */
   private calculateOverallProgress(paths: LearningPathWithProgress[]): number {
-    if (paths.length === 0) return 0
+    if (paths.length === 0) {return 0}
     
     const totalProgress = paths.reduce(
       (sum, path) => sum + (path.userProgress?.completionPercentage || 0),
@@ -140,7 +141,7 @@ export class LearningPathProgressIntegration {
   private calculateAverageScore(paths: LearningPathWithProgress[]): number {
     const pathsWithScores = paths.filter(path => path.userProgress?.averageScore)
     
-    if (pathsWithScores.length === 0) return 0
+    if (pathsWithScores.length === 0) {return 0}
     
     const totalScore = pathsWithScores.reduce(
       (sum, path) => sum + (path.userProgress?.averageScore || 0),
@@ -204,7 +205,7 @@ export class LearningPathProgressIntegration {
    */
   private countCompletedAssessments(paths: LearningPathWithProgress[]): number {
     return paths.reduce((total, path) => {
-      if (!path.userProgress) return total
+      if (!path.userProgress) {return total}
       
       const completedStepsWithAssessments = path.steps.filter(step => 
         step.hasAssessment && 
@@ -244,7 +245,7 @@ export class LearningPathProgressIntegration {
       path => path.userProgress?.status === LPProgressStatus.IN_PROGRESS
     )
     
-    if (inProgressPaths.length === 0) return 0
+    if (inProgressPaths.length === 0) {return 0}
     
     return inProgressPaths.reduce((total, path) => {
       const remainingPercentage = 100 - (path.userProgress?.completionPercentage || 0)

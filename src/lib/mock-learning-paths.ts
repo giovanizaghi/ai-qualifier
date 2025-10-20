@@ -76,8 +76,8 @@ const getStepTitle = (index: number, total: number): string => {
     'Next Steps and Resources'
   ]
   
-  if (index === 0) return 'Introduction and Setup'
-  if (index === total - 1) return 'Final Project and Assessment'
+  if (index === 0) {return 'Introduction and Setup'}
+  if (index === total - 1) {return 'Final Project and Assessment'}
   
   return titles[index % titles.length] || `Advanced Topic ${index}`
 }
@@ -438,7 +438,7 @@ export const getMockLearningPathsWithProgress = (userId?: string): LearningPathW
 // Helper function to get a single learning path with progress
 export const getMockLearningPath = (pathId: string, userId?: string): LearningPathWithProgress | null => {
   const path = mockLearningPaths.find(p => p.id === pathId)
-  if (!path) return null
+  if (!path) {return null}
   
   return {
     ...path,
@@ -490,13 +490,13 @@ export const filterMockLearningPaths = (
       const userProgress = path.userProgress
       switch (filters.status) {
         case 'not-started':
-          if (userProgress && userProgress.status !== ProgressStatus.NOT_STARTED) return false
+          if (userProgress && userProgress.status !== ProgressStatus.NOT_STARTED) {return false}
           break
         case 'in-progress':
-          if (!userProgress || userProgress.status !== ProgressStatus.IN_PROGRESS) return false
+          if (!userProgress || userProgress.status !== ProgressStatus.IN_PROGRESS) {return false}
           break
         case 'completed':
-          if (!userProgress || userProgress.status !== ProgressStatus.COMPLETED) return false
+          if (!userProgress || userProgress.status !== ProgressStatus.COMPLETED) {return false}
           break
       }
     }

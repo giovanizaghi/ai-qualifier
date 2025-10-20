@@ -50,19 +50,19 @@ class LearningPathService {
       const params = new URLSearchParams()
       
       // Add filters
-      if (filters.search) params.append('search', filters.search)
-      if (filters.category) params.append('category', filters.category)
-      if (filters.difficulty) params.append('difficulty', filters.difficulty)
-      if (filters.status) params.append('status', filters.status)
-      if (filters.tags?.length) params.append('tags', filters.tags.join(','))
+      if (filters.search) {params.append('search', filters.search)}
+      if (filters.category) {params.append('category', filters.category)}
+      if (filters.difficulty) {params.append('difficulty', filters.difficulty)}
+      if (filters.status) {params.append('status', filters.status)}
+      if (filters.tags?.length) {params.append('tags', filters.tags.join(','))}
       
       // Add pagination
-      if (pagination.limit) params.append('limit', pagination.limit.toString())
-      if (pagination.offset) params.append('offset', pagination.offset.toString())
+      if (pagination.limit) {params.append('limit', pagination.limit.toString())}
+      if (pagination.offset) {params.append('offset', pagination.offset.toString())}
       
       // Add sorting
-      if (sorting.sortBy) params.append('sortBy', sorting.sortBy)
-      if (sorting.sortOrder) params.append('sortOrder', sorting.sortOrder)
+      if (sorting.sortBy) {params.append('sortBy', sorting.sortBy)}
+      if (sorting.sortOrder) {params.append('sortOrder', sorting.sortOrder)}
       
       const response = await fetch(`${this.baseUrl}?${params.toString()}`)
       const result = await response.json()
