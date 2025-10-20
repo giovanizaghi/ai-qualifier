@@ -1,5 +1,11 @@
 # AI Qualifier - Intelligent Lead Qualification Platform
 
+## 🎥 Demo Video
+
+[![AI Qualifier Demo](https://img.youtube.com/vi/hUkq3k-VAvU/0.jpg)](https://youtu.be/hUkq3k-VAvU)
+
+*Click the image above to watch a 5-minute walkthrough of the AI Qualifier system*
+
 > An AI-powered lead qualification system that generates Ideal Customer Profiles (ICPs) and automatically qualifies prospects using OpenAI GPT-4.
 
 **Built for**: Cloud Employee Technical Assessment  
