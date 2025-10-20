@@ -2,7 +2,7 @@
 
 ## 🎥 Demo Video
 
-[![AI Qualifier Demo](https://img.youtube.com/vi/hUkq3k-VAvU/0.jpg)](https://youtu.be/hUkq3k-VAvU)
+[![AI Qualifier Demo](https://img.youtube.com/vi/hUkq3k-VAvU/maxresdefault.jpg)](https://youtu.be/hUkq3k-VAvU)
 
 *Click the image above to watch a 5-minute walkthrough of the AI Qualifier system*
 
@@ -28,7 +28,6 @@
 - [Implementation Details](#-implementation-details)
 - [Design Decisions](#-design-decisions)
 - [What's Next](#-whats-next)
-- [Video Walkthrough](#-video-walkthrough)
 
 ---
 
@@ -944,10 +943,6 @@ The project was built in 10 structured phases over ~9 hours:
 
 ## 🎨 Design Decisions
 
----
-
-## 🎨 Design Decisions
-
 ### Architecture Choices
 
 #### 1. Next.js App Router over Pages Router
@@ -998,20 +993,6 @@ The project was built in 10 structured phases over ~9 hours:
 - [ ] Performance optimization
 - [ ] Database backups
 - [ ] CI/CD pipeline (GitHub Actions)
-
----
-
-## 🎥 Video Walkthrough
-
-**Video URL**: [Add your Loom video link here]
-
-### Video Outline (5 minutes)
-
-1. **Introduction** (30s) - Project overview and tech stack
-2. **Architecture Deep-Dive** (90s) - Database schema, service layer, API routes
-3. **Live Demo** (2 min) - Full user flow from signup to results
-4. **Code Quality Showcase** (60s) - Error handling, type safety, rate limiting
-5. **Design Decisions** (30s) - Key architectural choices and trade-offs
 
 ---
 
