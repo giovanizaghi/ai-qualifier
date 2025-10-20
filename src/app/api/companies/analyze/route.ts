@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
     const { domain } = validationResult.data;
 
     // Check if company already exists for this user
-    const existingCompany = await prisma.company.findFirst({
+    const existingUserCompany = await prisma.company.findFirst({
       where: {
         domain: domain.toLowerCase(),
         userId: session.user.id,
@@ -52,13 +52,75 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if (existingCompany) {
+    if (existingUserCompany) {
       return NextResponse.json(
         { 
-          error: 'Company already exists',
-          company: existingCompany,
+          error: 'Company already exists for this user',
+          company: existingUserCompany,
         },
         { status: 409 }
+      );
+    }
+
+    // Check if company already exists globally (analyzed by any user)
+    const existingGlobalCompany = await prisma.company.findFirst({
+      where: {
+        domain: domain.toLowerCase(),
+      },
+      include: {
+        icps: {
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+      },
+    });
+
+    if (existingGlobalCompany) {
+      // Company already analyzed by another user - create a copy for this user
+      console.log(`[API] Company ${domain} already exists, creating copy for user ${session.user.id}`);
+      
+      const userCompanyCopy = await prisma.company.create({
+        data: {
+          userId: session.user.id,
+          domain: domain.toLowerCase(),
+          name: existingGlobalCompany.name,
+          description: existingGlobalCompany.description,
+          industry: existingGlobalCompany.industry,
+          size: existingGlobalCompany.size,
+          websiteData: existingGlobalCompany.websiteData as any,
+          aiAnalysis: existingGlobalCompany.aiAnalysis as any,
+          icps: {
+            create: existingGlobalCompany.icps.map(icp => ({
+              title: icp.title,
+              description: icp.description,
+              buyerPersonas: icp.buyerPersonas as any,
+              companySize: icp.companySize as any,
+              industries: icp.industries,
+              geographicRegions: icp.geographicRegions,
+              fundingStages: icp.fundingStages,
+              generatedBy: icp.generatedBy,
+              prompt: icp.prompt,
+            }))
+          },
+        },
+        include: {
+          icps: {
+            orderBy: { createdAt: 'desc' },
+            take: 1,
+          },
+        },
+      });
+
+      console.log(`[API] Company copy created for user: ${userCompanyCopy.id}`);
+
+      return NextResponse.json(
+        {
+          success: true,
+          company: userCompanyCopy,
+          icp: userCompanyCopy.icps[0],
+          reused: true, // Flag to indicate this was reused data
+        },
+        { status: 201 }
       );
     }
 

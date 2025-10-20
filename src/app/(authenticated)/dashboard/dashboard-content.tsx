@@ -3,7 +3,7 @@
 import { User } from "next-auth"
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Building2, Sparkles, TrendingUp, Plus, Loader2 } from "lucide-react"
+import { Building2, Sparkles, TrendingUp, Plus, Loader2, RefreshCw } from "lucide-react"
 
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -93,19 +93,35 @@ export default function DashboardContent({ user }: DashboardContentProps) {
   }
 
   useEffect(() => {
-    async function fetchData() {
-      try {
+    fetchData()
+  }, [user.id])
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
         // Fetch companies
-        const companyRes = await fetch("/api/companies")
+        console.log('[Dashboard] Fetching companies...');
+        const companyRes = await fetch("/api/companies", {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        })
         if (companyRes.ok) {
           const data = await companyRes.json()
+          console.log('[Dashboard] Companies response:', data);
           setCompanies(data.companies || [])
         } else {
           console.error('Failed to fetch companies:', companyRes.status, await companyRes.text())
         }
 
         // Fetch recent qualification runs
-        const runsRes = await fetch("/api/qualify/recent")
+        const runsRes = await fetch("/api/qualify/recent", {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache'
+          }
+        })
         if (runsRes.ok) {
           const data = await runsRes.json()
           console.log('Recent runs data:', data)
@@ -121,6 +137,8 @@ export default function DashboardContent({ user }: DashboardContentProps) {
         setLoading(false)
       }
     }
+
+  useEffect(() => {
     fetchData()
   }, [user.id])
 
@@ -179,12 +197,22 @@ export default function DashboardContent({ user }: DashboardContentProps) {
             <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
             <p className="text-muted-foreground">Manage your ICP and qualify prospects</p>
           </div>
-          <Button asChild>
-            <Link href="/qualify">
-              <Sparkles className="w-4 h-4 mr-2" />
-              Qualify Prospects
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => fetchData()}
+              disabled={loading}
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Button asChild>
+              <Link href="/qualify">
+                <Sparkles className="w-4 h-4 mr-2" />
+                Qualify Prospects
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {error && (

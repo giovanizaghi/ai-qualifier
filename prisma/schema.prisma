@@ -84,7 +84,7 @@ model VerificationToken {
 model Company {
   id          String   @id @default(cuid())
   userId      String
-  domain      String   @unique
+  domain      String
   name        String?
   description String?  @db.Text
   industry    String?
@@ -101,6 +101,7 @@ model Company {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
   
+  @@unique([domain, userId]) // Allow same domain for different users
   @@map("companies")
 }
 

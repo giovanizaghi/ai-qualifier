@@ -17,6 +17,8 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    console.log(`[API] Fetching companies for user: ${session.user.id} (${session.user.email})`);
+
     // Fetch user's companies with their ICPs
     const companies = await prisma.company.findMany({
       where: {
@@ -36,6 +38,11 @@ export async function GET(req: NextRequest) {
       orderBy: {
         createdAt: 'desc',
       },
+    });
+
+    console.log(`[API] Found ${companies.length} companies for user ${session.user.id}`);
+    companies.forEach(company => {
+      console.log(`[API] - Company: ${company.name || company.domain} (${company.id})`);
     });
 
     return NextResponse.json({
