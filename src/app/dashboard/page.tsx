@@ -1,8 +1,9 @@
 import { Metadata } from "next"
 import { redirect } from "next/navigation"
 
-import DashboardContent from "./dashboard-content"
 import { auth } from "@/lib/auth"
+
+import DashboardContent from "./dashboard-content"
 
 export const metadata: Metadata = {
   title: "Dashboard | AI Qualifier",

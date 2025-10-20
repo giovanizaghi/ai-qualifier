@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { User } from "next-auth"
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
+import { useState, useEffect } from "react"
+
 import { 
   DashboardHeader, 
   DashboardShell,
@@ -14,6 +14,7 @@ import {
   NoAchievementsEmptyState
 } from "@/components/dashboard"
 import { DashboardEmptyStateTest } from "@/components/dashboard/empty-state-test"
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 // Use dynamic import for Prisma client in server context
 let prisma: any = null;
 if (typeof window === "undefined") {
@@ -71,7 +72,7 @@ export default function DashboardContent({ user }: DashboardContentProps) {
   useEffect(() => {
     async function fetchData() {
       // Fetch qualification progress
-      if (!prisma) return;
+      if (!prisma) {return;}
       // Fetch qualification progress
       const qp: QualificationProgressType[] = await prisma.qualificationProgress.findMany({
         where: { userId: user.id },
