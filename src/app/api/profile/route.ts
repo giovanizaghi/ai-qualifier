@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
+import { z } from "zod"
+
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { z } from "zod"
 
 const updateProfileSchema = z.object({
   name: z.string().min(2, "Display name must be at least 2 characters"),
