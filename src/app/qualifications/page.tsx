@@ -102,13 +102,13 @@ export default function QualificationsPage() {
         const userProgress = qualification.userProgress
         switch (filters.status) {
           case 'not-started':
-            if (userProgress && userProgress.status !== 'NOT_STARTED') return false
+            if (userProgress && userProgress.status !== 'NOT_STARTED') {return false}
             break
           case 'in-progress':
-            if (!userProgress || userProgress.status !== 'IN_PROGRESS') return false
+            if (!userProgress || userProgress.status !== 'IN_PROGRESS') {return false}
             break
           case 'completed':
-            if (!userProgress || userProgress.status !== 'COMPLETED') return false
+            if (!userProgress || userProgress.status !== 'COMPLETED') {return false}
             break
         }
       }
@@ -442,7 +442,7 @@ function QualificationCard({
   }
 
   const formatDuration = (minutes: number) => {
-    if (minutes < 60) return `${minutes} min`
+    if (minutes < 60) {return `${minutes} min`}
     const hours = Math.floor(minutes / 60)
     const remainingMinutes = minutes % 60
     return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}m` : ''}`

@@ -127,14 +127,14 @@ export default function QualificationDetailsPage() {
   }
 
   const formatDuration = (minutes: number) => {
-    if (minutes < 60) return `${minutes} min`
+    if (minutes < 60) {return `${minutes} min`}
     const hours = Math.floor(minutes / 60)
     const remainingMinutes = minutes % 60
     return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}m` : ''}`
   }
 
   const formatDate = (date?: string | Date) => {
-    if (!date) return ''
+    if (!date) {return ''}
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -144,7 +144,7 @@ export default function QualificationDetailsPage() {
   }
 
   const generateLearningPath = (): LearningPathStep[] => {
-    if (!qualification?.assessments) return []
+    if (!qualification?.assessments) {return []}
 
     return qualification.assessments.map((assessment, index) => ({
       id: assessment.id,

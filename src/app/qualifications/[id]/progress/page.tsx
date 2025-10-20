@@ -104,14 +104,14 @@ export default function QualificationProgressPage() {
   }
 
   const formatDuration = (minutes: number) => {
-    if (minutes < 60) return `${minutes} min`
+    if (minutes < 60) {return `${minutes} min`}
     const hours = Math.floor(minutes / 60)
     const remainingMinutes = minutes % 60
     return `${hours}h ${remainingMinutes > 0 ? `${remainingMinutes}m` : ''}`
   }
 
   const formatDate = (date?: string | Date) => {
-    if (!date) return ''
+    if (!date) {return ''}
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return dateObj.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -130,7 +130,7 @@ export default function QualificationProgressPage() {
   }
 
   const calculateOverallStats = () => {
-    if (!data) return { completed: 0, total: 0, avgScore: 0, totalTime: 0 }
+    if (!data) {return { completed: 0, total: 0, avgScore: 0, totalTime: 0 }}
     
     const completed = data.assessments.filter(a => a.userProgress?.passed).length
     const total = data.assessments.length
