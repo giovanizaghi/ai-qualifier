@@ -545,12 +545,12 @@ const form = useForm<z.infer<typeof formSchema>>({
 
 ## 🚀 Live Demo
 
-**Application URL**: [Add your deployed URL here]
+**Application URL**: [\Vercel App\]](https://ai-qualifier.vercel.app)
 
 ### Test Credentials
 ```
-Email: demo@example.com
-Password: demo123
+Email: giovanitesting@test.com
+Password: Test@123
 ```
 
 ### Quick Test Flow
