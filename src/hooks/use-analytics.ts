@@ -2,7 +2,19 @@
 
 import { useCallback, useEffect, useRef } from 'react'
 
-import { AnalyticsEventType } from '@/lib/user-analytics'
+// Define analytics event types
+export type AnalyticsEventType = 
+  | 'session_start'
+  | 'session_end'
+  | 'page_view'
+  | 'assessment_start'
+  | 'assessment_complete'
+  | 'question_answered'
+  | 'search_performed'
+  | 'bookmark_added'
+  | 'bookmark_removed'
+  | 'error_occurred'
+  | string
 
 interface AnalyticsHookOptions {
   enableAutoTracking?: boolean

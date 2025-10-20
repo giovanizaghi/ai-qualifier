@@ -29,15 +29,6 @@ vi.mock('next/image', () => ({
   ),
 }))
 
-// Mock environment variables
-vi.mock('@/lib/env', () => ({
-  env: {
-    NEXTAUTH_SECRET: 'test-secret',
-    NEXTAUTH_URL: 'http://localhost:3000',
-    DATABASE_URL: 'postgresql://test:test@localhost:5432/test',
-  },
-}))
-
 // Global test utilities
 global.ResizeObserver = vi.fn().mockImplementation(() => ({
   observe: vi.fn(),
