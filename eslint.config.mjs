@@ -25,6 +25,11 @@ const eslintConfig = [
       "playwright-report/**",
       "src/generated/**",
       "prisma/generated/**",
+      "src/test/**",
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/*.spec.ts",
+      "**/*.spec.tsx",
     ],
   },
   {

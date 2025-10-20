@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -20,7 +20,7 @@ export async function GET(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Fetch company with all related data
     const company = await prisma.company.findUnique({
@@ -31,7 +31,7 @@ export async function GET(
         icps: {
           orderBy: { createdAt: 'desc' },
           include: {
-            qualifications: {
+            qualificationRuns: {
               orderBy: { createdAt: 'desc' },
               take: 5, // Get last 5 qualification runs
               include: {
@@ -84,7 +84,7 @@ export async function GET(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     // Check authentication
@@ -96,7 +96,7 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const { id } = await params;
 
     // Fetch company to verify ownership
     const company = await prisma.company.findUnique({

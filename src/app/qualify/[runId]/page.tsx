@@ -1,12 +1,12 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { QualificationResults } from "@/components/qualify/qualification-results";
+import { QualificationResults } from "@/components/qualify";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     runId: string;
-  };
+  }>;
 }
 
 export default async function QualificationRunPage({ params }: PageProps) {
@@ -16,9 +16,12 @@ export default async function QualificationRunPage({ params }: PageProps) {
     redirect("/auth/signin");
   }
 
+  // Await params in Next.js 15
+  const { runId } = await params;
+
   // Fetch run data
   const run = await prisma.qualificationRun.findUnique({
-    where: { id: params.runId },
+    where: { id: runId },
     include: {
       icp: {
         include: {

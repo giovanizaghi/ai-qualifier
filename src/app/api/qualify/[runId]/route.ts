@@ -8,7 +8,7 @@ import { prisma } from '@/lib/prisma';
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { runId: string } }
+  { params }: { params: Promise<{ runId: string }> }
 ) {
   try {
     // Check authentication
@@ -20,7 +20,7 @@ export async function GET(
       );
     }
 
-    const { runId } = params;
+    const { runId } = await params;
 
     // Fetch qualification run with results
     const run = await prisma.qualificationRun.findUnique({
@@ -124,7 +124,7 @@ export async function GET(
  */
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { runId: string } }
+  { params }: { params: Promise<{ runId: string }> }
 ) {
   try {
     // Check authentication
@@ -136,7 +136,7 @@ export async function DELETE(
       );
     }
 
-    const { runId } = params;
+    const { runId } = await params;
 
     // Fetch run to verify ownership
     const run = await prisma.qualificationRun.findUnique({

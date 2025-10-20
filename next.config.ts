@@ -87,7 +87,6 @@ const nextConfig: NextConfig = {
 
   // Docker and production optimizations
   ...(process.env.NODE_ENV === 'production' && {
-    swcMinify: true,
     output: 'standalone',
     compiler: {
       removeConsole: {

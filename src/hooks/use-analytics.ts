@@ -88,23 +88,23 @@ export function useAnalytics(options: AnalyticsHookOptions = {}) {
 
   // Track page views automatically
   useEffect(() => {
-    if (enableAutoTracking) {
-      const handleRouteChange = () => {
-        trackEvent('page_view', {
-          page: window.location.pathname,
-          referrer: document.referrer
-        })
-      }
+    if (!enableAutoTracking) return
 
-      // Track initial page view
-      handleRouteChange()
+    const handleRouteChange = () => {
+      trackEvent('page_view', {
+        page: window.location.pathname,
+        referrer: document.referrer
+      })
+    }
 
-      // For Next.js App Router, we'll track on mount
-      // In a real implementation, you might want to use Next.js router events
-      
-      return () => {
-        // Cleanup if needed
-      }
+    // Track initial page view
+    handleRouteChange()
+
+    // For Next.js App Router, we'll track on mount
+    // In a real implementation, you might want to use Next.js router events
+    
+    return () => {
+      // Cleanup if needed
     }
   }, [enableAutoTracking])
 

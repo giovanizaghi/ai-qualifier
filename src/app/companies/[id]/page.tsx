@@ -52,5 +52,21 @@ export default async function CompanyDetailsPage({ params }: PageProps) {
     redirect("/dashboard")
   }
 
-  return <CompanyDetailsContent company={company} user={session.user} />
+  // Serialize dates for client component
+  const serializedCompany = {
+    ...company,
+    createdAt: company.createdAt.toISOString(),
+    updatedAt: company.updatedAt.toISOString(),
+    icps: company.icps.map((icp: typeof company.icps[number]) => ({
+      ...icp,
+      createdAt: icp.createdAt.toISOString(),
+      qualificationRuns: icp.qualificationRuns.map((run: typeof icp.qualificationRuns[number]) => ({
+        ...run,
+        createdAt: run.createdAt.toISOString(),
+        completedAt: run.completedAt?.toISOString() || null,
+      })),
+    })),
+  }
+
+  return <CompanyDetailsContent company={serializedCompany} user={session.user} />
 }
