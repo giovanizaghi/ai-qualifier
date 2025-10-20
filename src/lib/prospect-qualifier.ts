@@ -103,7 +103,7 @@ Buyer Personas:
 ${icp.buyerPersonas.map((p) => `- ${p.role} (${p.seniority}, ${p.department})`).join('\n')}
 
 Key Indicators:
-${icp.keyIndicators.map((i) => `- ${i}`).join('\n')}
+${(icp.keyIndicators || []).map((i) => `- ${i}`).join('\n') || '- None specified'}
 
 === PROSPECT COMPANY ===
 Domain: ${prospectDomain}

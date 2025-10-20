@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import { qualifyProspects } from '@/lib/prospect-qualifier';
+import type { ICPData } from '@/lib/icp-generator';
 import { z } from 'zod';
 
 // Request validation schema
@@ -64,6 +65,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Map ICP to ICPData structure
+    const icpData = {
+      title: icp.title,
+      description: icp.description,
+      buyerPersonas: icp.buyerPersonas as any,
+      companySize: icp.companySize as any,
+      industries: icp.industries,
+      geographicRegions: icp.geographicRegions,
+      fundingStages: icp.fundingStages,
+      keyIndicators: (icp as any).keyIndicators || [],
+      technographics: (icp as any).technographics || [],
+    };
+
     // Create qualification run
     const run = await prisma.qualificationRun.create({
       data: {
@@ -79,7 +93,7 @@ export async function POST(req: NextRequest) {
 
     // Process prospects asynchronously
     // Note: In production, this should be moved to a background job queue
-    processQualification(run.id, icp, domains).catch((error) => {
+    processQualification(run.id, icpData, domains).catch((error) => {
       console.error(`[API] Error processing qualification run ${run.id}:`, error);
     });
 
@@ -112,7 +126,7 @@ export async function POST(req: NextRequest) {
  */
 async function processQualification(
   runId: string,
-  icp: any,
+  icp: ICPData,
   domains: string[]
 ) {
   try {

@@ -4,6 +4,7 @@ import { Inter } from "next/font/google"
 
 import { SessionProvider } from "@/components/providers/session-provider"
 import { SonnerProvider } from "@/components/ui/sonner-provider"
+import { ActiveRunNotifierWrapper } from "@/components/shared"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -80,6 +81,7 @@ export default function RootLayout({
       <body className={`${inter.className} antialiased safe-area-padding`}>
         <SessionProvider>
           <SonnerProvider />
+          <ActiveRunNotifierWrapper />
           {children}
         </SessionProvider>
       </body>

@@ -281,8 +281,17 @@ export function QualificationResults({ run: initialRun }: QualificationResultsPr
                                   <div key={i} className="flex items-start gap-2 text-sm">
                                     <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
                                     <div>
-                                      <span className="font-medium">{criterion.criterion || criterion}:</span>{" "}
-                                      {criterion.match || "Matches"}
+                                      <span className="font-medium">
+                                        {criterion.criteria || criterion.criterion || (typeof criterion === "string" ? criterion : "Criterion")}
+                                      </span>
+                                      {criterion.evidence && (
+                                        <span className="text-muted-foreground">: {criterion.evidence}</span>
+                                      )}
+                                      {criterion.confidence && (
+                                        <Badge variant="outline" className="ml-2 text-xs">
+                                          {criterion.confidence}% confident
+                                        </Badge>
+                                      )}
                                     </div>
                                   </div>
                                 ))}

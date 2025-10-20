@@ -98,15 +98,50 @@ export function ProspectCard({ prospect }: ProspectCardProps) {
                     Matched Criteria
                   </h4>
                   <div className="space-y-2">
-                    {matchedCriteria.map((item: any, index: number) => (
-                      <div key={index} className="text-sm">
-                        <Badge variant="outline" className="bg-green-50">
-                          {typeof item === "string"
-                            ? item
-                            : item.key || JSON.stringify(item)}
-                        </Badge>
-                      </div>
-                    ))}
+                    {matchedCriteria.map((item: any, index: number) => {
+                      // Handle string format
+                      if (typeof item === "string") {
+                        return (
+                          <div key={index} className="text-sm">
+                            <Badge variant="outline" className="bg-green-50">
+                              {item}
+                            </Badge>
+                          </div>
+                        );
+                      }
+                      
+                      // Handle MatchedCriteria object format
+                      if (item.criteria || item.criterion) {
+                        return (
+                          <div key={index} className="text-sm space-y-1">
+                            <div className="flex items-start gap-2">
+                              <Badge variant="outline" className="bg-green-50">
+                                {item.criteria || item.criterion}
+                              </Badge>
+                              {item.confidence && (
+                                <span className="text-xs text-muted-foreground">
+                                  ({item.confidence}% match)
+                                </span>
+                              )}
+                            </div>
+                            {item.evidence && (
+                              <p className="text-xs text-muted-foreground ml-2">
+                                {item.evidence}
+                              </p>
+                            )}
+                          </div>
+                        );
+                      }
+                      
+                      // Fallback for object with key/value
+                      return (
+                        <div key={index} className="text-sm">
+                          <Badge variant="outline" className="bg-green-50">
+                            {item.key || JSON.stringify(item)}
+                          </Badge>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
