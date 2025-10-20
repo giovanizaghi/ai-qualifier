@@ -19,6 +19,7 @@ import {
 import { useState } from "react"
 import { toast } from "sonner"
 
+import { NoAssessmentHistoryEmptyState } from "@/components/assessment/empty-states"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -218,6 +219,11 @@ export function StudyHistory({ userId }: StudyHistoryProps) {
     .filter(a => a.score)
     .reduce((sum, a, _, arr) => sum + (a.score! / arr.length), 0)
   const totalPoints = mockActivityData.reduce((sum, activity) => sum + activity.points, 0)
+
+  // Show empty state if no activity data exists
+  if (mockActivityData.length === 0) {
+    return <NoAssessmentHistoryEmptyState />
+  }
 
   return (
     <div className="space-y-6">

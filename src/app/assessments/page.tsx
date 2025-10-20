@@ -4,6 +4,7 @@ import { Search, Filter, Grid, List, BookOpen, Clock, Users } from 'lucide-react
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
 
+import { NoAvailableAssessmentsEmptyState, AssessmentFilterEmptyState } from '@/components/assessment/empty-states'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -327,9 +328,12 @@ export default function AssessmentsPage() {
         {/* Assessments Grid/List */}
         {!loading && (
           <>
-            {filteredAssessments.length === 0 ? (
-              <EmptyState
-                hasActiveFilters={hasActiveFilters}
+            {assessments.length === 0 ? (
+              // No assessments exist in the system at all
+              <NoAvailableAssessmentsEmptyState />
+            ) : filteredAssessments.length === 0 ? (
+              // Assessments exist but filters are too restrictive
+              <AssessmentFilterEmptyState
                 onClearFilters={clearFilters}
               />
             ) : (
@@ -495,38 +499,6 @@ function AssessmentCard({
           </Button>
         </div>
       </CardContent>
-    </Card>
-  )
-}
-
-function EmptyState({ 
-  hasActiveFilters, 
-  onClearFilters 
-}: { 
-  hasActiveFilters: boolean
-  onClearFilters: () => void 
-}) {
-  return (
-    <Card className="p-8 text-center">
-      <div className="space-y-4">
-        <BookOpen className="h-12 w-12 text-gray-400 mx-auto" />
-        <div className="space-y-2">
-          <h3 className="text-lg font-semibold">
-            {hasActiveFilters ? 'No assessments found' : 'No assessments available'}
-          </h3>
-          <p className="text-gray-600 dark:text-gray-400 max-w-md mx-auto">
-            {hasActiveFilters 
-              ? 'Try adjusting your search terms or filters to find what you\'re looking for.'
-              : 'New assessments are being added regularly. Check back soon for new challenges!'
-            }
-          </p>
-        </div>
-        {hasActiveFilters && (
-          <Button variant="outline" onClick={onClearFilters}>
-            Clear all filters
-          </Button>
-        )}
-      </div>
     </Card>
   )
 }
