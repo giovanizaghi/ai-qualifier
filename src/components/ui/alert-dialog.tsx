@@ -59,23 +59,32 @@ const AlertDialogContext = React.createContext<{
 
 const AlertDialog: React.FC<AlertDialogProps> = ({ children }) => {
   const [open, setOpen] = React.useState(false)
+  
+  // Extract content and trigger from children
+  let content: React.ReactNode = null
+  let trigger: React.ReactNode = null
+  
+  React.Children.forEach(children, (child) => {
+    if (React.isValidElement(child)) {
+      if (child.type === AlertDialogContent) {
+        content = child
+      } else if (child.type === AlertDialogTrigger) {
+        trigger = child
+      }
+    }
+  })
 
   return (
     <AlertDialogContext.Provider value={{ open, setOpen }}>
-      {children}
+      {trigger}
       {open && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div 
             className="fixed inset-0 bg-black/50" 
             onClick={() => setOpen(false)}
           />
-          <div className="relative">
-            {React.Children.map(children, (child) => {
-              if (React.isValidElement(child) && child.type === AlertDialogContent) {
-                return child
-              }
-              return null
-            })}
+          <div className="relative z-50">
+            {content}
           </div>
         </div>
       )}
