@@ -34,6 +34,7 @@ interface QualificationRun {
   totalProspects: number
   completed: number
   createdAt: string
+  completedAt?: string | null
   icp: {
     id: string
     title: string
@@ -50,6 +51,38 @@ export default function DashboardContent({ user }: DashboardContentProps) {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
 
+  // Helper function to get status badge variant and label
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case 'COMPLETED':
+        return { variant: 'default' as const, label: 'Completed' }
+      case 'PROCESSING':
+        return { variant: 'secondary' as const, label: 'Processing' }
+      case 'PENDING':
+        return { variant: 'outline' as const, label: 'Pending' }
+      case 'FAILED':
+        return { variant: 'destructive' as const, label: 'Failed' }
+      default:
+        return { variant: 'outline' as const, label: status }
+    }
+  }
+
+  // Helper function to format relative time
+  const formatRelativeTime = (dateString: string) => {
+    const date = new Date(dateString)
+    const now = new Date()
+    const diffMs = now.getTime() - date.getTime()
+    const diffMins = Math.floor(diffMs / 60000)
+    const diffHours = Math.floor(diffMs / 3600000)
+    const diffDays = Math.floor(diffMs / 86400000)
+
+    if (diffMins < 1) return 'Just now'
+    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
+    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+    return date.toLocaleDateString()
+  }
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -58,13 +91,23 @@ export default function DashboardContent({ user }: DashboardContentProps) {
         if (companyRes.ok) {
           const data = await companyRes.json()
           setCompanies(data.companies || [])
+        } else {
+          console.error('Failed to fetch companies:', companyRes.status, await companyRes.text())
         }
 
-        // Fetch recent qualification runs (we'll need to add this endpoint or get from company data)
-        // For now, we'll just show companies
+        // Fetch recent qualification runs
+        const runsRes = await fetch("/api/qualify/recent")
+        if (runsRes.ok) {
+          const data = await runsRes.json()
+          console.log('Recent runs data:', data)
+          setRecentRuns(data.runs || [])
+        } else {
+          console.error('Failed to fetch recent runs:', runsRes.status, await runsRes.text())
+        }
         
         setLoading(false)
       } catch (err) {
+        console.error('Error fetching dashboard data:', err)
         setError("Failed to load dashboard data")
         setLoading(false)
       }
@@ -249,19 +292,50 @@ export default function DashboardContent({ user }: DashboardContentProps) {
               </div>
             ) : (
               <div className="space-y-4">
-                {recentRuns.map((run) => (
-                  <div key={run.id} className="flex items-center justify-between p-4 border rounded-lg">
-                    <div>
-                      <p className="font-medium">{run.icp.title}</p>
-                      <p className="text-sm text-muted-foreground">
-                        {run.completed}/{run.totalProspects} prospects processed
-                      </p>
+                {recentRuns.map((run) => {
+                  const statusInfo = getStatusInfo(run.status)
+                  const progressPercent = run.totalProspects > 0 
+                    ? Math.round((run.completed / run.totalProspects) * 100) 
+                    : 0
+
+                  return (
+                    <div 
+                      key={run.id} 
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent/50 transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-medium truncate">{run.icp.title}</p>
+                          <Badge variant={statusInfo.variant}>{statusInfo.label}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">
+                          {run.icp.company.name || run.icp.company.domain}
+                        </p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span>
+                            {run.completed}/{run.totalProspects} prospects
+                          </span>
+                          {run.status === 'PROCESSING' && (
+                            <span className="text-primary font-medium">
+                              {progressPercent}% complete
+                            </span>
+                          )}
+                          <span>
+                            {formatRelativeTime(run.createdAt)}
+                          </span>
+                        </div>
+                      </div>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        asChild
+                        className="ml-4"
+                      >
+                        <Link href={`/qualify/${run.id}`}>View Results</Link>
+                      </Button>
                     </div>
-                    <Button variant="outline" size="sm" asChild>
-                      <Link href={`/qualify/${run.id}`}>View Results</Link>
-                    </Button>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             )}
           </CardContent>
