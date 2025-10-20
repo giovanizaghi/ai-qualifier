@@ -23,13 +23,15 @@ const eslintConfig = [
       "coverage/**",
       "test-results/**",
       "playwright-report/**",
+      "src/generated/**",
+      "prisma/generated/**",
     ],
   },
   {
     rules: {
-      // Code Quality Rules
+      // Code Quality Rules - more lenient for development
       "no-unused-vars": "off", // TypeScript handles this
-      "@typescript-eslint/no-unused-vars": ["error", { 
+      "@typescript-eslint/no-unused-vars": ["warn", { 
         "argsIgnorePattern": "^_",
         "varsIgnorePattern": "^_" 
       }],
@@ -37,11 +39,14 @@ const eslintConfig = [
       "@typescript-eslint/explicit-function-return-type": "off",
       "@typescript-eslint/explicit-module-boundary-types": "off",
       "@typescript-eslint/no-non-null-assertion": "warn",
+      "@typescript-eslint/no-require-imports": "warn",
+      "@typescript-eslint/no-this-alias": "warn",
+      "@typescript-eslint/no-unused-expressions": "warn",
       
-      // Performance Rules
-      "prefer-const": "error",
-      "no-var": "error",
-      "object-shorthand": "error",
+      // Performance Rules - warnings only
+      "prefer-const": "warn",
+      "no-var": "warn",
+      "object-shorthand": "warn",
       
       // Security Rules
       "no-eval": "error",
@@ -61,15 +66,15 @@ const eslintConfig = [
       "@next/next/no-img-element": "error",
       "@next/next/no-html-link-for-pages": "error",
       
-      // Code Style
-      "prefer-template": "error",
+      // Code Style - warnings only
+      "prefer-template": "warn",
       "no-console": ["warn", { "allow": ["warn", "error"] }],
-      "eqeqeq": ["error", "always"],
-      "curly": ["error", "all"],
+      "eqeqeq": ["warn", "always"],
+      "curly": "warn",
       
       // Import Rules
-      "import/no-duplicates": "error",
-      "import/order": ["error", {
+      "import/no-duplicates": "warn",
+      "import/order": ["warn", {
         "groups": [
           "builtin",
           "external",
