@@ -44,8 +44,6 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -75,6 +73,8 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.145 0 0);
 }
 
 .dark {
@@ -111,21 +111,6 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-@layer base {
-  * {
-    border-color: var(--color-border);
-    outline-color: var(--color-ring);
-    outline-offset: 2px;
-    outline-width: 2px;
-    outline-style: solid;
-    outline-color: transparent;
-  }
-  body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-  }
-}
-
 /* Enhanced responsive utilities for better tablet/mobile support */
 @layer utilities {
   /* Touch-friendly interactive elements */
@@ -133,12 +118,12 @@
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Better tap targets for mobile */
   .tap-target {
     position: relative;
   }
-  
+
   .tap-target::before {
     content: '';
     position: absolute;
@@ -147,35 +132,35 @@
     right: -8px;
     bottom: -8px;
   }
-  
+
   /* Smooth scrolling for better UX */
   .smooth-scroll {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Improved focus states for keyboard navigation */
   .focus-enhanced:focus-visible {
     outline-width: 2px;
     outline-offset: 2px;
     outline-color: var(--color-ring);
   }
-  
+
   /* Better line height for reading on mobile */
   .reading-optimized {
     line-height: 1.6;
   }
-  
+
   /* Safe area padding for mobile devices */
   .safe-area-padding {
     padding-left: env(safe-area-inset-left);
     padding-right: env(safe-area-inset-right);
   }
-  
+
   .safe-area-padding-top {
     padding-top: env(safe-area-inset-top);
   }
-  
+
   .safe-area-padding-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
@@ -197,7 +182,7 @@
     grid-template-columns: repeat(2, 1fr);
     gap: 1.5rem;
   }
-  
+
   .tablet-spacing {
     padding: 1.5rem;
   }
@@ -210,4 +195,27 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 2rem;
   }
+}
+
+/* Base styles - reset all unwanted borders/outlines */
+*,
+*::before,
+*::after {
+  border-width: 0;
+  border-style: none;
+  outline: none;
+}
+
+/* Body styles */
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Only add focus styles when actually focused via keyboard */
+*:focus-visible {
+  outline: 2px solid hsl(var(--ring) / 0.5);
+  outline-offset: 2px;
 }
