@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { toast } from "sonner";
 
 interface ProspectResult {
   id: string;
@@ -49,30 +50,73 @@ interface QualificationResultsProps {
 export function QualificationResults({ run: initialRun }: QualificationResultsProps) {
   const [run, setRun] = useState(initialRun);
   const [selectedFit, setSelectedFit] = useState<string>("all");
-  const [polling, setPolling] = useState(initialRun.status === "PROCESSING");
+  const [polling, setPolling] = useState(initialRun.status === "PROCESSING" || initialRun.status === "PENDING");
 
-  // Poll for updates if still processing
+  // Enhanced real-time polling with better error handling
   useEffect(() => {
-    if (!polling) return;
+    if (run.status !== "PROCESSING" && run.status !== "PENDING") return;
 
-    const interval = setInterval(async () => {
+    const pollInterval = setInterval(async () => {
       try {
-        const response = await fetch(`/api/qualify/${run.id}`);
-        if (response.ok) {
-          const data = await response.json();
-          setRun(data.run);
-          
-          if (data.run.status === "COMPLETED" || data.run.status === "FAILED") {
-            setPolling(false);
-          }
+        console.log(`Polling run ${run.id} - Current status: ${run.status}, Completed: ${run.completed}/${run.totalProspects}`);
+        
+        // Fetch updated run data with results
+        const response = await fetch(`/api/qualify/${run.id}`, {
+          cache: 'no-store', // Prevent caching
+          headers: {
+            'Cache-Control': 'no-cache',
+          },
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
-      } catch (err) {
-        console.error("Failed to poll qualification status:", err);
+        
+        const data = await response.json();
+        const updatedRun = data.run;
+        
+        console.log(`Poll response - Status: ${updatedRun.status}, Completed: ${updatedRun.completed}/${updatedRun.totalProspects}`);
+        
+        // Always update the run state with fresh data
+        setRun(updatedRun);
+        
+        // Stop polling when done
+        if (updatedRun.status === "COMPLETED" || updatedRun.status === "FAILED") {
+          console.log(`Stopping polling - Final status: ${updatedRun.status}`);
+          setPolling(false);
+        }
+        
+      } catch (error) {
+        console.error("Polling error:", error);
+        // Continue polling even on error, but reduce frequency
+        setTimeout(() => {}, 1000);
       }
     }, 3000); // Poll every 3 seconds
 
-    return () => clearInterval(interval);
-  }, [polling, run.id]);
+    return () => {
+      console.log(`Cleaning up polling for run ${run.id}`);
+      clearInterval(pollInterval);
+    };
+  }, [run.id, polling]); // Remove run.completed and run.status from deps
+
+  // Add real-time progress notifications
+  useEffect(() => {
+    if (run.status === "PROCESSING" && run.completed > 0) {
+      const progress = Math.round((run.completed / run.totalProspects) * 100);
+      toast.info(`Progress: ${run.completed}/${run.totalProspects} prospects analyzed (${progress}%)`, {
+        id: `progress-${run.id}`, // Prevent duplicate toasts
+        duration: 2000,
+      });
+    }
+    
+    if (run.status === "COMPLETED") {
+      toast.success(`✅ Qualification completed! ${run.totalProspects} prospects analyzed`);
+    }
+    
+    if (run.status === "FAILED") {
+      toast.error("❌ Qualification failed. Please try again.");
+    }
+  }, [run.status, run.completed, run.totalProspects, run.id]);
 
   const getFitBadgeVariant = (fitLevel: string) => {
     switch (fitLevel) {
