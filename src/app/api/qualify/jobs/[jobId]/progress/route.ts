@@ -14,7 +14,7 @@ const jobIdSchema = z.object({
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { jobId: string } }
+  { params }: { params: Promise<{ jobId: string }> }
 ) {
   try {
     // Check authentication
@@ -26,16 +26,16 @@ export async function GET(
       );
     }
 
+    const { jobId } = await params;
+
     // Validate job ID
-    const validationResult = jobIdSchema.safeParse({ jobId: params.jobId });
+    const validationResult = jobIdSchema.safeParse({ jobId });
     if (!validationResult.success) {
       return NextResponse.json(
         { error: 'Invalid job ID', details: validationResult.error.issues },
         { status: 400 }
       );
     }
-
-    const { jobId } = validationResult.data;
 
     // Get job from queue
     const processor = getQualificationProcessor();

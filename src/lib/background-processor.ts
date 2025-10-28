@@ -9,6 +9,7 @@ import {
   getJobQueue
 } from '@/lib/job-queue';
 import type { ICPData } from '@/lib/icp-generator';
+import { metricsService } from '@/lib/monitoring/metrics';
 
 /**
  * Background processor for prospect qualification jobs
@@ -36,9 +37,19 @@ export class QualificationProcessor {
     updateProgress: (progress: JobProgress) => Promise<void>
   ): Promise<JobResult> {
     const { runId, userId, icpId, icp, domains } = job.data;
+    const startTime = Date.now();
 
     try {
       console.log(`[BackgroundProcessor] Starting qualification job ${job.id} for run ${runId}`);
+
+      // Record job start metrics
+      metricsService.recordBusinessMetric('qualification_job_started', 1, {
+        jobId: job.id,
+        runId,
+        userId,
+        icpId,
+        totalDomains: domains.length
+      });
 
       // Verify the qualification run still exists and is in the right state
       const run = await prisma.qualificationRun.findUnique({
@@ -151,19 +162,65 @@ export class QualificationProcessor {
 
       console.log(`[BackgroundProcessor] Qualification job ${job.id} completed successfully`);
 
+      // Record comprehensive completion metrics
+      const totalTime = Date.now() - startTime;
+      metricsService.recordPerformance('qualification_total_time', totalTime, 'ms', {
+        runId,
+        totalDomains: domains.length.toString()
+      });
+
+      const averageScore = results.reduce((sum, r) => sum + r.score, 0) / results.length;
+      const highQualityCount = results.filter(r => r.score >= 70).length;
+
+      metricsService.recordBusinessMetric('qualification_job_completed', 1, {
+        jobId: job.id,
+        runId,
+        userId,
+        icpId,
+        totalDomains: domains.length,
+        totalResults: results.length,
+        averageScore,
+        highQualityProspects: highQualityCount,
+        totalTimeMs: totalTime
+      });
+
       return {
         success: true,
         data: {
           runId,
           totalProspects: domains.length,
           qualifiedProspects: results.length,
-          averageScore: results.reduce((sum, r) => sum + r.score, 0) / results.length,
-          highQualityCount: results.filter(r => r.score >= 70).length,
+          averageScore: averageScore,
+          highQualityCount: highQualityCount,
           completedAt: new Date(),
         },
       };
     } catch (error) {
       console.error(`[BackgroundProcessor] Error in qualification job ${job.id}:`, error);
+
+      // Record error metrics
+      const totalTime = Date.now() - startTime;
+      metricsService.recordError('qualification_error', 'Qualification job failed', {
+        metadata: {
+          jobId: job.id,
+          runId,
+          userId,
+          icpId,
+          totalDomains: domains.length,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          totalTimeMs: totalTime
+        }
+      });
+
+      metricsService.recordBusinessMetric('qualification_job_failed', 1, {
+        jobId: job.id,
+        runId,
+        userId,
+        icpId,
+        totalDomains: domains.length,
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+        totalTimeMs: totalTime
+      });
 
       // Update progress to show error
       await updateProgress({
