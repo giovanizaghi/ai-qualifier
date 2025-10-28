@@ -144,12 +144,18 @@ model QualificationRun {
   totalProspects Int   @default(0)
   completed   Int      @default(0)
   
+  // Run management fields
+  retryCount  Int      @default(0)
+  lastErrorMessage String? @db.Text
+  timeoutAt   DateTime? // When this run should timeout
+  
   // Relations
   icp         ICP      @relation(fields: [icpId], references: [id], onDelete: Cascade)
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   results     ProspectQualification[]
   
   createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
   completedAt DateTime?
   
   @@map("qualification_runs")

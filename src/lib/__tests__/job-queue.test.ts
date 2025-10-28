@@ -229,9 +229,16 @@ describe('JobQueue', () => {
       });
       
       // Wait for final failure
-      await new Promise(resolve => {
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Test timeout waiting for job to fail'));
+        }, 2000);
+        
         jobQueue.on('job:failed', (job) => {
-          if (job.id === jobId) resolve(job);
+          if (job.id === jobId) {
+            clearTimeout(timeout);
+            resolve(job);
+          }
         });
       });
 
@@ -243,7 +250,7 @@ describe('JobQueue', () => {
       // Should have retried 2 times (after first failure)
       const jobRetries = retryEvents.filter(e => e.jobId === jobId);
       expect(jobRetries).toHaveLength(2);
-    });
+    }, 10000);
 
     it('should use exponential backoff for retries', async () => {
       jobQueue.registerProcessor('qualify-prospects', mockFailProcessor);
@@ -261,9 +268,16 @@ describe('JobQueue', () => {
       });
 
       // Wait for final failure
-      await new Promise(resolve => {
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Test timeout waiting for job to fail'));
+        }, 2000);
+        
         jobQueue.on('job:failed', (job) => {
-          if (job.id === jobId) resolve(job);
+          if (job.id === jobId) {
+            clearTimeout(timeout);
+            resolve(job);
+          }
         });
       });
 
@@ -271,23 +285,30 @@ describe('JobQueue', () => {
       expect(retryDelays).toHaveLength(2);
       expect(retryDelays[1]).toBeGreaterThan(retryDelays[0]);
       expect(retryDelays[1]).toBeLessThanOrEqual(retryDelays[0] * 2.1); // Allow small variance
-    });
+    }, 10000);
 
     it('should handle processor errors gracefully', async () => {
       // Don't register any processor
       const jobId = await jobQueue.enqueue('qualify-prospects', createMockQualifyJobData());
       
       // Wait for failure
-      await new Promise(resolve => {
+      await new Promise((resolve, reject) => {
+        const timeout = setTimeout(() => {
+          reject(new Error('Test timeout waiting for job to fail'));
+        }, 2000);
+        
         jobQueue.on('job:failed', (job) => {
-          if (job.id === jobId) resolve(job);
+          if (job.id === jobId) {
+            clearTimeout(timeout);
+            resolve(job);
+          }
         });
       });
 
       const job = jobQueue.getJob(jobId);
       expect(job?.status).toBe(JobStatus.FAILED);
       expect(job?.error).toContain('No processor registered');
-    });
+    }, 10000);
   });
 
   describe('Job Management', () => {

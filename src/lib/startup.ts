@@ -1,4 +1,5 @@
 import { recoverStuckRuns, getQualificationProcessor } from '@/lib/background-processor';
+import { getRunManager } from '@/lib/qualification-run-manager';
 
 /**
  * Application startup initialization
@@ -12,13 +13,22 @@ export async function initializeApplication(): Promise<void> {
     const processor = getQualificationProcessor();
     console.log('[Startup] Job queue initialized');
 
-    // Recover any stuck qualification runs
-    await recoverStuckRuns();
+    // Initialize and start the run manager for automatic timeout handling
+    const runManager = getRunManager();
+    runManager.start();
+    console.log('[Startup] Run manager started with automatic timeout checking');
+
+    // Recover any stuck qualification runs using the run manager
+    await runManager.recoverStuckRuns();
     console.log('[Startup] Stuck runs recovery completed');
 
     // Log initial queue statistics
     const stats = processor.getQueueStats();
     console.log('[Startup] Initial queue stats:', stats);
+
+    // Log run manager statistics
+    const runStats = await runManager.getStats();
+    console.log('[Startup] Initial run manager stats:', runStats);
 
     console.log('[Startup] Application initialization completed successfully');
   } catch (error) {
@@ -39,6 +49,11 @@ export async function shutdownApplication(): Promise<void> {
     const processor = getQualificationProcessor();
     processor.stop();
     console.log('[Shutdown] Job queue stopped');
+
+    // Stop the run manager
+    const runManager = getRunManager();
+    runManager.stop();
+    console.log('[Shutdown] Run manager stopped');
 
     console.log('[Shutdown] Application shutdown completed');
   } catch (error) {

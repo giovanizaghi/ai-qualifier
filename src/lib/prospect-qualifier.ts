@@ -75,13 +75,20 @@ export function validateScore(score: number): number {
 
 /**
  * Determine fit level based on score with proper validation
+ * Note: Uses original score for threshold comparison, then validates for storage
  */
 export function getFitLevel(score: number): FitLevel {
-  const validatedScore = validateScore(score);
+  // Handle invalid scores first
+  if (typeof score !== 'number' || isNaN(score)) {
+    return 'POOR';
+  }
   
-  if (validatedScore >= FIT_LEVEL_THRESHOLDS.EXCELLENT) return 'EXCELLENT';
-  if (validatedScore >= FIT_LEVEL_THRESHOLDS.GOOD) return 'GOOD';
-  if (validatedScore >= FIT_LEVEL_THRESHOLDS.FAIR) return 'FAIR';
+  // Clamp score to valid range but don't round for threshold comparison
+  const clampedScore = Math.max(SCORE_BOUNDS.MIN, Math.min(SCORE_BOUNDS.MAX, score));
+  
+  if (clampedScore >= FIT_LEVEL_THRESHOLDS.EXCELLENT) return 'EXCELLENT';
+  if (clampedScore >= FIT_LEVEL_THRESHOLDS.GOOD) return 'GOOD';
+  if (clampedScore >= FIT_LEVEL_THRESHOLDS.FAIR) return 'FAIR';
   return 'POOR';
 }
 

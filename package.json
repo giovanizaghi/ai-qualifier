@@ -14,6 +14,7 @@
     "db:generate": "prisma generate",
     "db:studio": "prisma studio",
     "recover-stuck-runs": "tsx scripts/recover-stuck-runs.ts",
+    "run-manager": "tsx scripts/qualification-run-manager.ts",
     "vercel:build": "npm run db:generate && npm run build",
     "deploy": "npx vercel --prod",
     "deploy:preview": "npx vercel",

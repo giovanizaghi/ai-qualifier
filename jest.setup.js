@@ -1,5 +1,9 @@
 import '@testing-library/jest-dom'
 
+// Add Node.js globals for test environment
+global.setImmediate = global.setImmediate || ((fn, ...args) => setTimeout(fn, 0, ...args));
+global.clearImmediate = global.clearImmediate || clearTimeout;
+
 // Mock Next.js router
 jest.mock('next/navigation', () => ({
   useRouter() {

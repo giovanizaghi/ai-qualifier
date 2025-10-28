@@ -393,8 +393,10 @@ export class JobQueue extends EventEmitter {
         job.updatedAt = new Date();
         this.emit('job:retry', job, job.attempts);
 
-        // Continue processing other jobs
-        setImmediate(() => this.processJobs());
+        // Schedule retry processing after the delay
+        setTimeout(() => {
+          this.processJobs();
+        }, job.delay);
       } else {
         // Max attempts reached, mark as failed
         job.status = JobStatus.FAILED;

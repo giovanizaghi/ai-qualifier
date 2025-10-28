@@ -1,24 +1,27 @@
 import { QualificationProcessor } from '../background-processor';
 import { JobQueue, JobStatus } from '../job-queue';
+import { qualifyProspects } from '../prospect-qualifier';
 
-// Simple test focusing on core job queue functionality
-const mockQualifyProspects = jest.fn();
+// Mock the qualifyProspects function
+const mockQualifyProspects = qualifyProspects as jest.MockedFunction<typeof qualifyProspects>;
+
+// Mock functions for Prisma
 const mockPrismaUpdate = jest.fn();
 const mockPrismaCreate = jest.fn();
 const mockPrismaFindUnique = jest.fn();
 
 jest.mock('../prospect-qualifier', () => ({
-  qualifyProspects: mockQualifyProspects,
+  qualifyProspects: jest.fn(),
 }));
 
 jest.mock('../prisma', () => ({
   prisma: {
     qualificationRun: {
-      findUnique: mockPrismaFindUnique,
-      update: mockPrismaUpdate,
+      findUnique: () => mockPrismaFindUnique(),
+      update: () => mockPrismaUpdate(),
     },
     prospectQualification: {
-      create: mockPrismaCreate,
+      create: () => mockPrismaCreate(),
     },
   },
 }));
@@ -63,23 +66,46 @@ describe('QualificationProcessor', () => {
     mockPrismaUpdate.mockResolvedValue({});
     mockPrismaCreate.mockResolvedValue({});
 
-    mockQualifyProspects.mockImplementation(async (domains: string[], icp: any, progressCallback: Function) => {
+    mockQualifyProspects.mockImplementation(async (domains: string[], icp: any, onProgress?: (completed: number, total: number) => void) => {
       for (let i = 0; i < domains.length; i++) {
-        await progressCallback(i, domains.length);
+        if (onProgress) {
+          await onProgress(i, domains.length);
+        }
         await new Promise(resolve => setTimeout(resolve, 10));
       }
-      await progressCallback(domains.length, domains.length);
+      if (onProgress) {
+        await onProgress(domains.length, domains.length);
+      }
       
       return [
         {
           prospectDomain: 'test1.com',
           prospectName: 'Test Company 1',
-          prospectData: { domain: 'test1.com' },
           score: 85,
-          fitLevel: 'EXCELLENT',
+          fitLevel: 'EXCELLENT' as const,
           reasoning: 'Great fit',
-          matchedCriteria: ['industry'],
+          matchedCriteria: [{
+            category: 'industry',
+            criteria: 'Technology',
+            match: true,
+            confidence: 90
+          }],
           gaps: [],
+          recommendation: 'Highly recommended for outreach',
+          prospectData: {
+            scrapedData: {
+              domain: 'test1.com',
+              mainContent: ['Test company content'],
+              headings: ['About Us', 'Services']
+            },
+            aiAnalysis: {
+              companyName: 'Test Company 1',
+              industry: 'Technology',
+              description: 'A test technology company',
+              targetMarket: 'SMB',
+              keyOfferings: ['Software', 'Consulting']
+            }
+          }
         }
       ];
     });
