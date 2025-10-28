@@ -14,8 +14,13 @@ const customJestConfig = {
     '!src/generated/**',
     '!src/app/globals.css',
   ],
-
   testPathIgnorePatterns: ['<rootDir>/.next/', '<rootDir>/node_modules/'],
+  transformIgnorePatterns: [
+    'node_modules/(?!(cheerio|htmlparser2)/)'
+  ],
+  moduleNameMapper: {
+    '^cheerio$': '<rootDir>/__mocks__/cheerio.js'
+  }
 }
 
 module.exports = createJestConfig(customJestConfig)
