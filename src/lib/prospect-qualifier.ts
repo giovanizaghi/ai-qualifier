@@ -400,91 +400,243 @@ Provide specific, actionable qualification.`;
   return result;
 }
 
+// Configuration for optimized batching
+export const BATCH_CONFIG = {
+  DEFAULT_BATCH_SIZE: 5, // Process 5 prospects concurrently
+  MAX_BATCH_SIZE: 10,    // Maximum concurrent operations
+  DELAY_BETWEEN_BATCHES: 1000, // 1 second delay between batches to avoid rate limits
+  MAX_RETRIES: 2,        // Maximum retry attempts for failed prospects
+  RETRY_DELAY: 2000,     // 2 second delay before retry
+} as const;
+
 /**
- * Batch qualify multiple prospects
+ * Create a failed result structure for error cases
+ */
+function createFailedResult(
+  domain: string, 
+  error: Error | string, 
+  retryCount: number = 0
+): QualificationResult {
+  const errorMessage = error instanceof Error ? error.message : error;
+  
+  return {
+    prospectDomain: domain,
+    prospectName: domain,
+    score: 0,
+    fitLevel: 'POOR',
+    reasoning: `Failed to analyze: ${errorMessage}`,
+    matchedCriteria: [],
+    gaps: ['Unable to scrape or analyze website', 'Complete analysis failure'],
+    recommendation: 'Unable to qualify - manual review needed',
+    prospectData: {
+      scrapedData: {
+        domain,
+        mainContent: [],
+        headings: [],
+        error: errorMessage,
+      },
+      aiAnalysis: {
+        companyName: domain,
+        industry: 'Unknown',
+        description: 'Unable to analyze',
+        targetMarket: 'Unknown',
+        keyOfferings: [],
+      },
+    },
+    scoreValidation: {
+      originalScore: undefined,
+      wasClamped: false,
+      fallbackUsed: true,
+      validationErrors: [`Complete failure: ${errorMessage}`]
+    },
+    processing: {
+      timestamp: new Date(),
+      duration: 0,
+      retryCount,
+      errors: [`Qualification failed: ${errorMessage}`]
+    }
+  };
+}
+
+/**
+ * Process a single prospect with retry logic
+ */
+async function processProspectWithRetry(
+  domain: string, 
+  icp: ICPData, 
+  maxRetries: number = BATCH_CONFIG.MAX_RETRIES
+): Promise<QualificationResult> {
+  let lastError: Error | string = 'Unknown error';
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      const result = await qualifyProspect(domain, icp);
+      
+      // Update retry count in the result
+      if (result.processing) {
+        result.processing.retryCount = attempt;
+      }
+      
+      return result;
+    } catch (error) {
+      lastError = error instanceof Error ? error : String(error);
+      console.error(`Attempt ${attempt + 1} failed for ${domain}:`, lastError);
+      
+      // If this isn't the last attempt, wait before retrying
+      if (attempt < maxRetries) {
+        await new Promise(resolve => setTimeout(resolve, BATCH_CONFIG.RETRY_DELAY));
+      }
+    }
+  }
+  
+  // All attempts failed, return failed result
+  return createFailedResult(domain, lastError, maxRetries);
+}
+
+/**
+ * Process a batch of prospects concurrently
+ */
+async function processBatch(
+  domains: string[], 
+  icp: ICPData, 
+  batchIndex: number,
+  onProgress?: (completed: number, total: number, batchIndex: number) => void
+): Promise<QualificationResult[]> {
+  const batchSize = domains.length;
+  console.log(`Processing batch ${batchIndex + 1} with ${batchSize} prospects`);
+  
+  // Process all prospects in the batch concurrently
+  const batchPromises = domains.map(domain => 
+    processProspectWithRetry(domain, icp)
+  );
+  
+  // Wait for all prospects in the batch to complete
+  const results = await Promise.all(batchPromises);
+  
+  // Report progress for this batch
+  if (onProgress) {
+    onProgress(results.length, domains.length, batchIndex);
+  }
+  
+  return results;
+}
+
+/**
+ * Optimized batch qualify multiple prospects with configurable concurrency
  */
 export async function qualifyProspects(
   prospectDomains: string[],
   icp: ICPData,
-  onProgress?: (completed: number, total: number) => void
+  options: {
+    batchSize?: number;
+    onProgress?: (completed: number, total: number, batchIndex?: number) => void;
+    maxRetries?: number;
+    delayBetweenBatches?: number;
+  } = {}
 ): Promise<QualificationResult[]> {
-  const results: QualificationResult[] = [];
+  const {
+    batchSize = BATCH_CONFIG.DEFAULT_BATCH_SIZE,
+    onProgress,
+    maxRetries = BATCH_CONFIG.MAX_RETRIES,
+    delayBetweenBatches = BATCH_CONFIG.DELAY_BETWEEN_BATCHES
+  } = options;
+  
   const total = prospectDomains.length;
   const startTime = Date.now();
-
-  console.log(`Starting batch qualification of ${total} prospects`);
-
-  for (let i = 0; i < prospectDomains.length; i++) {
-    const domain = prospectDomains[i];
+  const effectiveBatchSize = Math.min(batchSize, BATCH_CONFIG.MAX_BATCH_SIZE);
+  
+  console.log(`Starting optimized batch qualification of ${total} prospects with batch size ${effectiveBatchSize}`);
+  
+  if (total === 0) {
+    return [];
+  }
+  
+  const results: QualificationResult[] = [];
+  let completed = 0;
+  
+  // Process prospects in batches
+  for (let i = 0; i < prospectDomains.length; i += effectiveBatchSize) {
+    const batch = prospectDomains.slice(i, i + effectiveBatchSize);
+    const batchIndex = Math.floor(i / effectiveBatchSize);
     
     try {
-      const result = await qualifyProspect(domain, icp);
-      results.push(result);
-    } catch (error) {
-      console.error(`Failed to qualify ${domain}:`, error);
-      
-      // Create a failed result with proper structure
-      const failedResult: QualificationResult = {
-        prospectDomain: domain,
-        prospectName: domain,
-        score: 0,
-        fitLevel: 'POOR',
-        reasoning: `Failed to analyze: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        matchedCriteria: [],
-        gaps: ['Unable to scrape or analyze website', 'Complete analysis failure'],
-        recommendation: 'Unable to qualify - manual review needed',
-        prospectData: {
-          scrapedData: {
-            domain,
-            mainContent: [],
-            headings: [],
-            error: error instanceof Error ? error.message : 'Unknown error',
-          },
-          aiAnalysis: {
-            companyName: domain,
-            industry: 'Unknown',
-            description: 'Unable to analyze',
-            targetMarket: 'Unknown',
-            keyOfferings: [],
-          },
-        },
-        scoreValidation: {
-          originalScore: undefined,
-          wasClamped: false,
-          fallbackUsed: true,
-          validationErrors: [`Complete failure: ${error instanceof Error ? error.message : 'Unknown error'}`]
-        },
-        processing: {
-          timestamp: new Date(),
-          duration: 0,
-          retryCount: 0,
-          errors: [`Qualification failed: ${error instanceof Error ? error.message : 'Unknown error'}`]
+      const batchResults = await processBatch(
+        batch, 
+        icp, 
+        batchIndex, 
+        (batchCompleted, batchTotal, batchIdx) => {
+          // Update overall progress
+          completed = i + batchCompleted;
+          if (onProgress) {
+            onProgress(completed, total, batchIdx);
+          }
         }
-      };
+      );
       
-      results.push(failedResult);
-    }
-
-    // Report progress
-    if (onProgress) {
-      onProgress(i + 1, total);
+      results.push(...batchResults);
+      completed = i + batch.length;
+      
+      // Report overall progress
+      if (onProgress) {
+        onProgress(completed, total, batchIndex);
+      }
+      
+      // Add delay between batches to avoid overwhelming APIs (except for the last batch)
+      if (i + effectiveBatchSize < prospectDomains.length && delayBetweenBatches > 0) {
+        console.log(`Waiting ${delayBetweenBatches}ms before next batch...`);
+        await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+      }
+      
+    } catch (error) {
+      console.error(`Batch ${batchIndex + 1} failed:`, error);
+      
+      // Create failed results for the entire batch
+      const failedResults = batch.map(domain => 
+        createFailedResult(domain, error instanceof Error ? error : 'Batch processing failed', maxRetries)
+      );
+      
+      results.push(...failedResults);
+      completed = i + batch.length;
+      
+      if (onProgress) {
+        onProgress(completed, total, batchIndex);
+      }
     }
   }
-
+  
   const duration = Date.now() - startTime;
   const successCount = results.filter(r => !r.scoreValidation?.fallbackUsed && !r.processing?.errors?.length).length;
-  const fallbackCount = results.filter(r => r.scoreValidation?.fallbackUsed).length;
+  const fallbackCount = results.filter(r => r.scoreValidation?.fallbackUsed && !r.processing?.errors?.length).length;
   const failureCount = results.filter(r => r.processing?.errors?.length).length;
-
-  console.log(`Batch qualification completed in ${duration}ms:`, {
+  const totalRetries = results.reduce((sum, r) => sum + (r.processing?.retryCount || 0), 0);
+  
+  console.log(`Optimized batch qualification completed in ${duration}ms:`, {
     total,
     successful: successCount,
     fallbacks: fallbackCount,
     failures: failureCount,
-    averageTime: Math.round(duration / total)
+    totalRetries,
+    averageTime: Math.round(duration / total),
+    batchSize: effectiveBatchSize,
+    throughput: Math.round((total / duration) * 1000 * 60) // prospects per minute
   });
-
+  
   return results;
+}
+
+/**
+ * Legacy batch qualify function for backward compatibility
+ * @deprecated Use qualifyProspects with options parameter instead
+ */
+export async function qualifyProspectsLegacy(
+  prospectDomains: string[],
+  icp: ICPData,
+  onProgress?: (completed: number, total: number) => void
+): Promise<QualificationResult[]> {
+  return qualifyProspects(prospectDomains, icp, { 
+    batchSize: 1, // Sequential processing for legacy compatibility
+    onProgress 
+  });
 }
 
 /**
