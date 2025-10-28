@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { qualifyProspects } from '@/lib/prospect-qualifier';
+import { getQualificationProcessor } from '@/lib/background-processor';
 import type { ICPData } from '@/lib/icp-generator';
 import { z } from 'zod';
 
@@ -91,11 +91,17 @@ export async function POST(req: NextRequest) {
 
     console.log(`[API] Created qualification run: ${run.id} for ${domains.length} prospects`);
 
-    // Process prospects asynchronously
-    // Note: In production, this should be moved to a background job queue
-    processQualification(run.id, icpData, domains).catch((error) => {
-      console.error(`[API] Error processing qualification run ${run.id}:`, error);
-    });
+    // Start background processing using job queue
+    const processor = getQualificationProcessor();
+    const jobId = await processor.startQualification(
+      run.id,
+      session.user.id,
+      icpId,
+      icpData,
+      domains
+    );
+
+    console.log(`[API] Started background job ${jobId} for qualification run ${run.id}`);
 
     return NextResponse.json(
       {
@@ -105,6 +111,7 @@ export async function POST(req: NextRequest) {
           status: run.status,
           totalProspects: run.totalProspects,
           completed: run.completed,
+          jobId, // Include job ID for progress tracking
         },
       },
       { status: 201 }
@@ -118,73 +125,5 @@ export async function POST(req: NextRequest) {
       },
       { status: 500 }
     );
-  }
-}
-
-/**
- * Process qualification run in the background
- */
-async function processQualification(
-  runId: string,
-  icp: ICPData,
-  domains: string[]
-) {
-  try {
-    console.log(`[Background] Starting qualification for run ${runId}`);
-
-    // Process prospects with progress tracking
-    const results = await qualifyProspects(
-      domains,
-      icp,
-      async (completed: number, total: number) => {
-        // Update progress in database
-        await prisma.qualificationRun.update({
-          where: { id: runId },
-          data: { completed },
-        });
-        console.log(`[Background] Progress: ${completed}/${total}`);
-      }
-    );
-
-    // Save results to database
-    for (const result of results) {
-      await prisma.prospectQualification.create({
-        data: {
-          runId,
-          domain: result.prospectDomain,
-          companyName: result.prospectName,
-          companyData: result.prospectData as any,
-          score: result.score,
-          fitLevel: result.fitLevel as any,
-          reasoning: result.reasoning,
-          matchedCriteria: result.matchedCriteria as any,
-          gaps: result.gaps,
-          status: 'COMPLETED',
-          analyzedAt: new Date(),
-        },
-      });
-    }
-
-    // Mark run as completed
-    await prisma.qualificationRun.update({
-      where: { id: runId },
-      data: {
-        status: 'COMPLETED',
-        completedAt: new Date(),
-      },
-    });
-
-    console.log(`[Background] Qualification run ${runId} completed`);
-  } catch (error) {
-    console.error(`[Background] Error in qualification run ${runId}:`, error);
-    
-    // Mark run as failed
-    await prisma.qualificationRun.update({
-      where: { id: runId },
-      data: {
-        status: 'FAILED',
-        completedAt: new Date(),
-      },
-    });
   }
 }
