@@ -75,25 +75,27 @@ export class QualificationProcessor {
       const results = await qualifyProspects(
         domains,
         icp,
-        async (completed: number, total: number) => {
-          // Update progress in both job queue and database
-          await Promise.all([
-            updateProgress({
-              completed,
-              total,
-              message: `Processing prospect ${completed + 1} of ${total}`,
-              details: {
-                currentDomain: domains[completed] || null,
-                completedDomains: domains.slice(0, completed),
-              },
-            }),
-            prisma.qualificationRun.update({
-              where: { id: runId },
-              data: { completed },
-            }),
-          ]);
+        {
+          onProgress: async (completed: number, total: number) => {
+            // Update progress in both job queue and database
+            await Promise.all([
+              updateProgress({
+                completed,
+                total,
+                message: `Processing prospect ${completed + 1} of ${total}`,
+                details: {
+                  currentDomain: domains[completed] || null,
+                  completedDomains: domains.slice(0, completed),
+                },
+              }),
+              prisma.qualificationRun.update({
+                where: { id: runId },
+                data: { completed },
+              }),
+            ]);
 
-          console.log(`[BackgroundProcessor] Progress: ${completed}/${total} for run ${runId}`);
+            console.log(`[BackgroundProcessor] Progress: ${completed}/${total} for run ${runId}`);
+          }
         }
       );
 

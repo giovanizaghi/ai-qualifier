@@ -6,7 +6,6 @@ import type { ICPData } from '@/lib/icp-generator';
 import { z } from 'zod';
 import { metricsService } from '@/lib/monitoring/metrics';
 import { withRateLimit } from '@/lib/rate-limit';
-import { performanceMonitor } from '@/test/performance/qualification.test';
 
 // Enhanced request validation schema with performance options
 const qualifyRequestSchema = z.object({
@@ -30,7 +29,6 @@ const qualifyRequestSchema = z.object({
  * Create a qualification run and process prospects against an ICP with performance optimizations
  */
 async function POST_HANDLER(req: NextRequest) {
-  const endPerformanceTracking = performanceMonitor.startOperation('qualify_api_request');
   const startTime = Date.now();
   
   try {
@@ -272,7 +270,7 @@ async function POST_HANDLER(req: NextRequest) {
       { status: 500 }
     );
   } finally {
-    endPerformanceTracking();
+    // Performance tracking completed - could be logged here
   }
 }
 

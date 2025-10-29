@@ -98,6 +98,23 @@ const nextConfig: NextConfig = {
 
   // Webpack optimization
   webpack: (config, { isServer, dev }) => {
+    // Exclude server-only modules from client bundle
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        stream: false,
+        crypto: false,
+        fs: false,
+        net: false,
+        tls: false,
+        dns: false,
+      };
+      
+      // Externalize ioredis and other server-only packages for client builds
+      config.externals = config.externals || [];
+      config.externals.push('ioredis');
+    }
+
     // Performance optimizations for production
     if (!dev && !isServer) {
       config.optimization = {

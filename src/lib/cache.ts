@@ -1,9 +1,7 @@
 /**
  * Response caching implementation for performance optimization
- * Supports both in-memory and Redis caching strategies
+ * Memory-only caching implementation
  */
-
-import { createHash } from 'crypto';
 
 // Cache configuration
 export const CACHE_CONFIG = {
@@ -32,6 +30,20 @@ export interface CacheStats {
 }
 
 /**
+ * Simple hash function for browser compatibility
+ * Generates a deterministic hash from input string
+ */
+function simpleHash(str: string): string {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  return Math.abs(hash).toString(16).padStart(8, '0');
+}
+
+/**
  * Generate a cache key from input parameters
  */
 export function generateCacheKey(prefix: string, ...params: (string | number | object)[]): string {
@@ -42,8 +54,16 @@ export function generateCacheKey(prefix: string, ...params: (string | number | o
     return String(param);
   }).join('|');
   
-  const hash = createHash('sha256').update(keyData).digest('hex').substring(0, 16);
+  const hash = simpleHash(keyData);
   return `${prefix}:${hash}`;
+}
+
+/**
+ * Generate a user-specific cache key to ensure data isolation
+ */
+export function generateUserCacheKey(userId: string, prefix: string, ...params: (string | number | object)[]): string {
+  // Always include userId as the first parameter for user-specific data
+  return generateCacheKey(prefix, userId, ...params);
 }
 
 /**
@@ -174,154 +194,85 @@ class MemoryCache {
 }
 
 /**
- * Cache manager that handles different cache strategies
+ * Cache manager using in-memory cache only
  */
 class CacheManager {
   private memoryCache: MemoryCache;
-  private redisCache: any | null = null; // Will be set if Redis is available
 
   constructor() {
     this.memoryCache = new MemoryCache();
-    this.initializeRedisCache();
-  }
-
-  private async initializeRedisCache(): Promise<void> {
-    try {
-      // Only try to initialize Redis if we have a Redis URL
-      if (process.env.REDIS_URL || process.env.REDIS_CONNECTION_STRING) {
-        const Redis = await import('ioredis').catch(() => null);
-        if (Redis) {
-          this.redisCache = new Redis.default(
-            process.env.REDIS_URL || process.env.REDIS_CONNECTION_STRING
-          );
-          console.log('Redis cache initialized successfully');
-        }
-      }
-    } catch (error) {
-      console.warn('Redis cache initialization failed, using memory cache only:', error);
-      this.redisCache = null;
-    }
   }
 
   async set<T>(key: string, value: T, ttl: number = CACHE_CONFIG.DEFAULT_TTL): Promise<void> {
-    // Always set in memory cache for fast access
+    // Set in memory cache
     this.memoryCache.set(key, value, ttl);
-
-    // Also set in Redis if available
-    if (this.redisCache) {
-      try {
-        const serializedValue = JSON.stringify({
-          value,
-          expiresAt: Date.now() + ttl,
-          createdAt: Date.now(),
-        });
-        await this.redisCache.setex(key, Math.ceil(ttl / 1000), serializedValue);
-      } catch (error) {
-        console.warn('Redis cache set failed:', error);
-      }
-    }
   }
 
   async get<T>(key: string): Promise<T | null> {
-    // Try memory cache first (fastest)
-    const memoryResult = this.memoryCache.get<T>(key);
-    if (memoryResult !== null) {
-      return memoryResult;
-    }
-
-    // Try Redis cache if available
-    if (this.redisCache) {
-      try {
-        const redisValue = await this.redisCache.get(key);
-        if (redisValue) {
-          const parsed = JSON.parse(redisValue);
-          
-          // Check if entry has expired
-          if (Date.now() <= parsed.expiresAt) {
-            // Store in memory cache for next time
-            const remainingTtl = Math.max(0, parsed.expiresAt - Date.now());
-            this.memoryCache.set(key, parsed.value, remainingTtl);
-            return parsed.value;
-          } else {
-            // Remove expired entry from Redis
-            await this.redisCache.del(key);
-          }
-        }
-      } catch (error) {
-        console.warn('Redis cache get failed:', error);
-      }
-    }
-
-    return null;
+    // Get from memory cache
+    return this.memoryCache.get<T>(key);
   }
 
   async has(key: string): Promise<boolean> {
-    // Check memory cache first
-    if (this.memoryCache.has(key)) {
-      return true;
-    }
-
-    // Check Redis cache
-    if (this.redisCache) {
-      try {
-        const exists = await this.redisCache.exists(key);
-        return exists === 1;
-      } catch (error) {
-        console.warn('Redis cache exists check failed:', error);
-      }
-    }
-
-    return false;
+    // Check memory cache
+    return this.memoryCache.has(key);
   }
 
   async delete(key: string): Promise<boolean> {
-    let deleted = false;
-
     // Delete from memory cache
-    if (this.memoryCache.delete(key)) {
-      deleted = true;
-    }
-
-    // Delete from Redis cache
-    if (this.redisCache) {
-      try {
-        const result = await this.redisCache.del(key);
-        if (result > 0) deleted = true;
-      } catch (error) {
-        console.warn('Redis cache delete failed:', error);
-      }
-    }
-
-    return deleted;
+    return this.memoryCache.delete(key);
   }
 
   async clear(): Promise<void> {
     // Clear memory cache
     this.memoryCache.clear();
-
-    // Clear Redis cache (only our keys)
-    if (this.redisCache) {
-      try {
-        // Get all keys with our prefix patterns
-        const patterns = ['domain:', 'icp:', 'qualify:', 'openai:'];
-        for (const pattern of patterns) {
-          const keys = await this.redisCache.keys(`${pattern}*`);
-          if (keys.length > 0) {
-            await this.redisCache.del(...keys);
-          }
-        }
-      } catch (error) {
-        console.warn('Redis cache clear failed:', error);
-      }
-    }
   }
 
   getStats(): CacheStats {
     return this.memoryCache.getStats();
   }
 
-  isRedisAvailable(): boolean {
-    return this.redisCache !== null;
+  /**
+   * Clear all cache entries for a specific user
+   */
+  clearUserCache(userId: string): number {
+    let clearedCount = 0;
+    const now = Date.now();
+    
+    // Access the internal cache from memoryCache
+    const internalCache = (this.memoryCache as any).cache as Map<string, CacheEntry>;
+    
+    // Look for cache keys that might contain user-specific data
+    for (const [key, entry] of internalCache.entries()) {
+      // Check if the key contains the user ID or if the cached data might be user-specific
+      if (key.includes(userId) || this.isUserSpecificKey(key)) {
+        internalCache.delete(key);
+        clearedCount++;
+      }
+      // Also remove expired entries while we're at it
+      else if (now > entry.expiresAt) {
+        internalCache.delete(key);
+        clearedCount++;
+      }
+    }
+    
+    return clearedCount;
+  }
+
+  /**
+   * Check if a cache key represents user-specific data
+   */
+  private isUserSpecificKey(key: string): boolean {
+    const userSpecificPrefixes = [
+      'companies:',
+      'qualify:',
+      'icp:',
+      'user:',
+      'dashboard:',
+      'runs:'
+    ];
+    
+    return userSpecificPrefixes.some(prefix => key.startsWith(prefix));
   }
 }
 
@@ -416,9 +367,42 @@ export function logCacheStats(): void {
   const stats = cacheManager.getStats();
   console.log('Cache Statistics:', {
     ...stats,
-    redisAvailable: cacheManager.isRedisAvailable(),
     memoryUsageKB: Math.round(stats.memoryUsage / 1024)
   });
+}
+
+/**
+ * Clear all browser-level caches that might contain user data
+ * This should be called when users sign out or switch accounts
+ */
+export function clearBrowserCaches(): void {
+  if (typeof window === 'undefined') return;
+  
+  try {
+    // Clear localStorage
+    const localKeys = Object.keys(localStorage);
+    localKeys.forEach(key => {
+      if (key.includes('user') || key.includes('companies') || 
+          key.includes('dashboard') || key.includes('qualify') ||
+          key.includes('auth') || key.includes('session')) {
+        localStorage.removeItem(key);
+      }
+    });
+    
+    // Clear sessionStorage
+    const sessionKeys = Object.keys(sessionStorage);
+    sessionKeys.forEach(key => {
+      if (key.includes('user') || key.includes('companies') || 
+          key.includes('dashboard') || key.includes('qualify') ||
+          key.includes('auth') || key.includes('session')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+    
+    console.log('[Cache] Cleared browser caches');
+  } catch (error) {
+    console.warn('[Cache] Error clearing browser caches:', error);
+  }
 }
 
 // Export cache instance for direct use

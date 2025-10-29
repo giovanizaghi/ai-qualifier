@@ -94,6 +94,11 @@ const healthMetrics: DomainHealthMetrics = {
  * Categorize errors for better handling
  */
 function categorizeError(error: Error, response?: Response): DomainErrorCategory {
+  // Check if error already has a category set
+  if ((error as any).errorCategory) {
+    return (error as any).errorCategory;
+  }
+  
   const errorMessage = error.message.toLowerCase();
   
   if (errorMessage.includes('timeout') || errorMessage.includes('aborted')) {
@@ -267,7 +272,7 @@ function analyzeDomainName(domain: string): { suggestedName: string; category: s
 /**
  * Try fallback data sources when primary scraping fails
  */
-async function getFallbackData(domain: string): Promise<DomainAnalysisResult> {
+async function getFallbackData(domain: string, originalErrorCategory?: DomainErrorCategory): Promise<DomainAnalysisResult> {
   console.log(`Attempting fallback data retrieval for ${domain}`);
   
   for (const source of fallbackDataSources.filter(s => s.enabled).sort((a, b) => a.priority - b.priority)) {
@@ -282,7 +287,7 @@ async function getFallbackData(domain: string): Promise<DomainAnalysisResult> {
           error: 'Primary scraping failed - using fallback data',
           fallbackUsed: true,
           timestamp: new Date(),
-          errorCategory: DomainErrorCategory.NETWORK_ERROR,
+          errorCategory: originalErrorCategory || DomainErrorCategory.NETWORK_ERROR,
           ...fallbackData,
         };
       }
@@ -340,7 +345,7 @@ export async function scrapeWebsite(domain: string): Promise<DomainAnalysisResul
   if (circuitBreaker.isOpen(normalizedDomain)) {
     healthMetrics.failedRequests++;
     console.warn(`Circuit breaker is open for domain: ${normalizedDomain}`);
-    return await getFallbackData(normalizedDomain);
+    return await getFallbackData(normalizedDomain, DomainErrorCategory.CIRCUIT_BREAKER);
   }
 
   if (!circuitBreaker.canAttempt(normalizedDomain)) {
@@ -386,7 +391,7 @@ export async function scrapeWebsite(domain: string): Promise<DomainAnalysisResul
           
           if (attempts === maxAttempts) {
             healthMetrics.failedRequests++;
-            return await getFallbackData(normalizedDomain);
+            return await getFallbackData(normalizedDomain, errorCategory);
           }
           
           // Wait before retry for server errors
@@ -494,8 +499,7 @@ export async function scrapeWebsite(domain: string): Promise<DomainAnalysisResul
         // Try fallback data
         if (errorCategory === DomainErrorCategory.NETWORK_ERROR || 
             errorCategory === DomainErrorCategory.TIMEOUT) {
-          const fallbackResult = await getFallbackData(normalizedDomain);
-          fallbackResult.errorCategory = errorCategory;
+          const fallbackResult = await getFallbackData(normalizedDomain, errorCategory);
           return fallbackResult;
         }
         
@@ -516,7 +520,7 @@ export async function scrapeWebsite(domain: string): Promise<DomainAnalysisResul
   }
 
   // This should never be reached, but include as fallback
-  return await getFallbackData(normalizedDomain);
+  return await getFallbackData(normalizedDomain, DomainErrorCategory.NETWORK_ERROR);
 }
 
 /**
@@ -744,7 +748,7 @@ export async function analyzeCompanyDomain(domain: string): Promise<{
     
     // Last resort fallback - try to get basic fallback data
     try {
-      const fallbackData = await getFallbackData(domain);
+      const fallbackData = await getFallbackData(domain, DomainErrorCategory.NETWORK_ERROR);
       const fallbackAnalysis = generateFallbackCompanyAnalysis(fallbackData);
       
       return {

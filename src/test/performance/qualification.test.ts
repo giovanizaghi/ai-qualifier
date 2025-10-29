@@ -5,10 +5,10 @@
 
 import { describe, test, expect, beforeAll, afterAll, beforeEach } from '@jest/globals';
 import { performance } from 'perf_hooks';
-import { qualifyProspects, BATCH_CONFIG } from '../lib/prospect-qualifier';
-import { generateICP } from '../lib/icp-generator';
-import type { ICPData } from '../lib/icp-generator';
-import { cache, logCacheStats } from '../lib/cache';
+import { qualifyProspects, BATCH_CONFIG } from '../../lib/prospect-qualifier';
+import { generateICP } from '../../lib/icp-generator';
+import type { ICPData } from '../../lib/icp-generator';
+import { cache, logCacheStats } from '../../lib/cache';
 
 // Test configuration
 const PERFORMANCE_TARGETS = {
@@ -38,8 +38,7 @@ function generateMockICP(): ICPData {
         seniority: 'Senior',
         department: 'Engineering',
         painPoints: ['Technical debt', 'Scalability'],
-        goals: ['System optimization'],
-        triggers: ['Performance issues']
+        goals: ['System optimization']
       }
     ],
     companySize: {

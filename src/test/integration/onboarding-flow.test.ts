@@ -81,11 +81,11 @@ const testPrisma = new PrismaClient({
 });
 
 // Test data factories
-const createTestUser = () => ({
-  id: 'test-user-id-' + Math.random().toString(36).substring(7),
-  email: 'onboarding-test@example.com',
+const createTestUser = (overrides: any = {}) => ({
+  email: 'onboarding-test-' + Math.random().toString(36).substring(7) + '@example.com',
   name: 'Onboarding Test User',
   role: 'USER' as const,
+  ...overrides
 });
 
 const createTestCompanyAnalysisData = () => ({
@@ -108,7 +108,7 @@ const createTestCompanyAnalysisData = () => ({
 });
 
 describe('Onboarding Flow Integration Tests', () => {
-  let testUser: { id: string; email: string; name: string; role: 'USER' };
+  let testUser: any;
 
   beforeAll(async () => {
     // Connect to test database
@@ -125,9 +125,8 @@ describe('Onboarding Flow Integration Tests', () => {
     await cleanTestDatabase();
     
     // Create test user
-    testUser = createTestUser();
-    await testPrisma.user.create({
-      data: testUser,
+    testUser = await testPrisma.user.create({
+      data: createTestUser(),
     });
   });
 

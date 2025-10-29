@@ -49,6 +49,12 @@ export async function GET(req: NextRequest) {
       success: true,
       companies,
       total: companies.length,
+    }, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate, private',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     });
   } catch (error) {
     console.error('[API] Error fetching companies:', error);

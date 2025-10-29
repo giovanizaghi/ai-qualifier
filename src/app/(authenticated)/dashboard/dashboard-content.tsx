@@ -99,12 +99,18 @@ export default function DashboardContent({ user }: DashboardContentProps) {
   const fetchData = async () => {
     setLoading(true);
     try {
+        // Force cache bust with timestamp and user ID
+        const timestamp = Date.now();
+        const cacheBuster = `t=${timestamp}&u=${user.id}`;
+        
         // Fetch companies
         console.log('[Dashboard] Fetching companies...');
-        const companyRes = await fetch("/api/companies", {
+        const companyRes = await fetch(`/api/companies?${cacheBuster}`, {
           cache: 'no-store',
           headers: {
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
           }
         })
         if (companyRes.ok) {
@@ -116,10 +122,12 @@ export default function DashboardContent({ user }: DashboardContentProps) {
         }
 
         // Fetch recent qualification runs
-        const runsRes = await fetch("/api/qualify/recent", {
+        const runsRes = await fetch(`/api/qualify/recent?${cacheBuster}`, {
           cache: 'no-store',
           headers: {
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
           }
         })
         if (runsRes.ok) {
@@ -139,6 +147,22 @@ export default function DashboardContent({ user }: DashboardContentProps) {
     }
 
   useEffect(() => {
+    // Clear any potential cached data when user changes
+    if (typeof window !== 'undefined') {
+      // Clear relevant localStorage/sessionStorage if any exists
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('companies') || key.includes('dashboard') || key.includes('qualify')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.includes('companies') || key.includes('dashboard') || key.includes('qualify')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    }
+    
     fetchData()
   }, [user.id])
 

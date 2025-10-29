@@ -26,23 +26,24 @@ const testPrisma = new PrismaClient({
 });
 
 // Test data factories
-const createTestUser = () => ({
-  id: 'api-test-user-id-' + Math.random().toString(36).substring(7),
-  email: 'api-test@example.com',
+const createTestUser = (overrides: any = {}) => ({
+  email: 'api-test-' + Math.random().toString(36).substring(7) + '@example.com',
   name: 'API Test User',
   role: 'USER' as const,
+  ...overrides
 });
 
-const createTestCompany = (userId: string) => ({
-  domain: 'api-test-company.com',
+const createTestCompany = (userId: string, overrides: any = {}) => ({
+  domain: 'api-test-company-' + Math.random().toString(36).substring(7) + '.com',
   name: 'API Test Company',
   description: 'Company for API testing',
   industry: 'Technology',
   size: '50-200',
   userId,
+  ...overrides
 });
 
-const createTestICP = (companyId: string) => ({
+const createTestICP = (companyId: string, overrides: any = {}) => ({
   companyId,
   title: 'API Test ICP',
   description: 'ICP for API testing',
@@ -60,6 +61,7 @@ const createTestICP = (companyId: string) => ({
   industries: ['Technology'],
   geographicRegions: ['North America'],
   fundingStages: ['Series A'],
+  ...overrides
 });
 
 // Mock HTTP request helper
@@ -140,6 +142,13 @@ class MockAPIClient {
       return {
         status: 400,
         json: async () => ({ error: 'Domain is required' })
+      };
+    }
+
+    if (!data.userId) {
+      return {
+        status: 400,
+        json: async () => ({ error: 'UserId is required' })
       };
     }
 
@@ -289,7 +298,7 @@ class MockAPIClient {
 }
 
 describe('API Endpoint Integration Tests', () => {
-  let testUser: { id: string; email: string; name: string; role: 'USER' };
+  let testUser: any;
   let testCompany: any;
   let testICP: any;
   let apiClient: MockAPIClient;
@@ -307,9 +316,8 @@ describe('API Endpoint Integration Tests', () => {
     await cleanTestDatabase();
     
     // Create test user
-    testUser = createTestUser();
-    await testPrisma.user.create({
-      data: testUser,
+    testUser = await testPrisma.user.create({
+      data: createTestUser(),
     });
 
     // Set auth token for API client
@@ -759,6 +767,7 @@ describe('API Endpoint Integration Tests', () => {
 
 // Utility function to clean test database
 async function cleanTestDatabase() {
+  // Delete in proper order to avoid foreign key constraint violations
   await testPrisma.prospectQualification.deleteMany();
   await testPrisma.qualificationRun.deleteMany();
   await testPrisma.iCP.deleteMany();

@@ -132,9 +132,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     }),
   ],
   callbacks: {
-    async jwt({ token, user, trigger, session }) {
+    async jwt({ token, user, account, trigger, session }) {
       // Initial sign in
       if (user) {
+        // For both OAuth and credentials, use the database user ID
+        token.sub = user.id
         token.role = user.role || "USER"
       }
 

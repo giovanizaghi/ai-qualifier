@@ -81,14 +81,13 @@ class PerformanceMonitor {
 
 // Test data generators
 const generateUser = (index = 0) => ({
-  id: `perf-user-${index}-${Math.random().toString(36).substring(7)}`,
-  email: `perf-user-${index}@example.com`,
+  email: `perf-user-${index}-${Math.random().toString(36).substring(7)}@example.com`,
   name: `Performance User ${index}`,
   role: 'USER' as const,
 });
 
 const generateCompany = (userId: string, index = 0) => ({
-  domain: `perf-company-${index}.com`,
+  domain: `perf-company-${index}-${Math.random().toString(36).substring(7)}.com`,
   name: `Performance Company ${index}`,
   description: `Company ${index} for performance testing`,
   industry: 'Technology',

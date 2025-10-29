@@ -3,6 +3,7 @@
 import { User } from "next-auth"
 import { LogOut, Settings, User as UserIcon } from "lucide-react"
 import { signOut } from "next-auth/react"
+import { cache, clearBrowserCaches } from "@/lib/cache"
 
 import {
   DropdownMenu,
@@ -32,7 +33,21 @@ export function UserNav({ user }: UserNavProps) {
   }
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" })
+    try {
+      // Clear server-side user-specific cache
+      const clearedCount = cache.clearUserCache(user.id || '');
+      console.log(`[UserNav] Cleared ${clearedCount} server cache entries for user ${user.id}`);
+      
+      // Clear browser-level caches
+      clearBrowserCaches();
+      
+      // Sign out
+      await signOut({ callbackUrl: "/" });
+    } catch (error) {
+      console.error('[UserNav] Error during sign out:', error);
+      // Still attempt to sign out even if cache clearing fails
+      await signOut({ callbackUrl: "/" });
+    }
   }
 
   return (

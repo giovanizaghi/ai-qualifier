@@ -4,7 +4,6 @@
 
 import { jest } from '@jest/globals';
 import * as cheerio from 'cheerio';
-import { generateStructuredResponse } from '../openai-client';
 import {
   scrapeWebsite,
   analyzeCompanyWithAI,
@@ -20,13 +19,20 @@ import {
 } from '../domain-analyzer';
 
 // Mock dependencies
-jest.mock('../openai-client');
+jest.mock('../openai-client', () => ({
+  generateStructuredResponse: jest.fn(),
+  openai: {},
+}));
+
+// Explicitly mock cheerio to ensure it's loaded
 jest.mock('cheerio');
 
 // Global fetch mock
 global.fetch = jest.fn() as jest.MockedFunction<typeof fetch>;
 
-const mockGenerateStructuredResponse = generateStructuredResponse as jest.MockedFunction<typeof generateStructuredResponse>;
+// Import the mocked functions after mocking
+const { generateStructuredResponse } = require('../openai-client');
+const mockGenerateStructuredResponse = generateStructuredResponse as jest.MockedFunction<any>;
 const mockFetch = global.fetch as jest.MockedFunction<typeof fetch>;
 const mockCheerio = cheerio as jest.Mocked<typeof cheerio>;
 
@@ -41,6 +47,114 @@ describe('Domain Analyzer Error Handling', () => {
     health.successfulRequests = 0;
     health.failedRequests = 0;
     health.circuitBreakerTrips = 0;
+
+    // Reset attempt counters for all domains
+    Object.keys(mockFetch as any).forEach(key => {
+      if (key.startsWith('attempts_')) {
+        delete (mockFetch as any)[key];
+      }
+    });
+
+    // Set up default mock responses
+    mockFetch.mockImplementation((input: string | URL | Request) => {
+      let domain: string;
+      if (typeof input === 'string') {
+        domain = input;
+      } else if (input instanceof URL) {
+        domain = input.hostname;
+      } else {
+        domain = input.url;
+      }
+      
+      // Success cases - check for domain names in URLs
+      if (domain.includes('working-domain.com') || domain.includes('stripe.com') || domain.includes('mixed-test.com')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: () => Promise.resolve('<html><head><title>Working Domain</title></head><body><h1>Welcome</h1><p>This is sufficient content for testing purposes. It contains enough text to pass the minimum length validation requirements that are enforced by the scraping logic. This domain provides comprehensive information about our services and products.</p></body></html>'),
+        } as Response);
+      }
+      
+      // Retry success cases
+      if (domain.includes('retry-test.com') || domain.includes('server-error-test.com')) {
+        // Use domain-specific attempt tracking
+        const attemptKey = `attempts_${domain}`;
+        const attempts = (mockFetch as any)[attemptKey] || 0;
+        (mockFetch as any)[attemptKey] = attempts + 1;
+        
+        if (attempts === 0) {
+          return Promise.reject(new Error('Temporary failure'));
+        } else {
+          return Promise.resolve({
+            ok: true,
+            status: 200,
+            text: () => Promise.resolve('<html><head><title>Success</title></head><body><h1>Recovered</h1><p>This content was successfully retrieved after retry attempts.</p></body></html>'),
+          } as Response);
+        }
+      }
+      
+      // HTTP error cases
+      if (domain.includes('not-found.com')) {
+        return Promise.resolve({
+          ok: false,
+          status: 404,
+          statusText: 'Not Found',
+        } as Response);
+      }
+      
+      // Content validation cases
+      if (domain.includes('minimal-content.com') || domain.includes('empty-response.com')) {
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          text: () => Promise.resolve('<html><body>short</body></html>'),
+        } as Response);
+      }
+      
+      // Complete failure cases for circuit breaker tests
+      if (domain.includes('failing-domain.com') || domain.includes('fail-')) {
+        return Promise.reject(new Error('failure'));
+      }
+      
+      // Timeout cases
+      if (domain.includes('timeout-test.com')) {
+        return Promise.reject(new Error('timeout exceeded'));
+      }
+      
+      // Rate limit cases
+      if (domain.includes('rate-limited.com')) {
+        return Promise.reject(new Error('rate limit exceeded'));
+      }
+      
+      // Network error cases
+      if (domain.includes('network-fail.com') || domain.includes('disaster-test.com')) {
+        return Promise.reject(new Error('Complete network failure'));
+      }
+      
+      // Default fallback
+      return Promise.reject(new Error('Unknown domain'));
+    });
+
+    // Set up OpenAI mock
+    mockGenerateStructuredResponse.mockImplementation(async (content: string, schema: any) => {
+      if (content.includes('sufficient content')) {
+        return {
+          companyName: 'Stripe',
+          industry: 'Financial Technology',
+          description: 'Online payment processing',
+          employees: '1000-5000',
+          headquarters: 'San Francisco, CA',
+          businessType: 'B2B',
+          tags: ['payments', 'fintech', 'api'],
+          technicalStack: ['JavaScript', 'Python', 'API'],
+          customerBase: 'global',
+          revenueModel: 'transaction fees'
+        };
+      }
+      
+      // Return basic fallback for insufficient content
+      return null;
+    });
   });
 
   describe('Error Categorization', () => {
@@ -92,15 +206,8 @@ describe('Domain Analyzer Error Handling', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: () => Promise.resolve('<html><title>Test</title><p>Content</p></html>'),
+        text: () => Promise.resolve('<html><head><title>Working Domain</title></head><body><h1>Welcome</h1><p>This is sufficient content for testing purposes. It contains enough text to pass the minimum length validation requirements that are enforced by the scraping logic.</p></body></html>'),
       } as Response);
-
-      mockCheerio.load.mockReturnValueOnce({
-        remove: jest.fn(),
-        text: jest.fn().mockReturnValue('Test'),
-        attr: jest.fn(),
-        each: jest.fn(),
-      } as any);
 
       const result = await scrapeWebsite('working-domain.com');
       expect(result.error).toBeUndefined();
@@ -158,22 +265,8 @@ describe('Domain Analyzer Error Handling', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: () => Promise.resolve('<html><title>Success</title><p>Working now</p></html>'),
+        text: () => Promise.resolve('<html><head><title>Success</title></head><body><h1>Success</h1><p>Working now with sufficient content for validation. This is enough text to meet the minimum requirements.</p></body></html>'),
       } as Response);
-
-      mockCheerio.load.mockReturnValueOnce({
-        remove: jest.fn(),
-        text: jest.fn().mockReturnValue('Success'),
-        attr: jest.fn(),
-        each: jest.fn((selector: string, callback: (index: number, element: any) => void) => {
-          if (selector === 'h1, h2, h3') {
-            callback(0, { textContent: 'Success' });
-          }
-          if (selector === 'p, li') {
-            callback(0, { textContent: 'Working now - this is a test paragraph' });
-          }
-        }),
-      } as any);
 
       const result = await scrapeWebsite(domain);
       
@@ -422,19 +515,8 @@ describe('Domain Analyzer Error Handling', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: () => Promise.resolve('<html><title>Success</title><p>Finally worked on retry</p></html>'),
+        text: () => Promise.resolve('<html><head><title>Success</title></head><body><h1>Success</h1><p>Finally worked on retry with sufficient content for validation testing purposes.</p></body></html>'),
       } as Response);
-
-      mockCheerio.load.mockReturnValueOnce({
-        remove: jest.fn(),
-        text: jest.fn().mockReturnValue('Success'),
-        attr: jest.fn(),
-        each: jest.fn((selector: string, callback: (index: number, element: any) => void) => {
-          if (selector === 'p, li') {
-            callback(0, { textContent: 'Finally worked on retry - sufficient content' });
-          }
-        }),
-      } as any);
 
       const result = await scrapeWebsite(domain);
       
@@ -455,19 +537,8 @@ describe('Domain Analyzer Error Handling', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        text: () => Promise.resolve('<html><title>Recovered</title><p>Server recovered successfully</p></html>'),
+        text: () => Promise.resolve('<html><head><title>Recovered</title></head><body><h1>Recovered</h1><p>Server recovered successfully with adequate content for testing validation requirements.</p></body></html>'),
       } as Response);
-
-      mockCheerio.load.mockReturnValueOnce({
-        remove: jest.fn(),
-        text: jest.fn().mockReturnValue('Recovered'),
-        attr: jest.fn(),
-        each: jest.fn((selector: string, callback: (index: number, element: any) => void) => {
-          if (selector === 'p, li') {
-            callback(0, { textContent: 'Server recovered successfully after retry' });
-          }
-        }),
-      } as any);
 
       const result = await scrapeWebsite('server-error-test.com');
       
@@ -507,7 +578,7 @@ describe('Domain Analyzer Error Handling', () => {
       const result = await scrapeWebsite('minimal-content.com');
       
       expect(result.error).toBeDefined();
-      expect(result.error).toContain('No meaningful content found');
+      expect(result.error).toContain('Invalid or insufficient content received');
     });
 
     it('should validate HTML content length', async () => {
