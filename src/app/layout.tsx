@@ -78,7 +78,7 @@ export default function RootLayout({
         {/* Manifest for PWA */}
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${inter.className} antialiased safe-area-padding`}>
+      <body className={`${inter.className} antialiased safe-area-padding`} suppressHydrationWarning={true}>
         <SessionProvider>
           <SonnerProvider />
           <ActiveRunNotifierWrapper />
