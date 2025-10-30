@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+
 import { ActiveRunNotifier } from "./active-run-notifier";
 
 export function ActiveRunNotifierWrapper() {

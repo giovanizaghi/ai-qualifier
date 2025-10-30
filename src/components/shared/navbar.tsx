@@ -4,8 +4,9 @@ import { Brain } from "lucide-react"
 import Link from "next/link"
 import { useSession } from "next-auth/react"
 
-import { UserNav } from "./user-nav"
 import { Button } from "@/components/ui/button"
+
+import { UserNav } from "./user-nav"
 
 export function Navbar() {
   const { data: session } = useSession()

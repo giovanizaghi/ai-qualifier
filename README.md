@@ -22,6 +22,10 @@
 - [Live Demo](#-live-demo)
 - [Key Features](#-key-features)
 - [Tech Stack](#-tech-stack)
+- [System Architecture & Diagrams](#-system-architecture--diagrams)
+  - [Authentication Flow](#authentication-flow)
+  - [Business Logic Flow](#business-logic-flow)
+  - [Testing Strategy](#testing-strategy)
 - [Getting Started](#-getting-started)
 - [Project Structure](#-project-structure)
 - [API Documentation](#-api-documentation)
@@ -643,6 +647,974 @@ Password: Test@123
    │PostgreSQL│
    └─────────┘
 ```
+
+---
+
+## 🏗️ System Architecture & Diagrams
+
+This section provides detailed visual explanations of the core system components: Authentication, Business Logic, and Testing Strategy.
+
+### Authentication Flow
+
+The AI Qualifier uses NextAuth.js v5 with a credential-based authentication system. Here's the complete authentication flow:
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant C as Client (Browser)
+    participant M as Middleware
+    participant A as Auth API
+    participant D as Database
+    participant S as Session
+
+    Note over U,S: Sign Up Flow
+    U->>C: Enter email/password
+    C->>A: POST /api/auth/signup
+    A->>A: Hash password (bcrypt)
+    A->>D: Create user record
+    D-->>A: User created
+    A-->>C: Success response
+    C->>C: Redirect to sign in
+
+    Note over U,S: Sign In Flow
+    U->>C: Enter credentials
+    C->>A: POST /api/auth/signin
+    A->>D: Find user by email
+    D-->>A: User data
+    A->>A: Compare password hash
+    A->>S: Create JWT session
+    S-->>A: Session token
+    A-->>C: Set auth cookies
+    C->>C: Redirect to dashboard
+
+    Note over U,S: Protected Route Access
+    U->>C: Navigate to /dashboard
+    C->>M: Request with cookies
+    M->>M: Verify JWT token
+    alt Valid Session
+        M->>C: Allow access
+        C->>C: Render protected page
+    else Invalid/Expired
+        M->>C: Redirect to /auth/signin
+    end
+
+    Note over U,S: API Route Protection
+    C->>A: POST /api/companies/analyze
+    A->>A: auth() middleware check
+    alt Authenticated
+        A->>A: Process request
+        A-->>C: API response
+    else Not Authenticated
+        A-->>C: 401 Unauthorized
+    end
+```
+
+#### Authentication Architecture Components
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                     Authentication Layer                    │
+├─────────────────────────────────────────────────────────────┤
+│                                                            │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
+│  │   Sign Up    │  │   Sign In    │  │   Sign Out   │    │
+│  │              │  │              │  │              │    │
+│  │ • Validation │  │ • Credential │  │ • Clear      │    │
+│  │ • Hashing    │  │   Check      │  │   Session    │    │
+│  │ • User       │  │ • JWT        │  │ • Redirect   │    │
+│  │   Creation   │  │   Creation   │  │              │    │
+│  └──────────────┘  └──────────────┘  └──────────────┘    │
+│           │              │                   │            │
+└───────────┼──────────────┼───────────────────┼────────────┘
+            ▼              ▼                   ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    Middleware Layer                        │
+├─────────────────────────────────────────────────────────────┤
+│                                                            │
+│  ┌──────────────────────────────────────────────────────┐  │
+│  │                 middleware.ts                        │  │
+│  │                                                      │  │
+│  │  export default auth((req) => {                     │  │
+│  │    const isLoggedIn = !!req.auth;                   │  │
+│  │    const isAuthPage = pathname.startsWith('/auth'); │  │
+│  │                                                      │  │
+│  │    if (!isLoggedIn && !isAuthPage) {                │  │
+│  │      return Response.redirect('/auth/signin');      │  │
+│  │    }                                                 │  │
+│  │  })                                                  │  │
+│  └──────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+            │
+            ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   Protected Resources                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                            │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐      │
+│  │ Dashboard   │  │ API Routes  │  │ Server      │      │
+│  │ Pages       │  │             │  │ Components  │      │
+│  │             │  │ • Companies │  │             │      │
+│  │ • /dashboard│  │ • Qualify   │  │ • User Data │      │
+│  │ • /onboard  │  │ • Auth      │  │ • Session   │      │
+│  │ • /qualify  │  │             │  │   Access    │      │
+│  └─────────────┘  └─────────────┘  └─────────────┘      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+#### Authentication Code Examples
+
+**1. NextAuth Configuration**
+```typescript
+// src/lib/auth.ts
+export const authConfig = {
+  providers: [
+    CredentialsProvider({
+      name: "credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          return null;
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email }
+        });
+
+        if (!user) return null;
+
+        const isValid = await bcrypt.compare(
+          credentials.password,
+          user.password
+        );
+
+        return isValid ? { id: user.id, email: user.email } : null;
+      }
+    })
+  ],
+  session: { strategy: "jwt" },
+  pages: {
+    signIn: '/auth/signin',
+    signUp: '/auth/signup',
+    error: '/auth/error',
+  }
+};
+```
+
+**2. Protected API Route**
+```typescript
+// src/app/api/companies/analyze/route.ts
+export async function POST(request: Request) {
+  try {
+    // Authentication check
+    const session = await auth();
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
+
+    // Rate limiting check
+    const rateLimitKey = `analyze:${session.user.id}`;
+    const allowed = await checkRateLimit(rateLimitKey, 5, 60); // 5 per minute
+    if (!allowed) {
+      return NextResponse.json(
+        { error: 'Rate limit exceeded' },
+        { status: 429 }
+      );
+    }
+
+    // Process request...
+  } catch (error) {
+    return handleApiError(error);
+  }
+}
+```
+
+### Business Logic Flow
+
+The core business logic follows a structured flow from company analysis to prospect qualification. Here's the complete process:
+
+```mermaid
+flowchart TD
+    A[User Enters Company Domain] --> B{Domain Validation}
+    B -->|Valid| C[Web Scraping Service]
+    B -->|Invalid| A1[Show Validation Error]
+    
+    C --> D[Extract Company Info]
+    D --> E[Company Info Structured]
+    E --> F[OpenAI ICP Generator]
+    
+    F --> G{AI Response Valid?}
+    G -->|Yes| H[Parse & Store ICP]
+    G -->|No| F1[Retry with Fallback Prompt]
+    F1 --> G
+    
+    H --> I[Display ICP to User]
+    I --> J[User Inputs Prospect Domains]
+    J --> K{Input Validation}
+    K -->|Valid| L[Create Qualification Run]
+    K -->|Invalid| J1[Show Input Errors]
+    
+    L --> M[Start Background Processing]
+    M --> N[Process Each Prospect]
+    
+    N --> O[Scrape Prospect Domain]
+    O --> P[Extract Prospect Info]
+    P --> Q[AI Qualification Analysis]
+    Q --> R[Generate Score & Reasoning]
+    R --> S[Store Results]
+    
+    S --> T{More Prospects?}
+    T -->|Yes| N
+    T -->|No| U[Mark Run Complete]
+    
+    U --> V[Display Results Dashboard]
+    V --> W[User Views Scored Prospects]
+
+    style A fill:#e1f5fe
+    style F fill:#fff3e0
+    style Q fill:#fff3e0
+    style V fill:#e8f5e8
+    style W fill:#e8f5e8
+```
+
+#### Detailed Service Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                            Business Logic Layer                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐       │
+│  │ Domain Analyzer │  │  ICP Generator  │  │ Prospect        │       │
+│  │                 │  │                 │  │ Qualifier       │       │
+│  │ • Web Scraping  │  │ • AI Prompting  │  │ • Batch Process │       │
+│  │ • HTML Parsing  │  │ • JSON Parsing  │  │ • Score Calc    │       │
+│  │ • Data Extract  │  │ • Validation    │  │ • Result Store  │       │
+│  │ • Sanitization  │  │ • Error Handle  │  │ • Progress Track│       │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘       │
+│           │                     │                     │               │
+│           ▼                     ▼                     ▼               │
+│  ┌─────────────────────────────────────────────────────────────────┐  │
+│  │                    OpenAI Client Service                       │  │
+│  │                                                                 │  │
+│  │  • Model: GPT-4o-mini (cost-optimized)                        │  │
+│  │  • Response Format: JSON mode (structured output)             │  │
+│  │  • Error Handling: Rate limits, context length, API errors    │  │
+│  │  • Retry Logic: Exponential backoff with jitter              │  │
+│  │  • Token Management: Max tokens per request                   │  │
+│  └─────────────────────────────────────────────────────────────────┘  │
+└─────────────────────────────────────────────────────────────────────────┘
+            │
+            ▼
+┌─────────────────────────────────────────────────────────────────────────┐
+│                            Data Persistence Layer                       │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐    │
+│  │   Company   │  │     ICP     │  │ Qualification│  │  Prospect   │    │
+│  │             │  │             │  │     Run      │  │ Qualification│    │
+│  │ • Domain    │  │ • Title     │  │              │  │             │    │
+│  │ • Name      │  │ • Personas  │  │ • Status     │  │ • Domain    │    │
+│  │ • Industry  │  │ • Criteria  │  │ • Progress   │  │ • Score     │    │
+│  │ • Analysis  │  │ • Regions   │  │ • Timestamps │  │ • Reasoning │    │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘    │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+#### Core Business Logic Services
+
+**1. Domain Analyzer Service**
+```typescript
+// src/lib/domain-analyzer.ts
+export class DomainAnalyzer {
+  async analyzeDomain(domain: string): Promise<CompanyAnalysis> {
+    // 1. Validate domain format
+    if (!this.isValidDomain(domain)) {
+      throw new ValidationError('Invalid domain format');
+    }
+
+    // 2. Scrape website content
+    const content = await this.scrapeWebsite(domain);
+    
+    // 3. Extract structured information
+    const analysis = await this.extractCompanyInfo(content);
+    
+    // 4. Sanitize and validate extracted data
+    return this.sanitizeAnalysis(analysis);
+  }
+
+  private async scrapeWebsite(domain: string): Promise<string> {
+    const response = await fetch(`https://${domain}`);
+    const html = await response.text();
+    
+    const $ = cheerio.load(html);
+    
+    // Extract relevant content
+    const title = $('title').text();
+    const description = $('meta[name="description"]').attr('content');
+    const content = $('body').text().slice(0, 5000); // Limit content
+    
+    return { title, description, content };
+  }
+}
+```
+
+**2. ICP Generator Service**
+```typescript
+// src/lib/icp-generator.ts
+export class ICPGenerator {
+  async generateICP(companyAnalysis: CompanyAnalysis): Promise<ICP> {
+    const prompt = this.buildPrompt(companyAnalysis);
+    
+    try {
+      const response = await this.openaiClient.generateCompletion({
+        prompt,
+        model: 'gpt-4o-mini',
+        responseFormat: 'json_object',
+        maxTokens: 2000,
+        temperature: 0.7
+      });
+
+      const icp = JSON.parse(response.content);
+      return this.validateAndStructureICP(icp);
+      
+    } catch (error) {
+      if (error.code === 'rate_limit_exceeded') {
+        throw new APIError('OpenAI rate limit exceeded', 429);
+      }
+      throw new AIGenerationError('Failed to generate ICP');
+    }
+  }
+
+  private buildPrompt(analysis: CompanyAnalysis): string {
+    return `
+      Analyze this company and generate a detailed ICP:
+      
+      COMPANY: ${analysis.name}
+      INDUSTRY: ${analysis.industry}
+      DESCRIPTION: ${analysis.description}
+      
+      Generate a JSON object with:
+      1. title: Clear ICP name
+      2. description: Detailed overview  
+      3. buyerPersonas: [3-5 detailed personas with roles, pain points]
+      4. companySize: {min, max, revenueRange}
+      5. industries: [target industries]
+      6. geographicRegions: [target regions]
+      7. fundingStages: [seed, series-a, etc]
+    `;
+  }
+}
+```
+
+**3. Prospect Qualifier Service**
+```typescript
+// src/lib/prospect-qualifier.ts
+export class ProspectQualifier {
+  async qualifyProspects(icpId: string, domains: string[]): Promise<string> {
+    // 1. Create qualification run
+    const run = await prisma.qualificationRun.create({
+      data: {
+        icpId,
+        status: 'PROCESSING',
+        totalProspects: domains.length
+      }
+    });
+
+    // 2. Process prospects (would be background job in production)
+    this.processProspectsAsync(run.id, domains);
+    
+    return run.id;
+  }
+
+  private async processProspectsAsync(runId: string, domains: string[]) {
+    try {
+      for (const domain of domains) {
+        await this.qualifySingleProspect(runId, domain);
+        
+        // Update progress
+        await this.updateProgress(runId, domain);
+      }
+      
+      // Mark run complete
+      await prisma.qualificationRun.update({
+        where: { id: runId },
+        data: { 
+          status: 'COMPLETED',
+          completedAt: new Date()
+        }
+      });
+      
+    } catch (error) {
+      await this.markRunAsFailed(runId, error);
+    }
+  }
+
+  private async qualifySingleProspect(runId: string, domain: string) {
+    // 1. Analyze prospect domain
+    const prospectAnalysis = await this.domainAnalyzer.analyzeDomain(domain);
+    
+    // 2. Get ICP for comparison
+    const icp = await this.getICPForRun(runId);
+    
+    // 3. Generate AI qualification
+    const qualification = await this.generateQualification(prospectAnalysis, icp);
+    
+    // 4. Store result
+    await prisma.prospectQualification.create({
+      data: {
+        runId,
+        domain,
+        score: qualification.score,
+        fitLevel: this.calculateFitLevel(qualification.score),
+        reasoning: qualification.reasoning,
+        prospectAnalysis
+      }
+    });
+  }
+}
+```
+
+#### Business Logic Data Flow
+
+```
+User Input (Domain)
+       │
+       ▼
+┌─────────────────┐
+│ Input Validation│ ── Validation Errors ──► User Feedback
+└─────────────────┘
+       │ Valid
+       ▼
+┌─────────────────┐
+│ Domain Analysis │ ── Network/Parse Errors ──► Error Handling
+└─────────────────┘
+       │ Success
+       ▼
+┌─────────────────┐
+│ ICP Generation  │ ── AI Errors ──► Retry Logic ──► Fallback
+└─────────────────┘
+       │ Success
+       ▼
+┌─────────────────┐
+│ Data Storage    │ ── DB Errors ──► Transaction Rollback
+└─────────────────┘
+       │ Success
+       ▼
+┌─────────────────┐
+│ User Dashboard  │
+└─────────────────┘
+       │ User Action
+       ▼
+┌─────────────────┐
+│ Prospect Input  │ ── Validation Errors ──► User Feedback
+└─────────────────┘
+       │ Valid
+       ▼
+┌─────────────────┐
+│ Batch Processing│ ── Processing Errors ──► Error Recovery
+└─────────────────┘
+       │ Progress Updates
+       ▼
+┌─────────────────┐
+│ Real-time UI    │ ── Polling ──► Status Updates
+└─────────────────┘
+       │ Complete
+       ▼
+┌─────────────────┐
+│ Results Display │
+└─────────────────┘
+```
+
+### Testing Strategy
+
+The AI Qualifier implements a comprehensive testing strategy covering unit tests, integration tests, and end-to-end testing. Here's the complete testing architecture:
+
+```mermaid
+graph TD
+    A[Testing Strategy] --> B[Unit Tests]
+    A --> C[Integration Tests]  
+    A --> D[E2E Tests]
+    A --> E[Performance Tests]
+
+    B --> B1[Jest + Testing Library]
+    B --> B2[Component Tests]
+    B --> B3[Service Tests]
+    B --> B4[Utility Tests]
+
+    C --> C1[API Route Tests]
+    C --> C2[Database Tests]
+    C --> C3[Service Integration]
+    C --> C4[Mock External APIs]
+
+    D --> D1[Playwright]
+    D --> D2[User Workflows]
+    D --> D3[Authentication Flows]
+    D --> D4[Error Scenarios]
+
+    E --> E1[Load Testing]
+    E --> E2[API Performance]
+    E --> E3[Database Performance]
+    E --> E4[AI Response Times]
+
+    style B fill:#e3f2fd
+    style C fill:#f3e5f5
+    style D fill:#e8f5e8
+    style E fill:#fff8e1
+```
+
+#### Testing Pyramid Implementation
+
+```
+                    ┌─────────────────────┐
+                    │     E2E Tests       │ ← Few, High Value
+                    │                     │
+                    │ • Full User Flows   │
+                    │ • Critical Paths    │
+                    │ • Browser Testing   │
+                    └─────────────────────┘
+                            │
+              ┌─────────────────────────────────┐
+              │      Integration Tests           │ ← Some, Medium Value  
+              │                                 │
+              │ • API Routes + Database         │
+              │ • Service Layer Integration     │
+              │ • External API Mocking          │
+              │ • Authentication Flows          │
+              └─────────────────────────────────┘
+                            │
+        ┌───────────────────────────────────────────────┐
+        │                Unit Tests                     │ ← Many, Fast
+        │                                               │
+        │ • Pure Functions (utils, validators)          │
+        │ • React Components (isolated)                 │
+        │ • Service Classes (mocked dependencies)       │
+        │ • Business Logic (domain functions)           │
+        └───────────────────────────────────────────────┘
+```
+
+#### Test Configuration & Setup
+
+**1. Jest Configuration**
+```javascript
+// jest.config.js
+module.exports = {
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  moduleNameMapping: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  collectCoverageFrom: [
+    'src/**/*.{ts,tsx}',
+    '!src/**/*.d.ts',
+    '!src/app/**', // Exclude app directory (integration tested)
+  ],
+  coverageThreshold: {
+    global: {
+      branches: 80,
+      functions: 80,
+      lines: 80,
+      statements: 80,
+    },
+  },
+  testMatch: [
+    '<rootDir>/src/**/__tests__/**/*.{js,jsx,ts,tsx}',
+    '<rootDir>/src/**/*.{test,spec}.{js,jsx,ts,tsx}',
+  ],
+};
+```
+
+**2. Testing Library Setup**
+```javascript
+// jest.setup.js
+import '@testing-library/jest-dom';
+import { TextEncoder, TextDecoder } from 'util';
+
+// Polyfills for Node.js environment
+global.TextEncoder = TextEncoder;
+global.TextDecoder = TextDecoder;
+
+// Mock Next.js router
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    refresh: jest.fn(),
+  }),
+  useSearchParams: () => new URLSearchParams(),
+}));
+
+// Mock NextAuth
+jest.mock('next-auth/react', () => ({
+  useSession: () => ({
+    data: { user: { id: '1', email: 'test@test.com' } },
+    status: 'authenticated',
+  }),
+}));
+```
+
+#### Unit Testing Examples
+
+**1. Utility Function Tests**
+```typescript
+// src/lib/__tests__/validation.test.ts
+import { validateDomain, sanitizeInput } from '../validation';
+
+describe('validation utilities', () => {
+  describe('validateDomain', () => {
+    test('accepts valid domains', () => {
+      expect(validateDomain('example.com')).toBe(true);
+      expect(validateDomain('sub.example.com')).toBe(true);
+      expect(validateDomain('example-site.co.uk')).toBe(true);
+    });
+
+    test('rejects invalid domains', () => {
+      expect(validateDomain('invalid')).toBe(false);
+      expect(validateDomain('http://example.com')).toBe(false);
+      expect(validateDomain('example..com')).toBe(false);
+    });
+
+    test('handles edge cases', () => {
+      expect(validateDomain('')).toBe(false);
+      expect(validateDomain('a'.repeat(300))).toBe(false);
+    });
+  });
+
+  describe('sanitizeInput', () => {
+    test('removes XSS attempts', () => {
+      const malicious = '<script>alert("xss")</script>example.com';
+      expect(sanitizeInput(malicious)).toBe('example.com');
+    });
+
+    test('preserves valid characters', () => {
+      const valid = 'example-site.com';
+      expect(sanitizeInput(valid)).toBe(valid);
+    });
+  });
+});
+```
+
+**2. React Component Tests**
+```typescript
+// src/components/__tests__/CompanyCard.test.tsx
+import { render, screen } from '@testing-library/react';
+import { CompanyCard } from '../company/CompanyCard';
+
+const mockCompany = {
+  id: '1',
+  domain: 'example.com',
+  name: 'Example Corp',
+  industry: 'Technology',
+  icps: [{ id: '1', title: 'B2B SaaS' }],
+};
+
+describe('CompanyCard', () => {
+  test('renders company information', () => {
+    render(<CompanyCard company={mockCompany} />);
+    
+    expect(screen.getByText('Example Corp')).toBeInTheDocument();
+    expect(screen.getByText('example.com')).toBeInTheDocument();
+    expect(screen.getByText('Technology')).toBeInTheDocument();
+  });
+
+  test('shows ICP count', () => {
+    render(<CompanyCard company={mockCompany} />);
+    
+    expect(screen.getByText('1 ICP')).toBeInTheDocument();
+  });
+
+  test('handles company without ICPs', () => {
+    const companyWithoutICP = { ...mockCompany, icps: [] };
+    render(<CompanyCard company={companyWithoutICP} />);
+    
+    expect(screen.getByText('No ICPs')).toBeInTheDocument();
+  });
+});
+```
+
+**3. Service Layer Tests**
+```typescript
+// src/lib/__tests__/domain-analyzer.test.ts
+import { DomainAnalyzer } from '../domain-analyzer';
+
+// Mock external dependencies
+jest.mock('cheerio');
+jest.mock('node-fetch');
+
+describe('DomainAnalyzer', () => {
+  let analyzer: DomainAnalyzer;
+
+  beforeEach(() => {
+    analyzer = new DomainAnalyzer();
+  });
+
+  test('analyzes domain successfully', async () => {
+    // Mock fetch response
+    const mockFetch = jest.mocked(fetch);
+    mockFetch.mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve('<html><title>Test Site</title></html>'),
+    } as Response);
+
+    const result = await analyzer.analyzeDomain('example.com');
+
+    expect(result).toEqual({
+      domain: 'example.com',
+      name: 'Test Site',
+      // ... other expected properties
+    });
+  });
+
+  test('handles fetch errors', async () => {
+    const mockFetch = jest.mocked(fetch);
+    mockFetch.mockRejectedValue(new Error('Network error'));
+
+    await expect(analyzer.analyzeDomain('example.com'))
+      .rejects.toThrow('Failed to analyze domain');
+  });
+});
+```
+
+#### Integration Testing Examples
+
+**1. API Route Tests**
+```typescript
+// src/app/api/companies/__tests__/analyze.test.ts
+import { POST } from '../analyze/route';
+import { NextRequest } from 'next/server';
+
+// Mock authentication
+jest.mock('../../../lib/auth', () => ({
+  auth: jest.fn(() => ({ user: { id: '1' } })),
+}));
+
+describe('/api/companies/analyze', () => {
+  test('analyzes company successfully', async () => {
+    const request = new NextRequest('http://localhost:3000/api/companies/analyze', {
+      method: 'POST',
+      body: JSON.stringify({ domain: 'example.com' }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const response = await POST(request);
+    const data = await response.json();
+
+    expect(response.status).toBe(200);
+    expect(data.company.domain).toBe('example.com');
+    expect(data.icp).toBeDefined();
+  });
+
+  test('returns 401 for unauthenticated requests', async () => {
+    jest.mocked(auth).mockResolvedValue(null);
+
+    const request = new NextRequest('http://localhost:3000/api/companies/analyze', {
+      method: 'POST',
+      body: JSON.stringify({ domain: 'example.com' }),
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(401);
+  });
+});
+```
+
+**2. Database Integration Tests**
+```typescript
+// src/lib/__tests__/database.integration.test.ts
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient({
+  datasources: { db: { url: process.env.TEST_DATABASE_URL } },
+});
+
+describe('Database Integration', () => {
+  beforeEach(async () => {
+    await prisma.$executeRaw`TRUNCATE TABLE users CASCADE`;
+  });
+
+  afterAll(async () => {
+    await prisma.$disconnect();
+  });
+
+  test('creates user with company and ICP', async () => {
+    const user = await prisma.user.create({
+      data: { email: 'test@test.com', password: 'hashed' },
+    });
+
+    const company = await prisma.company.create({
+      data: {
+        userId: user.id,
+        domain: 'example.com',
+        name: 'Example Corp',
+      },
+    });
+
+    const icp = await prisma.iCP.create({
+      data: {
+        companyId: company.id,
+        title: 'B2B SaaS',
+        description: 'SaaS companies',
+        buyerPersonas: [],
+      },
+    });
+
+    expect(company.userId).toBe(user.id);
+    expect(icp.companyId).toBe(company.id);
+  });
+});
+```
+
+#### E2E Testing with Playwright
+
+**1. Playwright Configuration**
+```typescript
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+
+const config: PlaywrightTestConfig = {
+  testDir: './e2e',
+  timeout: 30000,
+  use: {
+    baseURL: 'http://localhost:3000',
+    trace: 'on-first-retry',
+    screenshot: 'only-on-failure',
+  },
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox', use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
+  ],
+  webServer: {
+    command: 'npm run dev',
+    port: 3000,
+    reuseExistingServer: !process.env.CI,
+  },
+};
+
+export default config;
+```
+
+**2. E2E Test Examples**
+```typescript
+// e2e/onboarding-flow.spec.ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Onboarding Flow', () => {
+  test('complete company analysis flow', async ({ page }) => {
+    // 1. Sign up
+    await page.goto('/auth/signup');
+    await page.fill('[name="email"]', 'test@example.com');
+    await page.fill('[name="password"]', 'Test123!');
+    await page.click('button[type="submit"]');
+
+    // 2. Start onboarding
+    await page.goto('/onboarding');
+    await page.fill('[name="domain"]', 'example.com');
+    await page.click('button:has-text("Analyze Company")');
+
+    // 3. Wait for analysis to complete
+    await expect(page.locator('text=Analysis Complete')).toBeVisible({
+      timeout: 60000,
+    });
+
+    // 4. Verify ICP generation
+    await expect(page.locator('[data-testid="icp-display"]')).toBeVisible();
+    await expect(page.locator('text=Buyer Personas')).toBeVisible();
+
+    // 5. Navigate to dashboard
+    await page.click('button:has-text("Go to Dashboard")');
+    await expect(page).toHaveURL('/dashboard');
+  });
+
+  test('handles invalid domain input', async ({ page }) => {
+    await page.goto('/onboarding');
+    await page.fill('[name="domain"]', 'invalid-domain');
+    await page.click('button[type="submit"]');
+
+    await expect(page.locator('text=Invalid domain format')).toBeVisible();
+  });
+});
+```
+
+#### Test Coverage & CI/CD Integration
+
+**1. GitHub Actions Workflow**
+```yaml
+# .github/workflows/test.yml
+name: Test Suite
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test -- --coverage
+
+      - name: Run integration tests
+        run: npm run test:integration
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+
+      - name: Install Playwright
+        run: npx playwright install
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+```
+
+**2. Coverage Reports**
+```bash
+# Coverage output example
+---------------------------|---------|----------|---------|---------|
+File                      | % Stmts | % Branch | % Funcs | % Lines |
+---------------------------|---------|----------|---------|---------|
+All files                 |   87.5   |   82.1   |   89.3  |   88.2  |
+ src/lib                  |   92.1   |   88.5   |   94.2  |   91.8  |
+  domain-analyzer.ts      |   95.2   |   91.3   |   100   |   94.8  |
+  icp-generator.ts        |   88.9   |   85.7   |   88.9  |   88.9  |
+  prospect-qualifier.ts   |   93.4   |   89.2   |   95.0  |   92.8  |
+ src/components           |   83.7   |   78.9   |   85.1  |   84.2  |
+  company/                |   88.2   |   82.4   |   90.0  |   87.5  |
+  qualify/                |   79.1   |   75.3   |   80.2  |   80.8  |
+---------------------------|---------|----------|---------|---------|
+```
+
+This comprehensive testing strategy ensures code quality, catches regressions early, and provides confidence in deployments through automated CI/CD pipelines.
 
 ---
 

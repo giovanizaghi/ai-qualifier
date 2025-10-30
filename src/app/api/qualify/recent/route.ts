@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+
 import { auth } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 
@@ -61,6 +62,12 @@ export async function GET() {
           company: run.icp.company,
         },
       })),
+    }, {
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate, private',
+        'Pragma': 'no-cache',
+        'Expires': '0'
+      }
     });
   } catch (error) {
     console.error('[API] Error fetching recent runs:', error);

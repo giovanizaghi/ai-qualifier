@@ -1,15 +1,17 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import Link from "next/link";
 import { ArrowLeft, Loader2, TrendingUp, TrendingDown, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
+import Link from "next/link";
+import { useState, useEffect } from "react";
+import { toast } from "sonner";
+
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { toast } from "sonner";
+
 
 interface ProspectResult {
   id: string;
@@ -54,7 +56,7 @@ export function QualificationResults({ run: initialRun }: QualificationResultsPr
 
   // Enhanced real-time polling with better error handling
   useEffect(() => {
-    if (run.status !== "PROCESSING" && run.status !== "PENDING") return;
+    if (run.status !== "PROCESSING" && run.status !== "PENDING") {return;}
 
     const pollInterval = setInterval(async () => {
       try {

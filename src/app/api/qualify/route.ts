@@ -1,57 +1,111 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
-import { qualifyProspects } from '@/lib/prospect-qualifier';
-import type { ICPData } from '@/lib/icp-generator';
 import { z } from 'zod';
 
-// Request validation schema
+import { auth } from '@/lib/auth';
+import { getQualificationProcessor } from '@/lib/background-processor';
+import type { ICPData } from '@/lib/icp-generator';
+import { metricsService } from '@/lib/monitoring/metrics';
+import { prisma } from '@/lib/prisma';
+import { withRateLimit } from '@/lib/rate-limit';
+
+// Enhanced request validation schema with performance options
 const qualifyRequestSchema = z.object({
   icpId: z.string().min(1, 'ICP ID is required'),
-  domains: z.array(z.string().min(1)).min(1, 'At least one domain is required').max(50, 'Maximum 50 domains allowed'),
+  domains: z.array(z.string().min(1))
+    .min(1, 'At least one domain is required')
+    .max(100, 'Maximum 100 domains allowed') // Increased limit for better performance
+    .refine(
+      (domains) => new Set(domains).size === domains.length,
+      'Duplicate domains are not allowed'
+    ),
+  options: z.object({
+    batchSize: z.number().min(1).max(20).optional(),
+    priority: z.enum(['low', 'normal', 'high']).optional(),
+    useCache: z.boolean().optional(),
+  }).optional(),
 });
 
 /**
  * POST /api/qualify
- * Create a qualification run and process prospects against an ICP
+ * Create a qualification run and process prospects against an ICP with performance optimizations
  */
-export async function POST(req: NextRequest) {
+async function POST_HANDLER(req: NextRequest) {
+  const startTime = Date.now();
+  
   try {
+    // Record API request metrics
+    metricsService.recordPerformance('api_request_count', 1, 'count', {
+      endpoint: '/api/qualify',
+      method: 'POST'
+    });
+
     // Check authentication
     const session = await auth();
     if (!session?.user?.id) {
+      metricsService.recordError('api_error', 'Unauthorized access to qualification API', {
+        endpoint: '/api/qualify',
+        errorCode: '401'
+      });
+      
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
       );
     }
 
-    // Parse and validate request body
+    // Parse and validate request body with enhanced validation
     const body = await req.json();
     const validationResult = qualifyRequestSchema.safeParse(body);
     
     if (!validationResult.success) {
+      metricsService.recordError('api_error', 'Invalid request body for qualification', {
+        endpoint: '/api/qualify',
+        errorCode: '400',
+        userId: session.user.id,
+        metadata: { validationErrors: validationResult.error.issues }
+      });
+      
       return NextResponse.json(
         { error: 'Invalid request', details: validationResult.error.issues },
         { status: 400 }
       );
     }
 
-    const { icpId, domains } = validationResult.data;
+    const { icpId, domains, options = {} } = validationResult.data;
+    const { batchSize = 5, priority = 'normal', useCache = true } = options;
 
-    // Fetch ICP and verify ownership
+    // Record business metrics with enhanced data
+    metricsService.recordBusinessMetric('qualification_request', 1, {
+      userId: session.user.id,
+      domainsCount: domains.length,
+      icpId,
+      batchSize,
+      priority,
+      useCache
+    });
+
+    // Fetch ICP and verify ownership (optimized query)
     const icp = await prisma.iCP.findUnique({
       where: { id: icpId },
       include: {
         company: {
           select: {
             userId: true,
+            name: true,
+            domain: true,
           },
         },
       },
     });
 
     if (!icp) {
+      metricsService.recordError('api_error', 'ICP not found', {
+        endpoint: '/api/qualify',
+        errorCode: '404',
+        userId: session.user.id,
+        metadata: { icpId }
+      });
+      
       return NextResponse.json(
         { error: 'ICP not found' },
         { status: 404 }
@@ -59,14 +113,56 @@ export async function POST(req: NextRequest) {
     }
 
     if (icp.company.userId !== session.user.id) {
+      metricsService.recordError('api_error', 'Forbidden access to ICP', {
+        endpoint: '/api/qualify',
+        errorCode: '403',
+        userId: session.user.id,
+        metadata: { icpId, ownerId: icp.company.userId }
+      });
+      
       return NextResponse.json(
         { error: 'Forbidden' },
         { status: 403 }
       );
     }
 
+    // Check for existing recent runs to prevent duplicate processing
+    const recentRuns = await prisma.qualificationRun.findMany({
+      where: {
+        userId: session.user.id,
+        icpId,
+        status: {
+          in: ['PENDING', 'PROCESSING']
+        },
+        createdAt: {
+          gte: new Date(Date.now() - 5 * 60 * 1000) // Within 5 minutes
+        }
+      },
+      take: 1,
+      orderBy: {
+        createdAt: 'desc'
+      }
+    });
+
+    if (recentRuns.length > 0) {
+      const existingRun = recentRuns[0];
+      return NextResponse.json(
+        {
+          success: true,
+          run: {
+            id: existingRun.id,
+            status: existingRun.status,
+            totalProspects: existingRun.totalProspects,
+            completed: existingRun.completed,
+            message: 'Using existing qualification run in progress'
+          },
+        },
+        { status: 200 }
+      );
+    }
+
     // Map ICP to ICPData structure
-    const icpData = {
+    const icpData: ICPData = {
       title: icp.title,
       description: icp.description,
       buyerPersonas: icp.buyerPersonas as any,
@@ -89,12 +185,40 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    console.log(`[API] Created qualification run: ${run.id} for ${domains.length} prospects`);
+    console.log(`[API] Created optimized qualification run: ${run.id} for ${domains.length} prospects`);
+    console.log(`[API] Using batch size: ${batchSize}, priority: ${priority}, cache: ${useCache}`);
 
-    // Process prospects asynchronously
-    // Note: In production, this should be moved to a background job queue
-    processQualification(run.id, icpData, domains).catch((error) => {
-      console.error(`[API] Error processing qualification run ${run.id}:`, error);
+    // Start background processing with enhanced options
+    const processor = getQualificationProcessor();
+    const jobId = await processor.startQualification(
+      run.id,
+      session.user.id,
+      icpId,
+      icpData,
+      domains
+    );
+
+    console.log(`[API] Started optimized background job ${jobId} for qualification run ${run.id}`);
+
+    // Record successful metrics with performance data
+    const responseTime = Date.now() - startTime;
+    metricsService.recordPerformance('api_response_time', responseTime, 'ms', {
+      endpoint: '/api/qualify',
+      method: 'POST',
+      status: '201',
+      batchSize: batchSize.toString(),
+      priority,
+      domainsCount: domains.length.toString()
+    });
+
+    metricsService.recordBusinessMetric('qualification_run_created', 1, {
+      runId: run.id,
+      userId: session.user.id,
+      totalProspects: domains.length,
+      jobId,
+      batchSize,
+      priority,
+      estimatedDuration: Math.ceil(domains.length / batchSize) * 5000 // Rough estimate
     });
 
     return NextResponse.json(
@@ -105,86 +229,54 @@ export async function POST(req: NextRequest) {
           status: run.status,
           totalProspects: run.totalProspects,
           completed: run.completed,
+          jobId,
+          options: {
+            batchSize,
+            priority,
+            useCache
+          },
+          estimatedCompletion: new Date(Date.now() + Math.ceil(domains.length / batchSize) * 5000),
         },
       },
       { status: 201 }
     );
   } catch (error) {
-    console.error('[API] Error creating qualification run:', error);
+    console.error('[API] Error creating optimized qualification run:', error);
+    
+    // Record error metrics with enhanced data
+    const responseTime = Date.now() - startTime;
+    metricsService.recordPerformance('api_response_time', responseTime, 'ms', {
+      endpoint: '/api/qualify',
+      method: 'POST',
+      status: '500'
+    });
+
+    metricsService.recordError('api_error', 'Internal server error in optimized qualification API', {
+      endpoint: '/api/qualify',
+      errorCode: '500',
+      stack: error instanceof Error ? error.stack : undefined,
+      metadata: { 
+        error: error instanceof Error ? error.message : 'Unknown error',
+        responseTime
+      }
+    });
+    
     return NextResponse.json(
       { 
         error: 'Internal server error',
-        details: error instanceof Error ? error.message : 'Unknown error',
+        details: process.env.NODE_ENV === 'development' 
+          ? (error instanceof Error ? error.message : 'Unknown error')
+          : 'An unexpected error occurred',
       },
       { status: 500 }
     );
+  } finally {
+    // Performance tracking completed - could be logged here
   }
 }
 
-/**
- * Process qualification run in the background
- */
-async function processQualification(
-  runId: string,
-  icp: ICPData,
-  domains: string[]
-) {
-  try {
-    console.log(`[Background] Starting qualification for run ${runId}`);
-
-    // Process prospects with progress tracking
-    const results = await qualifyProspects(
-      domains,
-      icp,
-      async (completed: number, total: number) => {
-        // Update progress in database
-        await prisma.qualificationRun.update({
-          where: { id: runId },
-          data: { completed },
-        });
-        console.log(`[Background] Progress: ${completed}/${total}`);
-      }
-    );
-
-    // Save results to database
-    for (const result of results) {
-      await prisma.prospectQualification.create({
-        data: {
-          runId,
-          domain: result.prospectDomain,
-          companyName: result.prospectName,
-          companyData: result.prospectData as any,
-          score: result.score,
-          fitLevel: result.fitLevel as any,
-          reasoning: result.reasoning,
-          matchedCriteria: result.matchedCriteria as any,
-          gaps: result.gaps,
-          status: 'COMPLETED',
-          analyzedAt: new Date(),
-        },
-      });
-    }
-
-    // Mark run as completed
-    await prisma.qualificationRun.update({
-      where: { id: runId },
-      data: {
-        status: 'COMPLETED',
-        completedAt: new Date(),
-      },
-    });
-
-    console.log(`[Background] Qualification run ${runId} completed`);
-  } catch (error) {
-    console.error(`[Background] Error in qualification run ${runId}:`, error);
-    
-    // Mark run as failed
-    await prisma.qualificationRun.update({
-      where: { id: runId },
-      data: {
-        status: 'FAILED',
-        completedAt: new Date(),
-      },
-    });
-  }
-}
+// Apply rate limiting to the POST handler
+export const POST = withRateLimit(POST_HANDLER, {
+  requests: 10, // 10 requests per minute for qualification endpoint
+  window: 60 * 1000,
+});

@@ -11,24 +11,13 @@ export async function register() {
     console.log('[Instrumentation] Server starting...');
     
     try {
-      // Import recovery function
-      const { recoverStuckRuns } = await import('./lib/background-recovery');
+      // Initialize the new background processing system
+      const { initializeApplication } = await import('./lib/startup');
+      await initializeApplication();
       
-      // Recover stuck runs from previous server sessions
-      // Using 5 minutes timeout - more aggressive for development
-      console.log('[Instrumentation] Checking for stuck qualification runs...');
-      const result = await recoverStuckRuns(5); // 5 minutes timeout instead of 10
-      
-      if (result.recovered > 0) {
-        console.log(`[Instrumentation] ✅ Recovered ${result.recovered} stuck runs`);
-        result.runs.forEach((run: any) => {
-          console.log(`  - Run ${run.id}: ${run.completed}/${run.totalProspects} completed (status: ${run.status} → FAILED)`);
-        });
-      } else {
-        console.log('[Instrumentation] ✅ No stuck runs found');
-      }
+      console.log('[Instrumentation] ✅ Background processing system initialized');
     } catch (error) {
-      console.error('[Instrumentation] ❌ Error during recovery:', error);
+      console.error('[Instrumentation] ❌ Error during initialization:', error);
       // Don't throw - let the server continue starting
     }
     

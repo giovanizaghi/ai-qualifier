@@ -1,7 +1,9 @@
 import { Metadata } from "next"
 import { redirect, notFound } from "next/navigation"
+
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+
 import CompanyDetailsContent from "./company-details-content"
 
 export const metadata: Metadata = {

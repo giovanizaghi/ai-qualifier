@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
-import { auth } from "@/lib/auth";
+
 import { QualifyForm } from "@/components/qualify/qualify-form";
+import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export default async function QualifyPage() {

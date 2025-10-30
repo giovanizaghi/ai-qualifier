@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
 import { auth } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
 import { analyzeCompanyDomain } from '@/lib/domain-analyzer';
 import { generateICP } from '@/lib/icp-generator';
-import { z } from 'zod';
+import { prisma } from '@/lib/prisma';
 
 // Request validation schema
 const analyzeRequestSchema = z.object({

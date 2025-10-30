@@ -1,14 +1,14 @@
 "use client"
 
+import { Building2, Sparkles, TrendingUp, Plus, Loader2, RefreshCw } from "lucide-react"
+import Link from "next/link"
 import { User } from "next-auth"
 import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Building2, Sparkles, TrendingUp, Plus, Loader2, RefreshCw } from "lucide-react"
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import {
   Carousel,
   CarouselContent,
@@ -85,10 +85,10 @@ export default function DashboardContent({ user }: DashboardContentProps) {
     const diffHours = Math.floor(diffMs / 3600000)
     const diffDays = Math.floor(diffMs / 86400000)
 
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+    if (diffMins < 1) {return 'Just now'}
+    if (diffMins < 60) {return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`}
+    if (diffHours < 24) {return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`}
+    if (diffDays < 7) {return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`}
     return date.toLocaleDateString()
   }
 
@@ -99,12 +99,18 @@ export default function DashboardContent({ user }: DashboardContentProps) {
   const fetchData = async () => {
     setLoading(true);
     try {
+        // Force cache bust with timestamp and user ID
+        const timestamp = Date.now();
+        const cacheBuster = `t=${timestamp}&u=${user.id}`;
+        
         // Fetch companies
         console.log('[Dashboard] Fetching companies...');
-        const companyRes = await fetch("/api/companies", {
+        const companyRes = await fetch(`/api/companies?${cacheBuster}`, {
           cache: 'no-store',
           headers: {
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
           }
         })
         if (companyRes.ok) {
@@ -116,10 +122,12 @@ export default function DashboardContent({ user }: DashboardContentProps) {
         }
 
         // Fetch recent qualification runs
-        const runsRes = await fetch("/api/qualify/recent", {
+        const runsRes = await fetch(`/api/qualify/recent?${cacheBuster}`, {
           cache: 'no-store',
           headers: {
-            'Cache-Control': 'no-cache'
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
           }
         })
         if (runsRes.ok) {
@@ -139,6 +147,22 @@ export default function DashboardContent({ user }: DashboardContentProps) {
     }
 
   useEffect(() => {
+    // Clear any potential cached data when user changes
+    if (typeof window !== 'undefined') {
+      // Clear relevant localStorage/sessionStorage if any exists
+      Object.keys(localStorage).forEach(key => {
+        if (key.includes('companies') || key.includes('dashboard') || key.includes('qualify')) {
+          localStorage.removeItem(key);
+        }
+      });
+      
+      Object.keys(sessionStorage).forEach(key => {
+        if (key.includes('companies') || key.includes('dashboard') || key.includes('qualify')) {
+          sessionStorage.removeItem(key);
+        }
+      });
+    }
+    
     fetchData()
   }, [user.id])
 

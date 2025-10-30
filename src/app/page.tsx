@@ -1,4 +1,4 @@
-import { Brain, Award, Users, TrendingUp, CheckCircle, Star } from "lucide-react";
+import { Brain, Award, Users, TrendingUp, CheckCircle, Star, FileText, Github, Mail, MapPin, Calendar, Code2, ExternalLink, Coffee } from "lucide-react";
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
@@ -426,6 +426,359 @@ export default async function Home() {
         </div>
       </section>
 
+      {/* Documentation Section */}
+      <section className="container mx-auto px-4 py-12 sm:py-16 lg:py-20" role="region" aria-labelledby="docs-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 id="docs-heading" className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">Comprehensive Documentation</h2>
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Detailed documentation covering every aspect of development, implementation, and deployment
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+            {/* Implementation Phases */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-primary" />
+                  Implementation Phases (6 Complete)
+                </CardTitle>
+                <CardDescription>
+                  Detailed documentation for each development phase with summaries and completion status
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <div>
+                      <div className="font-medium text-sm">Phase 1: Database Schema</div>
+                      <div className="text-xs text-muted-foreground">Models, migrations, Prisma setup</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <div>
+                      <div className="font-medium text-sm">Phase 2: Core Services</div>
+                      <div className="text-xs text-muted-foreground">AI integration, domain analysis</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <div>
+                      <div className="font-medium text-sm">Phase 3: API Routes</div>
+                      <div className="text-xs text-muted-foreground">REST endpoints, validation</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <div>
+                      <div className="font-medium text-sm">Phase 4: Frontend Pages</div>
+                      <div className="text-xs text-muted-foreground">Dashboard, onboarding, auth</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <div>
+                      <div className="font-medium text-sm">Phase 5: UI Components</div>
+                      <div className="text-xs text-muted-foreground">Reusable components, forms</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <div>
+                      <div className="font-medium text-sm">Phase 6: Production Polish</div>
+                      <div className="text-xs text-muted-foreground">Error handling, security</div>
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t">
+                  <Button variant="outline" asChild className="w-full">
+                    <Link href="https://github.com/giovanizaghi/ai-qualifier/tree/main/docs" target="_blank" className="flex items-center gap-2">
+                      <ExternalLink className="w-4 h-4" />
+                      View All Documentation on GitHub
+                    </Link>
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Quick Stats */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-primary" />
+                  Documentation Stats
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium">Total Files</span>
+                      <span className="text-lg font-bold text-primary">42+</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">Comprehensive project documentation</div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium">Implementation Docs</span>
+                      <span className="text-lg font-bold text-primary">15+</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">Phase completion summaries</div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium">Bug Fixes & Features</span>
+                      <span className="text-lg font-bold text-primary">10+</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">Detailed fix documentation</div>
+                  </div>
+                  <div>
+                    <div className="flex justify-between items-center mb-1">
+                      <span className="text-sm font-medium">Deployment Guides</span>
+                      <span className="text-lg font-bold text-primary">5+</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground">Setup and deployment instructions</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Key Documentation Highlights */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Card className="border-l-4 border-l-blue-500">
+              <CardContent className="pt-4">
+                <h4 className="font-semibold mb-2">Technical Architecture</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• Implementation plan & status</li>
+                  <li>• Architecture decisions</li>
+                  <li>• Phase completion summaries</li>
+                  <li>• Performance optimizations</li>
+                </ul>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-green-500">
+              <CardContent className="pt-4">
+                <h4 className="font-semibold mb-2">Feature Development</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• Active run notifier system</li>
+                  <li>• Recent activity features</li>
+                  <li>• Company details pages</li>
+                  <li>• Background task persistence</li>
+                </ul>
+              </CardContent>
+            </Card>
+            <Card className="border-l-4 border-l-orange-500">
+              <CardContent className="pt-4">
+                <h4 className="font-semibold mb-2">Bug Fixes & Solutions</h4>
+                <ul className="text-sm space-y-1 text-muted-foreground">
+                  <li>• React child object fixes</li>
+                  <li>• Webpack module issues</li>
+                  <li>• Navigation menu improvements</li>
+                  <li>• Business logic corrections</li>
+                </ul>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
+      {/* Developer Section */}
+      <section className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 bg-slate-50 dark:bg-slate-900" role="region" aria-labelledby="developer-heading">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <h2 id="developer-heading" className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4">Meet the Developer</h2>
+            <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
+              Built by Giovani Zaghi - Full Stack Developer & AI Enthusiast
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Developer Profile */}
+            <Card className="lg:col-span-1">
+              <CardHeader className="text-center">
+                <div className="w-24 h-24 mx-auto rounded-full overflow-hidden mb-4 border-4 border-primary/20">
+                  <img 
+                    src="/the_best_dev.JPG" 
+                    alt="Giovani Zaghi - Full Stack Developer" 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <CardTitle className="text-xl">Giovani Zaghi</CardTitle>
+                <CardDescription>Full Stack Developer</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <MapPin className="w-4 h-4 text-muted-foreground" />
+                    <span>São Paulo, Brazil</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Mail className="w-4 h-4 text-muted-foreground" />
+                    <span>zaghi.giovani@gmail.com</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span>Available for opportunities</span>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2 mt-6">
+                  <Button asChild className="flex-1">
+                    <Link href="https://github.com/giovanizaghi" target="_blank" className="flex items-center gap-2">
+                      <Github className="w-4 h-4" />
+                      GitHub
+                    </Link>
+                  </Button>
+                  <Button variant="outline" asChild className="flex-1">
+                    <Link href="https://www.linkedin.com/in/giovanizaghi/" target="_blank" className="flex items-center gap-2">
+                      <ExternalLink className="w-4 h-4" />
+                      LinkedIn
+                    </Link>
+                  </Button>
+                </div>
+                
+                {/* Buy Me a Coffee Button */}
+                <div className="mt-3">
+                  <Button asChild variant="secondary" className="w-full bg-orange-500 hover:bg-orange-600 text-white border-0">
+                    <Link href="https://buymeacoffee.com/giovanizagu" target="_blank" className="flex items-center gap-2">
+                      <Coffee className="w-4 h-4" />
+                      Buy Me a Coffee
+                    </Link>
+                  </Button>
+                  <div className="mt-2 text-xs text-muted-foreground text-center">
+                    Support open source development ☕
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Skills & Experience */}
+            <Card className="lg:col-span-2">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-primary" />
+                  Technical Expertise
+                </CardTitle>
+                <CardDescription>
+                  Specialized in modern web technologies and AI integration
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <h4 className="font-semibold mb-3">Frontend Technologies</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Shadcn/ui'].map((tech) => (
+                        <Badge key={tech} variant="secondary" className="text-xs">{tech}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">Backend & Database</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Node.js', 'PostgreSQL', 'Prisma ORM', 'NextAuth.js', 'API Design'].map((tech) => (
+                        <Badge key={tech} variant="secondary" className="text-xs">{tech}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">AI & Integration</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['OpenAI GPT-4', 'Web Scraping', 'Prompt Engineering', 'AI Workflows'].map((tech) => (
+                        <Badge key={tech} variant="secondary" className="text-xs">{tech}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h4 className="font-semibold mb-3">DevOps & Tools</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {['Git', 'Vercel', 'Docker', 'CI/CD', 'Testing'].map((tech) => (
+                        <Badge key={tech} variant="secondary" className="text-xs">{tech}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="mt-6 pt-6 border-t">
+                  <h4 className="font-semibold mb-3">Project Highlights</h4>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span><strong>AI Qualifier:</strong> Complete production-ready app in 72 hours with 4,300+ lines of code</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span><strong>Architecture:</strong> Designed scalable Next.js 15 App Router architecture with server components</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span><strong>Documentation:</strong> Created 42+ documentation files covering all development phases</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span><strong>AI Integration:</strong> Implemented GPT-4 for ICP generation and prospect qualification</span>
+                    </li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* CV Download & GitHub */}
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
+            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-primary">
+                  <FileText className="w-5 h-5" />
+                  Download CV
+                </CardTitle>
+                <CardDescription>
+                  Complete resume with experience, projects, and technical skills
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild className="w-full">
+                  <a href="/cv/Giovani_Zaghi_CV_v2.pdf" download="Giovani_Zaghi_CV.pdf" className="flex items-center gap-2">
+                    <FileText className="w-4 h-4" />
+                    Download PDF Resume
+                  </a>
+                </Button>
+                <div className="mt-3 text-xs text-muted-foreground text-center">
+                  Includes detailed work experience, education, and project portfolio
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="border-2 border-primary/20 hover:border-primary/40 transition-colors">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-primary">
+                  <Github className="w-5 h-5" />
+                  GitHub Portfolio
+                </CardTitle>
+                <CardDescription>
+                  Explore the complete AI Qualifier source code and other projects
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <Button asChild variant="outline" className="w-full">
+                  <Link href="https://github.com/giovanizaghi/ai-qualifier" target="_blank" className="flex items-center gap-2">
+                    <Github className="w-4 h-4" />
+                    View Project Repository
+                  </Link>
+                </Button>
+                <div className="mt-3 text-xs text-muted-foreground text-center">
+                  Full source code, documentation, and commit history available
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="bg-primary text-primary-foreground py-12 sm:py-16 lg:py-20">
         <div className="container mx-auto px-4 text-center">
@@ -506,16 +859,26 @@ export default async function Home() {
             <div>
               <h3 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Resources</h3>
               <ul className="space-y-2 text-xs sm:text-sm">
-                <li><a href="https://github.com/giovanizaghi/ai-qualifier" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub</a></li>
+                <li><a href="https://github.com/giovanizaghi/ai-qualifier" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub Repository</a></li>
                 <li><a href="https://github.com/giovanizaghi/ai-qualifier/tree/main/docs" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Documentation</a></li>
                 <li><a href="https://github.com/giovanizaghi/ai-qualifier#readme" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">README</a></li>
-                <li><span className="hover:text-white transition-colors">API Reference</span></li>
+                <li><a href="https://github.com/giovanizaghi" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Developer Profile</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Developer</h3>
+              <ul className="space-y-2 text-xs sm:text-sm">
+                <li><a href="https://github.com/giovanizaghi" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">GitHub Profile</a></li>
+                <li><a href="https://www.linkedin.com/in/giovanizaghi/" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">LinkedIn</a></li>
+                <li><span className="hover:text-white transition-colors">zaghi.giovani@gmail.com</span></li>
+                <li><span className="hover:text-white transition-colors">São Paulo, Brazil</span></li>
               </ul>
             </div>
           </div>
           
           <div className="border-t border-slate-700 mt-8 sm:mt-12 pt-6 sm:pt-8 text-center text-xs sm:text-sm">
-            <p>&copy; 2025 AI Qualifier. Built for Cloud Employee technical assessment. All rights reserved.</p>
+            <p>&copy; 2025 AI Qualifier. Built by <a href="https://github.com/giovanizaghi" target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 transition-colors">Giovani Zaghi</a> for Cloud Employee technical assessment.</p>
           </div>
         </div>
       </footer>

@@ -1,9 +1,12 @@
 "use client"
 
-import { User } from "next-auth"
 import { LogOut, Settings, User as UserIcon } from "lucide-react"
+import { User } from "next-auth"
 import { signOut } from "next-auth/react"
 
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,8 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { cache, clearBrowserCaches } from "@/lib/cache"
 
 interface UserNavProps {
   user: User
@@ -22,7 +24,7 @@ interface UserNavProps {
 
 export function UserNav({ user }: UserNavProps) {
   const getInitials = (name?: string | null) => {
-    if (!name) return "U"
+    if (!name) {return "U"}
     return name
       .split(" ")
       .map((n) => n[0])
@@ -32,7 +34,21 @@ export function UserNav({ user }: UserNavProps) {
   }
 
   const handleSignOut = async () => {
-    await signOut({ callbackUrl: "/" })
+    try {
+      // Clear server-side user-specific cache
+      const clearedCount = cache.clearUserCache(user.id || '');
+      console.log(`[UserNav] Cleared ${clearedCount} server cache entries for user ${user.id}`);
+      
+      // Clear browser-level caches
+      clearBrowserCaches();
+      
+      // Sign out
+      await signOut({ callbackUrl: "/" });
+    } catch (error) {
+      console.error('[UserNav] Error during sign out:', error);
+      // Still attempt to sign out even if cache clearing fails
+      await signOut({ callbackUrl: "/" });
+    }
   }
 
   return (

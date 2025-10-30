@@ -3,8 +3,8 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 
 import { SessionProvider } from "@/components/providers/session-provider"
-import { SonnerProvider } from "@/components/ui/sonner-provider"
 import { ActiveRunNotifierWrapper } from "@/components/shared"
+import { SonnerProvider } from "@/components/ui/sonner-provider"
 
 const inter = Inter({ 
   subsets: ["latin"],
@@ -78,7 +78,7 @@ export default function RootLayout({
         {/* Manifest for PWA */}
         <link rel="manifest" href="/manifest.json" />
       </head>
-      <body className={`${inter.className} antialiased safe-area-padding`}>
+      <body className={`${inter.className} antialiased safe-area-padding`} suppressHydrationWarning={true}>
         <SessionProvider>
           <SonnerProvider />
           <ActiveRunNotifierWrapper />

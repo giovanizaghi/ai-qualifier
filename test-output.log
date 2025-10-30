@@ -1,0 +1,805 @@
+
+> ai-qualifier@0.1.0 test
+> jest
+
+PASS src/lib/__tests__/prospect-qualifier.test.ts
+  ● Console
+
+    console.warn
+      Invalid score type: number, value: NaN. Defaulting to 0.
+
+      67 | export function validateScore(score: number): number {
+      68 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 69 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      70 |     return SCORE_BOUNDS.MIN;
+      71 |   }
+      72 |   
+
+      at warn (src/lib/prospect-qualifier.ts:69:13)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier.test.ts:34:27)
+
+    console.warn
+      Invalid score type: object, value: null. Defaulting to 0.
+
+      67 | export function validateScore(score: number): number {
+      68 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 69 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      70 |     return SCORE_BOUNDS.MIN;
+      71 |   }
+      72 |   
+
+      at warn (src/lib/prospect-qualifier.ts:69:13)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier.test.ts:37:27)
+
+    console.warn
+      Invalid score type: undefined, value: undefined. Defaulting to 0.
+
+      67 | export function validateScore(score: number): number {
+      68 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 69 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      70 |     return SCORE_BOUNDS.MIN;
+      71 |   }
+      72 |   
+
+      at warn (src/lib/prospect-qualifier.ts:69:13)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier.test.ts:38:27)
+
+    console.warn
+      Invalid score type: string, value: string. Defaulting to 0.
+
+      67 | export function validateScore(score: number): number {
+      68 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 69 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      70 |     return SCORE_BOUNDS.MIN;
+      71 |   }
+      72 |   
+
+      at warn (src/lib/prospect-qualifier.ts:69:13)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier.test.ts:39:27)
+
+PASS src/lib/__tests__/validation.test.ts
+PASS src/lib/__tests__/background-processor.test.ts
+  ● Console
+
+    console.log
+      [BackgroundProcessor] Enqueued qualification job job_1761673826845_z5zaklgjy for run run-123
+
+      at QualificationProcessor.log [as startQualification] (src/lib/background-processor.ts:215:13)
+
+    console.log
+      [BackgroundProcessor] Enqueued qualification job job_1761673826869_09lmly9dp for run run-123
+
+      at QualificationProcessor.log [as startQualification] (src/lib/background-processor.ts:215:13)
+
+    console.log
+      [BackgroundProcessor] Starting qualification job job_1761673826845_z5zaklgjy for run run-123
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:41:15)
+
+    console.log
+      [BackgroundProcessor] Progress: 0/1 for run run-123
+
+      at log (src/lib/background-processor.ts:85:19)
+
+    console.log
+      [BackgroundProcessor] Starting qualification job job_1761673826869_09lmly9dp for run run-123
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:41:15)
+
+    console.log
+      [BackgroundProcessor] Progress: 0/1 for run run-123
+
+      at log (src/lib/background-processor.ts:85:19)
+
+    console.log
+      [BackgroundProcessor] Progress: 1/1 for run run-123
+
+      at log (src/lib/background-processor.ts:85:19)
+
+    console.log
+      [BackgroundProcessor] Qualification completed, saving 1 results for run run-123
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:89:15)
+
+    console.log
+      [BackgroundProcessor] Saved batch 1 - 1/1 results
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:127:17)
+
+    console.log
+      [BackgroundProcessor] Qualification job job_1761673826845_z5zaklgjy completed successfully
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:152:15)
+
+    console.log
+      [BackgroundProcessor] Progress: 1/1 for run run-123
+
+      at log (src/lib/background-processor.ts:85:19)
+
+    console.log
+      [BackgroundProcessor] Qualification completed, saving 1 results for run run-123
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:89:15)
+
+    console.log
+      [BackgroundProcessor] Saved batch 1 - 1/1 results
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:127:17)
+
+    console.log
+      [BackgroundProcessor] Qualification job job_1761673826869_09lmly9dp completed successfully
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:152:15)
+
+    console.log
+      [BackgroundProcessor] Enqueued qualification job job_1761673826894_72a0n5w4t for run run-123
+
+      at QualificationProcessor.log [as startQualification] (src/lib/background-processor.ts:215:13)
+
+    console.log
+      [BackgroundProcessor] Starting qualification job job_1761673826894_72a0n5w4t for run run-123
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:41:15)
+
+    console.error
+      [BackgroundProcessor] Error in qualification job job_1761673826894_72a0n5w4t: Error: Processing failed
+          at Object.<anonymous> (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/__tests__/background-processor.test.ts:157:44)
+          at Promise.finally.completed (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at _runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      164 |       };
+      165 |     } catch (error) {
+    > 166 |       console.error(`[BackgroundProcessor] Error in qualification job ${job.id}:`, error);
+          |               ^
+      167 |
+      168 |       // Update progress to show error
+      169 |       await updateProgress({
+
+      at QualificationProcessor.error [as processQualification] (src/lib/background-processor.ts:166:15)
+      at JobQueue.processJob (src/lib/job-queue.ts:367:22)
+
+    console.error
+      [JobQueue] Job job_1761673826894_72a0n5w4t failed: Processing failed
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+    console.log
+      [BackgroundProcessor] Starting qualification job job_1761673826894_72a0n5w4t for run run-123
+
+      at QualificationProcessor.log [as processQualification] (src/lib/background-processor.ts:41:15)
+
+    console.error
+      [BackgroundProcessor] Error in qualification job job_1761673826894_72a0n5w4t: Error: Processing failed
+          at Object.<anonymous> (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/__tests__/background-processor.test.ts:157:44)
+          at Promise.finally.completed (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at _runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      164 |       };
+      165 |     } catch (error) {
+    > 166 |       console.error(`[BackgroundProcessor] Error in qualification job ${job.id}:`, error);
+          |               ^
+      167 |
+      168 |       // Update progress to show error
+      169 |       await updateProgress({
+
+      at QualificationProcessor.error [as processQualification] (src/lib/background-processor.ts:166:15)
+      at JobQueue.processJob (src/lib/job-queue.ts:367:22)
+
+    console.error
+      [JobQueue] Job job_1761673826894_72a0n5w4t failed: Processing failed
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+    console.log
+      [BackgroundProcessor] Enqueued qualification job job_1761673827002_7ln8rf4vv for run run-123
+
+      at QualificationProcessor.log [as startQualification] (src/lib/background-processor.ts:215:13)
+
+    console.log
+      [BackgroundProcessor] Enqueued qualification job job_1761673827002_nuigauqol for run run-456
+
+      at QualificationProcessor.log [as startQualification] (src/lib/background-processor.ts:215:13)
+
+    console.log
+      [BackgroundProcessor] Enqueued qualification job job_1761673827004_f29pn49e1 for run run-123
+
+      at QualificationProcessor.log [as startQualification] (src/lib/background-processor.ts:215:13)
+
+PASS src/lib/__tests__/qualification-run-manager.test.ts
+  ● Console
+
+    console.log
+      [RunManager] Stopped
+
+      at QualificationRunManager.log [as stop] (src/lib/qualification-run-manager.ts:76:13)
+
+    console.log
+      [RunManager] Stopped
+
+      at QualificationRunManager.log [as stop] (src/lib/qualification-run-manager.ts:76:13)
+
+    console.log
+      [RunManager] Starting with config: {"timeoutMinutes":10,"checkIntervalMinutes":1,"maxRetries":2}
+
+      at QualificationRunManager.log [as start] (src/lib/qualification-run-manager.ts:56:13)
+
+    console.log
+      [RunManager] Starting comprehensive stuck run recovery...
+
+      at QualificationRunManager.log [as recoverStuckRuns] (src/lib/qualification-run-manager.ts:178:15)
+
+    console.log
+      [RunManager] Stopped
+
+      at QualificationRunManager.log [as stop] (src/lib/qualification-run-manager.ts:76:13)
+
+    console.error
+      [RunManager] Error during stuck run recovery: TypeError: Cannot read properties of undefined (reading 'length')
+          at QualificationRunManager.length [as recoverStuckRuns] (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/qualification-run-manager.ts:205:22)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+      287 |       return results;
+      288 |     } catch (error) {
+    > 289 |       console.error('[RunManager] Error during stuck run recovery:', error);
+          |               ^
+      290 |       throw error;
+      291 |     }
+      292 |   }
+
+      at QualificationRunManager.error [as recoverStuckRuns] (src/lib/qualification-run-manager.ts:289:15)
+
+    console.error
+      TypeError: Cannot read properties of undefined (reading 'length')
+          at QualificationRunManager.length [as recoverStuckRuns] (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/qualification-run-manager.ts:205:22)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+
+
+    console.log
+      [RunManager] Stopped
+
+      at QualificationRunManager.log [as stop] (src/lib/qualification-run-manager.ts:76:13)
+
+    console.log
+      [RunManager] Stopped
+
+      at QualificationRunManager.log [as stop] (src/lib/qualification-run-manager.ts:76:13)
+
+    console.log
+      [RunManager] Cleaning up runs older than 30 days
+
+      at QualificationRunManager.log [as cleanup] (src/lib/qualification-run-manager.ts:460:15)
+
+    console.log
+      [RunManager] Cleaned up 5 old runs
+
+      at QualificationRunManager.log [as cleanup] (src/lib/qualification-run-manager.ts:476:15)
+
+    console.log
+      [RunManager] Stopped
+
+      at QualificationRunManager.log [as stop] (src/lib/qualification-run-manager.ts:76:13)
+
+    console.log
+      [RunManager] Failing run run-123: Test failure reason
+
+      at QualificationRunManager.log [as failRun] (src/lib/qualification-run-manager.ts:357:15)
+
+    console.log
+      [RunManager] Run run-123 marked as FAILED: Test failure reason
+
+      at QualificationRunManager.log [as failRun] (src/lib/qualification-run-manager.ts:368:15)
+
+    console.log
+      [RunManager] Stopped
+
+      at QualificationRunManager.log [as stop] (src/lib/qualification-run-manager.ts:76:13)
+
+    console.log
+      [RunManager] Stopped
+
+      at QualificationRunManager.log [as stop] (src/lib/qualification-run-manager.ts:76:13)
+
+PASS src/lib/__tests__/prospect-qualifier-core.test.ts
+  ● Console
+
+    console.warn
+      Invalid score type: number, value: NaN. Defaulting to 0.
+
+      19 | export function validateScore(score: number): number {
+      20 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 21 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      22 |     return SCORE_BOUNDS.MIN;
+      23 |   }
+      24 |   
+
+      at warn (src/lib/prospect-qualifier-core.ts:21:13)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier-core.test.ts:33:27)
+
+    console.warn
+      Invalid score type: object, value: null. Defaulting to 0.
+
+      19 | export function validateScore(score: number): number {
+      20 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 21 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      22 |     return SCORE_BOUNDS.MIN;
+      23 |   }
+      24 |   
+
+      at warn (src/lib/prospect-qualifier-core.ts:21:13)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier-core.test.ts:36:27)
+
+    console.warn
+      Invalid score type: undefined, value: undefined. Defaulting to 0.
+
+      19 | export function validateScore(score: number): number {
+      20 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 21 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      22 |     return SCORE_BOUNDS.MIN;
+      23 |   }
+      24 |   
+
+      at warn (src/lib/prospect-qualifier-core.ts:21:13)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier-core.test.ts:37:27)
+
+    console.warn
+      Invalid score type: string, value: string. Defaulting to 0.
+
+      19 | export function validateScore(score: number): number {
+      20 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 21 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      22 |     return SCORE_BOUNDS.MIN;
+      23 |   }
+      24 |   
+
+      at warn (src/lib/prospect-qualifier-core.ts:21:13)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier-core.test.ts:38:27)
+
+    console.warn
+      Invalid score type: number, value: NaN. Defaulting to 0.
+
+      19 | export function validateScore(score: number): number {
+      20 |   if (typeof score !== 'number' || isNaN(score)) {
+    > 21 |     console.warn(`Invalid score type: ${typeof score}, value: ${score}. Defaulting to 0.`);
+         |             ^
+      22 |     return SCORE_BOUNDS.MIN;
+      23 |   }
+      24 |   
+
+      at warn (src/lib/prospect-qualifier-core.ts:21:13)
+      at validateScore (src/lib/prospect-qualifier-core.ts:32:26)
+      at Object.<anonymous> (src/lib/__tests__/prospect-qualifier-core.test.ts:63:25)
+
+PASS src/components/__tests__/score-badge.test.tsx
+PASS src/components/__tests__/error-display.test.tsx
+PASS src/lib/__tests__/job-queue.test.ts
+  ● Console
+
+    console.error
+      [JobQueue] Job job_1761673827439_vb4dbwzdd failed: Test processor failure
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+    console.error
+      [JobQueue] Job job_1761673827439_vb4dbwzdd failed: Test processor failure
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+    console.error
+      [JobQueue] Job job_1761673827439_vb4dbwzdd failed: Test processor failure
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+    console.error
+      [JobQueue] Job job_1761673827513_vrdq6jyzg failed: Test processor failure
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+    console.error
+      [JobQueue] Job job_1761673827513_vrdq6jyzg failed: Test processor failure
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+    console.error
+      [JobQueue] Job job_1761673827513_vrdq6jyzg failed: Test processor failure
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+    console.error
+      [JobQueue] Job job_1761673827582_f5icgb7ik failed: No processor registered for job type: qualify-prospects
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+      at JobQueue.processJob [as processJobs] (src/lib/job-queue.ts:312:16)
+      at processJobs (src/lib/job-queue.ts:166:31)
+      at Timeout.task [as _onTimeout] (node_modules/jsdom/lib/jsdom/browser/Window.js:579:19)
+
+    console.error
+      [JobQueue] Job job_1761673827582_f5icgb7ik failed: No processor registered for job type: qualify-prospects
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+      at JobQueue.processJob [as processJobs] (src/lib/job-queue.ts:310:16)
+      at processJobs (src/lib/job-queue.ts:398:16)
+      at Timeout.task [as _onTimeout] (node_modules/jsdom/lib/jsdom/browser/Window.js:579:19)
+
+    console.error
+      [JobQueue] Job job_1761673827582_f5icgb7ik failed: No processor registered for job type: qualify-prospects
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+      at JobQueue.processJob [as processJobs] (src/lib/job-queue.ts:310:16)
+      at processJobs (src/lib/job-queue.ts:398:16)
+      at Timeout.task [as _onTimeout] (node_modules/jsdom/lib/jsdom/browser/Window.js:579:19)
+
+    console.error
+      [JobQueue] Job job_1761673827624_p5bz4eq25 failed: Test processor failure
+
+      380 |     } catch (error) {
+      381 |       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    > 382 |       console.error(`[JobQueue] Job ${job.id} failed:`, errorMessage);
+          |               ^
+      383 |
+      384 |       // Check if we should retry
+      385 |       if (job.attempts < job.maxAttempts) {
+
+      at JobQueue.error [as processJob] (src/lib/job-queue.ts:382:15)
+
+PASS src/lib/__tests__/icp-generator.test.ts (5.051 s)
+  ● Console
+
+    console.log
+      Successfully generated ICP on attempt 1: { completenessScore: 100, isComplete: true, warningCount: 0 }
+
+      at log (src/lib/icp-generator.ts:142:15)
+
+    console.error
+      ICP generation failed on attempt 1: Error: AI service unavailable
+          at Object.<anonymous> (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/__tests__/icp-generator.test.ts:379:60)
+          at Promise.finally.completed (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at processTicksAndRejections (node:internal/process/task_queues:105:5)
+          at _runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      150 |     } catch (error) {
+      151 |       lastError = error instanceof Error ? error : new Error(String(error));
+    > 152 |       console.error(`ICP generation failed on attempt ${attempt + 1}:`, lastError);
+          |               ^
+      153 |
+      154 |       // If this is the last attempt and fallback is enabled, return fallback
+      155 |       if (attempt === defaultOptions.maxRetries && defaultOptions.fallbackOnError) {
+
+      at error (src/lib/icp-generator.ts:152:15)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:386:22)
+
+    console.error
+      ICP generation failed on attempt 2: TypeError: Cannot read properties of undefined (reading 'title')
+          at title (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/icp-validator.ts:403:11)
+          at generateICP (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/icp-generator.ts:115:43)
+          at Object.<anonymous> (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/__tests__/icp-generator.test.ts:386:22)
+
+      150 |     } catch (error) {
+      151 |       lastError = error instanceof Error ? error : new Error(String(error));
+    > 152 |       console.error(`ICP generation failed on attempt ${attempt + 1}:`, lastError);
+          |               ^
+      153 |
+      154 |       // If this is the last attempt and fallback is enabled, return fallback
+      155 |       if (attempt === defaultOptions.maxRetries && defaultOptions.fallbackOnError) {
+
+      at error (src/lib/icp-generator.ts:152:15)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:386:22)
+
+    console.warn
+      All attempts failed, returning fallback ICP
+
+      154 |       // If this is the last attempt and fallback is enabled, return fallback
+      155 |       if (attempt === defaultOptions.maxRetries && defaultOptions.fallbackOnError) {
+    > 156 |         console.warn('All attempts failed, returning fallback ICP');
+          |                 ^
+      157 |         const fallbackICP = applyICPFallback({
+      158 |           title: `${companyAnalysis.companyName} Customer Profile`,
+      159 |           description: `Companies that would benefit from ${companyAnalysis.companyName}'s ${companyAnalysis.industry} solutions.`,
+
+      at warn (src/lib/icp-generator.ts:156:17)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:386:22)
+
+    console.warn
+      ICP validation failed on attempt 1, applying fallback data [
+        {
+          field: 'buyerPersonas',
+          message: 'At least 1 buyer persona is required',
+          severity: 'error',
+          code: 'INSUFFICIENT_COUNT'
+        }
+      ]
+
+      131 |       if (!validation.isValid && defaultOptions.fallbackOnError) {
+      132 |         finalICP = applyICPFallback(sanitizedICP);
+    > 133 |         console.warn(`ICP validation failed on attempt ${attempt + 1}, applying fallback data`, validation.errors);
+          |                 ^
+      134 |       } else {
+      135 |         finalICP = sanitizedICP;
+      136 |       }
+
+      at warn (src/lib/icp-generator.ts:133:17)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:410:22)
+
+    console.log
+      Successfully generated ICP on attempt 1: { completenessScore: 82, isComplete: true, warningCount: 1 }
+
+      at log (src/lib/icp-generator.ts:142:15)
+
+    console.error
+      ICP generation failed on attempt 1: ICPGenerationError: Generated ICP failed validation: Description is required, Buyer personas are required, Company size profile is required, At least one industry is required, Key indicators are required
+          at generateICP (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/icp-generator.ts:121:15)
+          at Object.<anonymous> (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/__tests__/icp-generator.test.ts:430:7) {
+        code: 'VALIDATION_FAILED',
+        originalError: undefined,
+        context: {
+          validation: {
+            isValid: false,
+            isComplete: false,
+            completenessScore: 9,
+            errors: [Array],
+            warnings: [Array],
+            missingFields: [Array],
+            suggestions: [Array]
+          },
+          attempt: 1
+        }
+      }
+
+      150 |     } catch (error) {
+      151 |       lastError = error instanceof Error ? error : new Error(String(error));
+    > 152 |       console.error(`ICP generation failed on attempt ${attempt + 1}:`, lastError);
+          |               ^
+      153 |
+      154 |       // If this is the last attempt and fallback is enabled, return fallback
+      155 |       if (attempt === defaultOptions.maxRetries && defaultOptions.fallbackOnError) {
+
+      at error (src/lib/icp-generator.ts:152:15)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:430:7)
+
+    console.error
+      ICP generation failed on attempt 1: Error: First failure
+          at Object.<anonymous> (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/__tests__/icp-generator.test.ts:437:32)
+          at Promise.finally.completed (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at _runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      150 |     } catch (error) {
+      151 |       lastError = error instanceof Error ? error : new Error(String(error));
+    > 152 |       console.error(`ICP generation failed on attempt ${attempt + 1}:`, lastError);
+          |               ^
+      153 |
+      154 |       // If this is the last attempt and fallback is enabled, return fallback
+      155 |       if (attempt === defaultOptions.maxRetries && defaultOptions.fallbackOnError) {
+
+      at error (src/lib/icp-generator.ts:152:15)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:463:22)
+
+    console.error
+      ICP generation failed on attempt 2: Error: Second failure
+          at Object.<anonymous> (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/__tests__/icp-generator.test.ts:438:32)
+          at Promise.finally.completed (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at _runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      150 |     } catch (error) {
+      151 |       lastError = error instanceof Error ? error : new Error(String(error));
+    > 152 |       console.error(`ICP generation failed on attempt ${attempt + 1}:`, lastError);
+          |               ^
+      153 |
+      154 |       // If this is the last attempt and fallback is enabled, return fallback
+      155 |       if (attempt === defaultOptions.maxRetries && defaultOptions.fallbackOnError) {
+
+      at error (src/lib/icp-generator.ts:152:15)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:463:22)
+
+    console.log
+      Successfully generated ICP on attempt 3: { completenessScore: 73, isComplete: false, warningCount: 0 }
+
+      at log (src/lib/icp-generator.ts:142:15)
+
+    console.error
+      Error refining ICP: Error: Refinement failed
+          at Object.<anonymous> (/Volumes/Sandisk Extreme/Projects/ai-qualifier/src/lib/__tests__/icp-generator.test.ts:506:60)
+          at Promise.finally.completed (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1557:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1497:10)
+          at _callCircusTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1007:40)
+          at _runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:947:3)
+          at /Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:849:7
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:862:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at _runTestsForDescribeBlock (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:857:11)
+          at run (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:761:3)
+          at runAndTransformResultsToJestFormat (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/jestAdapterInit.js:1918:21)
+          at jestAdapter (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-circus/build/runner.js:101:19)
+          at runTestInternal (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:275:16)
+          at runTest (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:343:7)
+          at Object.worker (/Volumes/Sandisk Extreme/Projects/ai-qualifier/node_modules/jest-runner/build/testWorker.js:497:12)
+
+      251 |     return createValidatedICP(sanitizedICP);
+      252 |   } catch (error) {
+    > 253 |     console.error('Error refining ICP:', error);
+          |             ^
+      254 |     
+      255 |     if (defaultOptions.fallbackOnError) {
+      256 |       // Return the original ICP as fallback
+
+      at error (src/lib/icp-generator.ts:253:13)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:512:22)
+
+    console.warn
+      ICP refinement failed, returning original ICP
+
+      255 |     if (defaultOptions.fallbackOnError) {
+      256 |       // Return the original ICP as fallback
+    > 257 |       console.warn('ICP refinement failed, returning original ICP');
+          |               ^
+      258 |       return createValidatedICP(existingICP);
+      259 |     }
+      260 |     
+
+      at warn (src/lib/icp-generator.ts:257:15)
+      at Object.<anonymous> (src/lib/__tests__/icp-generator.test.ts:512:22)
+
+
+Test Suites: 9 passed, 9 total
+Tests:       144 passed, 144 total
+Snapshots:   0 total
+Time:        6.32 s
+Ran all test suites.

@@ -25,7 +25,7 @@ export function useRealTimePolling(
   const isPollingRef = useRef(false);
 
   const pollForUpdates = useCallback(async () => {
-    if (isPollingRef.current) return; // Prevent concurrent polling
+    if (isPollingRef.current) {return;} // Prevent concurrent polling
     isPollingRef.current = true;
 
     try {

@@ -3,9 +3,9 @@
  * Provides consistent error responses across all API routes
  */
 
+import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import { Prisma } from '@prisma/client';
 
 /**
  * Standard API error response format
