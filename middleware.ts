@@ -34,6 +34,8 @@ const protectedRoutes = [
   "/dashboard",
   "/profile",
   "/qualifications",
+  "/qualify",
+  "/companies",
 ]
 
 export default async function middleware(req: NextRequest) {

@@ -33,9 +33,7 @@ export function Navbar() {
                 <Button variant="ghost" asChild className="focus-enhanced">
                   <Link href="/qualify" role="menuitem">Qualify</Link>
                 </Button>
-                <Button variant="ghost" asChild className="focus-enhanced">
-                  <Link href="/companies" role="menuitem">Companies</Link>
-                </Button>
+                {/* '/companies' link removed as the route is deprecated */}
               </div>
               
               {/* User Menu */}

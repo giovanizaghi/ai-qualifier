@@ -1,6 +1,7 @@
 import { Metadata } from "next"
 import { redirect, notFound } from "next/navigation"
 
+import { ErrorBoundary } from "@/components/error-boundary"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 
@@ -24,10 +25,8 @@ export default async function CompanyDetailsPage({ params }: PageProps) {
     redirect("/auth/signin")
   }
 
-  // Await params in Next.js 15
   const resolvedParams = await params
 
-  // Fetch company data directly from database
   const company = await prisma.company.findUnique({
     where: {
       id: resolvedParams.id,
@@ -38,7 +37,15 @@ export default async function CompanyDetailsPage({ params }: PageProps) {
         include: {
           qualificationRuns: {
             orderBy: { createdAt: 'desc' },
-            take: 5, // Get last 5 qualification runs
+            take: 5,
+            select: {
+              id: true,
+              status: true,
+              totalProspects: true,
+              completed: true,
+              createdAt: true,
+              completedAt: true,
+            },
           },
         },
       },
@@ -49,26 +56,44 @@ export default async function CompanyDetailsPage({ params }: PageProps) {
     notFound()
   }
 
-  // Verify ownership
   if (company.userId !== session.user.id) {
     redirect("/dashboard")
   }
 
-  // Serialize dates for client component
   const serializedCompany = {
     ...company,
     createdAt: company.createdAt.toISOString(),
     updatedAt: company.updatedAt.toISOString(),
-    icps: company.icps.map((icp: typeof company.icps[number]) => ({
+    websiteData: company.websiteData ? JSON.parse(JSON.stringify(company.websiteData)) : null,
+    aiAnalysis: company.aiAnalysis ? JSON.parse(JSON.stringify(company.aiAnalysis)) : null,
+    icps: company.icps?.map((icp: any) => ({
       ...icp,
       createdAt: icp.createdAt.toISOString(),
-      qualificationRuns: icp.qualificationRuns.map((run: typeof icp.qualificationRuns[number]) => ({
+      updatedAt: icp.updatedAt.toISOString(),
+      buyerPersonas: icp.buyerPersonas ? JSON.parse(JSON.stringify(icp.buyerPersonas)) : null,
+      companySize: icp.companySize ? JSON.parse(JSON.stringify(icp.companySize)) : null,
+      industries: Array.isArray(icp.industries) ? icp.industries : [],
+      geographicRegions: Array.isArray(icp.geographicRegions) ? icp.geographicRegions : [],
+      fundingStages: Array.isArray(icp.fundingStages) ? icp.fundingStages : [],
+      qualificationRuns: icp.qualificationRuns?.map((run: any) => ({
         ...run,
         createdAt: run.createdAt.toISOString(),
         completedAt: run.completedAt?.toISOString() || null,
-      })),
-    })),
+      })) || [],
+    })) || [],
   }
 
-  return <CompanyDetailsContent company={serializedCompany} user={session.user} />
+  return (
+    <ErrorBoundary>
+      <CompanyDetailsContent 
+        company={serializedCompany} 
+        user={{
+          id: session.user.id,
+          name: session.user.name,
+          email: session.user.email,
+          image: session.user.image,
+        }} 
+      />
+    </ErrorBoundary>
+  )
 }
