@@ -1,8 +1,8 @@
 "use client"
 
-import { useEffect, Suspense } from "react"
 import { usePathname, useSearchParams } from "next/navigation"
 import NProgress from "nprogress"
+import { useEffect, Suspense } from "react"
 import "nprogress/nprogress.css"
 
 // Configure NProgress

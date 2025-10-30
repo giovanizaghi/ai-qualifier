@@ -2,8 +2,9 @@
 
 import NextLink from "next/link"
 import { useRouter } from "next/navigation"
-import { startNavigationProgress } from "./navigation-progress"
 import { MouseEvent, AnchorHTMLAttributes } from "react"
+
+import { startNavigationProgress } from "./navigation-progress"
 
 interface ProgressLinkProps extends Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> {
   href: string
