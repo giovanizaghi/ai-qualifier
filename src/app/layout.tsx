@@ -1,9 +1,10 @@
 import "./globals.css"
+import "./nprogress.css"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 
 import { SessionProvider } from "@/components/providers/session-provider"
-import { ActiveRunNotifierWrapper } from "@/components/shared"
+import { ActiveRunNotifierWrapper, NavigationProgress } from "@/components/shared"
 import { SonnerProvider } from "@/components/ui/sonner-provider"
 
 const inter = Inter({ 
@@ -80,6 +81,7 @@ export default function RootLayout({
       </head>
       <body className={`${inter.className} antialiased safe-area-padding`} suppressHydrationWarning={true}>
         <SessionProvider>
+          <NavigationProgress />
           <SonnerProvider />
           <ActiveRunNotifierWrapper />
           {children}

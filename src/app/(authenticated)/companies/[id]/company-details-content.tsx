@@ -136,7 +136,7 @@ export default function CompanyDetailsContent({ company, user }: CompanyDetailsC
           </div>
           <div className="flex gap-2">
             <Button asChild>
-              <Link href="/qualify">
+              <Link href={`/qualify?companyId=${company.id}`}>
                 <Sparkles className="w-4 h-4 mr-2" />
                 Qualify Prospects
               </Link>
@@ -472,7 +472,7 @@ export default function CompanyDetailsContent({ company, user }: CompanyDetailsC
                 Start qualifying prospects against your ICP to see results here
               </p>
               <Button asChild size="lg">
-                <Link href="/qualify">
+                <Link href={`/qualify?companyId=${company.id}`}>
                   <Sparkles className="w-4 h-4 mr-2" />
                   Qualify Prospects
                 </Link>

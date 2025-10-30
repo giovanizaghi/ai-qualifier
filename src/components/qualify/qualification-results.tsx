@@ -176,7 +176,7 @@ export function QualificationResults({ run: initialRun }: QualificationResultsPr
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/dashboard">
+            <Link href="/dashboard" prefetch={true}>
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Link>
@@ -184,7 +184,7 @@ export function QualificationResults({ run: initialRun }: QualificationResultsPr
         </div>
         {run.status === "COMPLETED" && (
           <Button variant="outline" asChild>
-            <Link href="/qualify">Qualify More Prospects</Link>
+            <Link href="/qualify" prefetch={true}>Qualify More Prospects</Link>
           </Button>
         )}
       </div>

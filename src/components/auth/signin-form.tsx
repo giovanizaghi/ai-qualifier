@@ -5,7 +5,7 @@ import { Github, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -15,6 +15,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Spinner } from "@/components/ui/spinner"
+import { startNavigationProgress } from "@/components/shared"
 
 
 const signInSchema = z.object({
@@ -27,6 +28,7 @@ type SignInFormData = z.infer<typeof signInSchema>
 export function SignInForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
   const {
@@ -51,8 +53,11 @@ export function SignInForm() {
         toast.error("Invalid email or password")
       } else {
         toast.success("Welcome back!")
-        router.push("/dashboard")
-        router.refresh()
+        startNavigationProgress();
+        startTransition(() => {
+          router.push("/dashboard")
+          router.refresh()
+        });
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.")

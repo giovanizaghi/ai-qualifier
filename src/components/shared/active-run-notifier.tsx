@@ -2,13 +2,14 @@
 
 import { Loader2, X, ChevronRight, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
+import { startNavigationProgress } from "./navigation-progress";
 
 interface ActiveRun {
   id: string;
@@ -29,6 +30,7 @@ export function ActiveRunNotifier({ userId }: ActiveRunNotifierProps) {
   const [activeRuns, setActiveRuns] = useState<ActiveRun[]>([]);
   const [dismissed, setDismissed] = useState<Set<string>>(new Set());
   const [isVisible, setIsVisible] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const previousRunsRef = useRef<Map<string, ActiveRun>>(new Map());
 
   // Poll for active runs
@@ -53,7 +55,10 @@ export function ActiveRunNotifier({ userId }: ActiveRunNotifierProps) {
                 description: `${run.icp.title} - ${run.totalProspects} prospects analyzed`,
                 action: {
                   label: "View Results",
-                  onClick: () => router.push(`/qualify/${run.id}`),
+                  onClick: () => {
+                    startNavigationProgress();
+                    router.push(`/qualify/${run.id}`);
+                  },
                 },
                 duration: 10000,
               });
@@ -83,6 +88,7 @@ export function ActiveRunNotifier({ userId }: ActiveRunNotifierProps) {
   }, [dismissed, router]);
 
   const handleNavigate = (runId: string) => {
+    startNavigationProgress();
     router.push(`/qualify/${runId}`);
   };
 

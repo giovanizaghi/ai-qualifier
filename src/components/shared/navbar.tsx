@@ -16,7 +16,11 @@ export function Navbar() {
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Brain className="w-8 h-8 text-primary" aria-hidden="true" />
-          <Link href={session?.user ? "/dashboard" : "/"} className="text-xl sm:text-2xl font-bold text-foreground focus-enhanced">
+          <Link 
+            href={session?.user ? "/dashboard" : "/"} 
+            className="text-xl sm:text-2xl font-bold text-foreground focus-enhanced"
+            prefetch={true}
+          >
             <span className="sr-only">AI Qualifier - </span>
             AI Qualifier
           </Link>
@@ -28,10 +32,10 @@ export function Navbar() {
               {/* Desktop Navigation */}
               <div className="hidden md:flex items-center gap-4" role="menubar">
                 <Button variant="ghost" asChild className="focus-enhanced">
-                  <Link href="/dashboard" role="menuitem">Dashboard</Link>
+                  <Link href="/dashboard" role="menuitem" prefetch={true}>Dashboard</Link>
                 </Button>
                 <Button variant="ghost" asChild className="focus-enhanced">
-                  <Link href="/qualify" role="menuitem">Qualify</Link>
+                  <Link href="/qualify" role="menuitem" prefetch={true}>Qualify</Link>
                 </Button>
                 {/* '/companies' link removed as the route is deprecated */}
               </div>
@@ -42,10 +46,10 @@ export function Navbar() {
           ) : (
             <>
               <Button variant="outline" asChild className="hidden sm:flex text-sm focus-enhanced">
-                <Link href="/auth/signin" aria-label="Sign in to your account">Sign In</Link>
+                <Link href="/auth/signin" aria-label="Sign in to your account" prefetch={true}>Sign In</Link>
               </Button>
               <Button asChild className="text-sm sm:text-base focus-enhanced">
-                <Link href="/auth/signup" aria-label="Create a new account">
+                <Link href="/auth/signup" aria-label="Create a new account" prefetch={true}>
                   <span className="hidden sm:inline">Get Started</span>
                   <span className="sm:hidden">Join</span>
                 </Link>

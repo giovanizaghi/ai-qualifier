@@ -2,14 +2,16 @@
 
 import { Loader2, Building2, Sparkles, CheckCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect, useTransition } from "react";
 
+import { LottieAnimation } from "@/components/lottie-animation";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { startNavigationProgress } from "@/components/shared";
 
 type OnboardingStep = "welcome" | "domain" | "analyzing" | "review" | "complete";
 
@@ -41,6 +43,25 @@ export function OnboardingWizard({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(false);
   const [company, setCompany] = useState<Company | null>(null);
   const [icp, setIcp] = useState<ICP | null>(null);
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const [isPending, startTransition] = useTransition();
+
+  const analyzingMessages = [
+    "Scraping website content",
+    "Analyzing business model",
+    "Generating ICP with AI"
+  ];
+
+  useEffect(() => {
+    if (step === "analyzing") {
+      const interval = setInterval(() => {
+        setCurrentMessageIndex((prev) => (prev + 1) % analyzingMessages.length);
+      }, 2000);
+
+      return () => clearInterval(interval);
+    }
+    return undefined;
+  }, [step, analyzingMessages.length]);
 
   const handleDomainSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,7 +94,10 @@ export function OnboardingWizard({ userId }: { userId: string }) {
   };
 
   const handleComplete = () => {
-    router.push("/dashboard");
+    startNavigationProgress();
+    startTransition(() => {
+      router.push("/dashboard");
+    });
   };
 
   return (
@@ -81,43 +105,57 @@ export function OnboardingWizard({ userId }: { userId: string }) {
       {/* Progress Indicator */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
-          {["welcome", "domain", "analyzing", "review"].map((s, i) => (
-            <div
-              key={s}
-              className={`flex items-center ${
-                i < ["welcome", "domain", "analyzing", "review"].indexOf(step)
-                  ? "text-green-600"
-                  : i === ["welcome", "domain", "analyzing", "review"].indexOf(step)
-                  ? "text-primary"
-                  : "text-gray-400"
-              }`}
-            >
-              <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
-                  i < ["welcome", "domain", "analyzing", "review"].indexOf(step)
-                    ? "border-green-600 bg-green-600 text-white"
-                    : i === ["welcome", "domain", "analyzing", "review"].indexOf(step)
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-gray-300 bg-white"
-                }`}
-              >
-                {i < ["welcome", "domain", "analyzing", "review"].indexOf(step) ? (
-                  <CheckCircle className="w-5 h-5" />
-                ) : (
-                  <span>{i + 1}</span>
+          {[
+            { key: "welcome", label: "Welcome" },
+            { key: "domain", label: "Company Info" },
+            { key: "analyzing", label: "Analyzing" },
+            { key: "review", label: "Review" }
+          ].map((stepInfo, i) => {
+            const stepKeys = ["welcome", "domain", "analyzing", "review"];
+            const currentIndex = stepKeys.indexOf(step);
+            const isCompleted = i < currentIndex;
+            const isCurrent = i === currentIndex;
+            
+            return (
+              <div key={stepInfo.key} className="flex items-center">
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-8 h-8 rounded-full flex items-center justify-center border-2 ${
+                      isCompleted
+                        ? "border-green-600 bg-green-600 text-white"
+                        : isCurrent
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-gray-300 bg-white text-gray-400"
+                    }`}
+                  >
+                    {isCompleted ? (
+                      <CheckCircle className="w-5 h-5" />
+                    ) : (
+                      <span className="text-sm font-medium">{i + 1}</span>
+                    )}
+                  </div>
+                  <span
+                    className={`mt-2 text-xs font-medium ${
+                      isCompleted
+                        ? "text-green-600"
+                        : isCurrent
+                        ? "text-primary"
+                        : "text-gray-400"
+                    }`}
+                  >
+                    {stepInfo.label}
+                  </span>
+                </div>
+                {i < 3 && (
+                  <div
+                    className={`h-0.5 w-12 md:w-24 mx-2 mb-6 ${
+                      isCompleted ? "bg-green-600" : "bg-gray-300"
+                    }`}
+                  />
                 )}
               </div>
-              {i < 3 && (
-                <div
-                  className={`h-0.5 w-12 md:w-24 mx-2 ${
-                    i < ["welcome", "domain", "analyzing", "review"].indexOf(step)
-                      ? "bg-green-600"
-                      : "bg-gray-300"
-                  }`}
-                />
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
@@ -126,9 +164,13 @@ export function OnboardingWizard({ userId }: { userId: string }) {
         <Card className="border-2">
           <CardHeader className="text-center">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-                <Sparkles className="w-8 h-8 text-primary" />
-              </div>
+              <LottieAnimation
+                animationPath="/animations/AIModel.json"
+                width={120}
+                height={120}
+                loop={true}
+                autoplay={true}
+              />
             </div>
             <CardTitle className="text-3xl">Welcome to ICP Qualifier</CardTitle>
             <CardDescription className="text-lg mt-2">
@@ -235,27 +277,30 @@ export function OnboardingWizard({ userId }: { userId: string }) {
       {/* Analyzing Step */}
       {step === "analyzing" && (
         <Card className="border-2">
+          <CardHeader className="text-center">
+            <CardTitle className="text-3xl">Analyzing Your Company</CardTitle>
+            <CardDescription className="text-lg">
+              Our AI is analyzing your website and generating your ICP
+            </CardDescription>
+          </CardHeader>
           <CardContent className="py-12 text-center">
-            <div className="flex justify-center mb-4">
-              <Loader2 className="w-16 h-16 text-primary animate-spin" />
+            <div className="flex justify-center mb-8">
+              <LottieAnimation
+                animationPath="/animations/loading.json"
+                width={280}
+                height={280}
+                loop={true}
+                autoplay={true}
+              />
             </div>
-            <h2 className="text-2xl font-bold mb-2">Analyzing Your Company</h2>
-            <p className="text-muted-foreground mb-6">
-              Our AI is analyzing your website and generating your ICP...
-            </p>
-            <div className="space-y-2 text-sm text-left max-w-md mx-auto">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span>Scraping website content</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse delay-100" />
-                <span>Analyzing business model</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse delay-200" />
-                <span>Generating ICP with AI</span>
-              </div>
+            <div className="flex items-center justify-center gap-2 min-h-[24px]">
+              <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span 
+                key={currentMessageIndex}
+                className="text-sm animate-in fade-in-0 duration-500"
+              >
+                {analyzingMessages[currentMessageIndex]}
+              </span>
             </div>
           </CardContent>
         </Card>
@@ -266,7 +311,10 @@ export function OnboardingWizard({ userId }: { userId: string }) {
         <div className="space-y-6">
           <Card className="border-2">
             <CardHeader>
-              <CardTitle className="text-2xl">Your Company Profile</CardTitle>
+              <CardTitle className="text-2xl flex items-center gap-2">
+                <Building2 className="w-6 h-6 text-primary" />
+                Your Company Profile
+              </CardTitle>
               <CardDescription>Review the analyzed information</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -340,10 +388,21 @@ export function OnboardingWizard({ userId }: { userId: string }) {
           </Card>
 
           <div className="flex gap-3">
-            <Button variant="outline" onClick={() => router.push("/dashboard")}>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                startNavigationProgress();
+                startTransition(() => {
+                  router.push("/dashboard");
+                });
+              }}
+              disabled={isPending}
+            >
+              {isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Skip to Dashboard
             </Button>
-            <Button onClick={handleComplete} className="flex-1" size="lg">
+            <Button onClick={handleComplete} className="flex-1" size="lg" disabled={isPending}>
+              {isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : null}
               Complete Setup
             </Button>
           </div>
