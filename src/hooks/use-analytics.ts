@@ -88,7 +88,7 @@ export function useAnalytics(options: AnalyticsHookOptions = {}) {
 
   // Track page views automatically
   useEffect(() => {
-    if (!enableAutoTracking) return
+    if (!enableAutoTracking) {return}
 
     const handleRouteChange = () => {
       trackEvent('page_view', {

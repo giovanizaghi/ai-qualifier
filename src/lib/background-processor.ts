@@ -1,5 +1,4 @@
-import { prisma } from '@/lib/prisma';
-import { qualifyProspects } from '@/lib/prospect-qualifier';
+import type { ICPData } from '@/lib/icp-generator';
 import { 
   JobQueue, 
   JobProcessor, 
@@ -8,8 +7,9 @@ import {
   JobProgress,
   getJobQueue
 } from '@/lib/job-queue';
-import type { ICPData } from '@/lib/icp-generator';
 import { metricsService } from '@/lib/monitoring/metrics';
+import { prisma } from '@/lib/prisma';
+import { qualifyProspects } from '@/lib/prospect-qualifier';
 
 /**
  * Background processor for prospect qualification jobs
@@ -192,8 +192,8 @@ export class QualificationProcessor {
           runId,
           totalProspects: domains.length,
           qualifiedProspects: results.length,
-          averageScore: averageScore,
-          highQualityCount: highQualityCount,
+          averageScore,
+          highQualityCount,
           completedAt: new Date(),
         },
       };

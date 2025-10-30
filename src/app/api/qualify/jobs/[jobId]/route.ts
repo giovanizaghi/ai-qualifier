@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
+
 import { auth } from '@/lib/auth';
 import { getQualificationProcessor } from '@/lib/background-processor';
-import { z } from 'zod';
 
 // Request validation schema
 const jobIdSchema = z.object({

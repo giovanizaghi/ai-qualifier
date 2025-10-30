@@ -1,10 +1,12 @@
 "use client"
 
-import { User } from "next-auth"
 import { LogOut, Settings, User as UserIcon } from "lucide-react"
+import { User } from "next-auth"
 import { signOut } from "next-auth/react"
-import { cache, clearBrowserCaches } from "@/lib/cache"
 
+
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,8 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
+import { cache, clearBrowserCaches } from "@/lib/cache"
 
 interface UserNavProps {
   user: User
@@ -23,7 +24,7 @@ interface UserNavProps {
 
 export function UserNav({ user }: UserNavProps) {
   const getInitials = (name?: string | null) => {
-    if (!name) return "U"
+    if (!name) {return "U"}
     return name
       .split(" ")
       .map((n) => n[0])

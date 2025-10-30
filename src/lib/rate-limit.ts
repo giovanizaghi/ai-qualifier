@@ -4,6 +4,7 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
+
 import { cache } from './cache';
 
 // Rate limiting configuration
@@ -118,7 +119,7 @@ class TokenBucketRateLimiter {
       lastRefill: number;
     }>(key);
 
-    let bucket = cached || {
+    const bucket = cached || {
       tokens: rateLimit.requests,
       lastRefill: now,
     };
@@ -355,7 +356,7 @@ export class RateLimitMonitor {
     };
 
     existing.requests++;
-    if (blocked) existing.blocked++;
+    if (blocked) {existing.blocked++;}
 
     this.stats.set(key, existing);
   }

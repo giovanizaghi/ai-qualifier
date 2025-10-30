@@ -1,6 +1,6 @@
-import { generateStructuredResponse } from './openai-client';
 import { analyzeCompanyDomain, type DomainAnalysisResult, type CompanyAnalysis } from './domain-analyzer';
 import type { ICPData } from './icp-generator';
+import { generateStructuredResponse } from './openai-client';
 
 export type FitLevel = 'EXCELLENT' | 'GOOD' | 'FAIR' | 'POOR';
 
@@ -86,9 +86,9 @@ export function getFitLevel(score: number): FitLevel {
   // Clamp score to valid range but don't round for threshold comparison
   const clampedScore = Math.max(SCORE_BOUNDS.MIN, Math.min(SCORE_BOUNDS.MAX, score));
   
-  if (clampedScore >= FIT_LEVEL_THRESHOLDS.EXCELLENT) return 'EXCELLENT';
-  if (clampedScore >= FIT_LEVEL_THRESHOLDS.GOOD) return 'GOOD';
-  if (clampedScore >= FIT_LEVEL_THRESHOLDS.FAIR) return 'FAIR';
+  if (clampedScore >= FIT_LEVEL_THRESHOLDS.EXCELLENT) {return 'EXCELLENT';}
+  if (clampedScore >= FIT_LEVEL_THRESHOLDS.GOOD) {return 'GOOD';}
+  if (clampedScore >= FIT_LEVEL_THRESHOLDS.FAIR) {return 'FAIR';}
   return 'POOR';
 }
 
@@ -216,7 +216,7 @@ export async function qualifyProspect(
   const startTime = Date.now();
   let fallbackUsed = false;
   let originalScore: number | undefined;
-  let validationErrors: string[] = [];
+  const validationErrors: string[] = [];
   
   // Step 1: Analyze the prospect's domain
   const prospectData = await analyzeCompanyDomain(prospectDomain);

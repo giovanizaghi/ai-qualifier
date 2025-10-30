@@ -3,6 +3,7 @@
  * Phase 3.2: Comprehensive prospect qualification data validation
  */
 
+import { DomainAnalysisResult, CompanyAnalysis, DomainErrorCategory } from '../domain-analyzer';
 import { 
   QualificationResult, 
   MatchedCriteria, 
@@ -10,7 +11,6 @@ import {
   SCORE_BOUNDS, 
   FIT_LEVEL_THRESHOLDS 
 } from '../prospect-qualifier';
-import { DomainAnalysisResult, CompanyAnalysis, DomainErrorCategory } from '../domain-analyzer';
 
 export interface ProspectValidationResult {
   isValid: boolean;
@@ -728,9 +728,9 @@ function isValidFitLevel(fitLevel: any): fitLevel is FitLevel {
 }
 
 function getExpectedFitLevel(score: number): FitLevel {
-  if (score >= FIT_LEVEL_THRESHOLDS.EXCELLENT) return 'EXCELLENT';
-  if (score >= FIT_LEVEL_THRESHOLDS.GOOD) return 'GOOD';
-  if (score >= FIT_LEVEL_THRESHOLDS.FAIR) return 'FAIR';
+  if (score >= FIT_LEVEL_THRESHOLDS.EXCELLENT) {return 'EXCELLENT';}
+  if (score >= FIT_LEVEL_THRESHOLDS.GOOD) {return 'GOOD';}
+  if (score >= FIT_LEVEL_THRESHOLDS.FAIR) {return 'FAIR';}
   return 'POOR';
 }
 
@@ -744,7 +744,7 @@ function getFitLevelMidpoint(fitLevel: FitLevel): number {
 }
 
 function sanitizeString(input: string): string {
-  if (typeof input !== 'string') return '';
+  if (typeof input !== 'string') {return '';}
   
   return input
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')

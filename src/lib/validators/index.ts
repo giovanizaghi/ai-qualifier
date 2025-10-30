@@ -3,18 +3,18 @@
  * Phase 3.2: Comprehensive validation system with type-safe error handling
  */
 
-import { validateICP, ICPValidationOptions } from './icp-validator';
-import { ICPValidationResult } from '../../types/icp';
-import { validateProspectResult, ProspectValidationOptions, ProspectValidationResult } from './prospect-validator';
+import { ICPValidationResult , ICPData } from '../../types/icp';
+import { DomainAnalysisResult, CompanyAnalysis } from '../domain-analyzer';
+import { QualificationResult } from '../prospect-qualifier';
+
 import { 
   validateCompanyData, 
   getCompanyDataHealth,
   CompanyValidationOptions, 
   CompanyValidationResult 
 } from './company-validator';
-import { ICPData } from '../../types/icp';
-import { QualificationResult } from '../prospect-qualifier';
-import { DomainAnalysisResult, CompanyAnalysis } from '../domain-analyzer';
+import { validateICP, ICPValidationOptions } from './icp-validator';
+import { validateProspectResult, ProspectValidationOptions, ProspectValidationResult } from './prospect-validator';
 
 /**
  * Centralized validation error types
@@ -338,7 +338,7 @@ function calculateOverallValidationScore(categories: ValidationSummary['categori
     scores.push(categories.company.qualityScore, categories.company.completenessScore);
   }
 
-  if (scores.length === 0) return 0;
+  if (scores.length === 0) {return 0;}
   
   return Math.round(scores.reduce((sum, score) => sum + score, 0) / scores.length);
 }
@@ -466,7 +466,7 @@ function generateDataHealthReport(validationSummary: ValidationSummary): DataHea
 
   // Collect scores and issues
   Object.entries(validationSummary.categories).forEach(([category, validation]) => {
-    if (!validation) return;
+    if (!validation) {return;}
 
     if ('qualityScore' in validation) {
       qualityScores.push(validation.qualityScore);
@@ -502,11 +502,11 @@ function generateDataHealthReport(validationSummary: ValidationSummary): DataHea
   let status: DataHealthReport['status'];
   const overallScore = (avgQuality + avgCompleteness + reliabilityScore) / 3;
   
-  if (overallScore >= 90) status = 'excellent';
-  else if (overallScore >= 75) status = 'good';
-  else if (overallScore >= 60) status = 'fair';
-  else if (overallScore >= 40) status = 'poor';
-  else status = 'critical';
+  if (overallScore >= 90) {status = 'excellent';}
+  else if (overallScore >= 75) {status = 'good';}
+  else if (overallScore >= 60) {status = 'fair';}
+  else if (overallScore >= 40) {status = 'poor';}
+  else {status = 'critical';}
 
   // Mock trends (would be calculated from historical data)
   const trends: DataHealthTrend[] = [

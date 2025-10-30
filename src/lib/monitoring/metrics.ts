@@ -3,6 +3,7 @@
  * Provides performance tracking, business metrics, and error monitoring
  */
 
+import { prisma } from '@/lib/prisma'
 import { 
   PerformanceMetric, 
   BusinessMetric, 
@@ -11,7 +12,6 @@ import {
   Alert,
   AlertRule
 } from '@/types/monitoring'
-import { prisma } from '@/lib/prisma'
 
 class MetricsService {
   private performanceMetrics: PerformanceMetric[] = []
@@ -246,7 +246,7 @@ class MetricsService {
       m.timestamp >= cutoff
     )
 
-    if (responseTimeMetrics.length === 0) return 0
+    if (responseTimeMetrics.length === 0) {return 0}
     return responseTimeMetrics.reduce((sum, m) => sum + m.value, 0) / responseTimeMetrics.length
   }
 
@@ -291,7 +291,7 @@ class MetricsService {
     const { condition } = rule
     const metricValue = this.getMetricValue(condition.metric, metric)
     
-    if (metricValue === undefined) return false
+    if (metricValue === undefined) {return false}
 
     switch (condition.operator) {
       case '>':
@@ -334,7 +334,7 @@ class MetricsService {
       alert => alert.ruleId === rule.id && alert.status === 'active'
     )
 
-    if (existingAlert) return // Don't trigger duplicate alerts
+    if (existingAlert) {return} // Don't trigger duplicate alerts
 
     const alert: Alert = {
       id: `alert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

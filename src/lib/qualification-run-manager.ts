@@ -1,5 +1,5 @@
-import { prisma } from '@/lib/prisma';
 import { getQualificationProcessor } from '@/lib/background-processor';
+import { prisma } from '@/lib/prisma';
 
 export interface RunTimeoutConfig {
   timeoutMinutes: number;

@@ -1,14 +1,14 @@
 "use client"
 
+import { Building2, Sparkles, TrendingUp, Plus, Loader2, RefreshCw } from "lucide-react"
+import Link from "next/link"
 import { User } from "next-auth"
 import { useState, useEffect } from "react"
-import Link from "next/link"
-import { Building2, Sparkles, TrendingUp, Plus, Loader2, RefreshCw } from "lucide-react"
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
 import {
   Carousel,
   CarouselContent,
@@ -85,10 +85,10 @@ export default function DashboardContent({ user }: DashboardContentProps) {
     const diffHours = Math.floor(diffMs / 3600000)
     const diffDays = Math.floor(diffMs / 86400000)
 
-    if (diffMins < 1) return 'Just now'
-    if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`
-    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`
-    if (diffDays < 7) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`
+    if (diffMins < 1) {return 'Just now'}
+    if (diffMins < 60) {return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`}
+    if (diffHours < 24) {return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`}
+    if (diffDays < 7) {return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`}
     return date.toLocaleDateString()
   }
 

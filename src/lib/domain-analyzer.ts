@@ -1,4 +1,5 @@
 import * as cheerio from 'cheerio';
+
 import { generateStructuredResponse } from './openai-client';
 
 export interface DomainAnalysisResult {
@@ -529,10 +530,10 @@ export async function scrapeWebsite(domain: string): Promise<DomainAnalysisResul
 function generateFallbackCompanyAnalysis(scrapedData: DomainAnalysisResult): CompanyAnalysis {
   const basicInfo = analyzeDomainName(scrapedData.domain);
   
-  let industry = basicInfo.category;
+  const industry = basicInfo.category;
   let companyName = basicInfo.suggestedName;
   let description = `${companyName} - Business analysis not available`;
-  let targetMarket = 'Unknown';
+  const targetMarket = 'Unknown';
   let keyOfferings: string[] = [];
   
   // Try to extract some info from available data
@@ -542,7 +543,7 @@ function generateFallbackCompanyAnalysis(scrapedData: DomainAnalysisResult): Com
   
   if (scrapedData.metaDescription) {
     description = scrapedData.metaDescription.length > 200 
-      ? scrapedData.metaDescription.substring(0, 200) + '...'
+      ? `${scrapedData.metaDescription.substring(0, 200)  }...`
       : scrapedData.metaDescription;
   }
   

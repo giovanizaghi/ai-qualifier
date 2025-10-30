@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+
 import type { ICPData } from '@/lib/icp-generator';
 
 // Job types
@@ -206,7 +207,7 @@ export class JobQueue extends EventEmitter {
    */
   async cancelJob(jobId: string): Promise<boolean> {
     const job = this.jobs.get(jobId);
-    if (!job) return false;
+    if (!job) {return false;}
 
     if (job.status === JobStatus.PENDING) {
       job.status = JobStatus.FAILED;
@@ -288,7 +289,7 @@ export class JobQueue extends EventEmitter {
   }
 
   private async processJobs(): Promise<void> {
-    if (this.processing) return;
+    if (this.processing) {return;}
     this.processing = true;
 
     try {

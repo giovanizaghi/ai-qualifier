@@ -123,7 +123,7 @@ class MemoryCache {
 
   has(key: string): boolean {
     const entry = this.cache.get(key);
-    if (!entry) return false;
+    if (!entry) {return false;}
     
     if (Date.now() > entry.expiresAt) {
       this.cache.delete(key);
@@ -148,7 +148,7 @@ class MemoryCache {
     for (const [key, entry] of this.cache.entries()) {
       if (now > entry.expiresAt) {
         this.cache.delete(key);
-        if (this.cache.size < this.maxEntries) return;
+        if (this.cache.size < this.maxEntries) {return;}
       }
     }
 
@@ -376,7 +376,7 @@ export function logCacheStats(): void {
  * This should be called when users sign out or switch accounts
  */
 export function clearBrowserCaches(): void {
-  if (typeof window === 'undefined') return;
+  if (typeof window === 'undefined') {return;}
   
   try {
     // Clear localStorage

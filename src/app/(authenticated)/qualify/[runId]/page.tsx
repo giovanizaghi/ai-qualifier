@@ -1,7 +1,8 @@
 import { redirect } from "next/navigation";
+
+import { QualificationResults } from "@/components/qualify";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { QualificationResults } from "@/components/qualify";
 
 interface PageProps {
   params: Promise<{

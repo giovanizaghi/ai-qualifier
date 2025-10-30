@@ -642,7 +642,7 @@ export function sanitizeICP(icp: Partial<ICPData>): SanitizedICP {
  * Basic string sanitization
  */
 function sanitizeString(input: string): string {
-  if (typeof input !== 'string') return '';
+  if (typeof input !== 'string') {return '';}
   
   return input
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags

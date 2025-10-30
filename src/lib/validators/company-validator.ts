@@ -630,8 +630,8 @@ function calculateQualityScore(
   // Bonus for data presence and quality
   if (scrapedData.mainContent && scrapedData.mainContent.length > 0) {
     const contentLength = scrapedData.mainContent.join(' ').length;
-    if (contentLength > 500) score += 10;
-    else if (contentLength > 100) score += 5;
+    if (contentLength > 500) {score += 10;}
+    else if (contentLength > 100) {score += 5;}
   }
 
   if (aiAnalysis.companyName && aiAnalysis.industry && aiAnalysis.description) {
@@ -660,18 +660,18 @@ function calculateCompletenessScore(
   const totalFields = 10; // Total trackable fields
 
   // Scraped data fields (4 fields)
-  if (scrapedData.domain) score += 10;
-  if (scrapedData.mainContent && scrapedData.mainContent.length > 0) score += 10;
-  if (scrapedData.headings && scrapedData.headings.length > 0) score += 10;
-  if (scrapedData.metaDescription) score += 10;
+  if (scrapedData.domain) {score += 10;}
+  if (scrapedData.mainContent && scrapedData.mainContent.length > 0) {score += 10;}
+  if (scrapedData.headings && scrapedData.headings.length > 0) {score += 10;}
+  if (scrapedData.metaDescription) {score += 10;}
 
   // AI analysis fields (6 fields)
-  if (aiAnalysis.companyName) score += 10;
-  if (aiAnalysis.industry) score += 10;
-  if (aiAnalysis.description) score += 10;
-  if (aiAnalysis.targetMarket) score += 10;
-  if (aiAnalysis.keyOfferings && aiAnalysis.keyOfferings.length > 0) score += 10;
-  if (aiAnalysis.companySize) score += 10;
+  if (aiAnalysis.companyName) {score += 10;}
+  if (aiAnalysis.industry) {score += 10;}
+  if (aiAnalysis.description) {score += 10;}
+  if (aiAnalysis.targetMarket) {score += 10;}
+  if (aiAnalysis.keyOfferings && aiAnalysis.keyOfferings.length > 0) {score += 10;}
+  if (aiAnalysis.companySize) {score += 10;}
 
   return score;
 }
@@ -712,11 +712,11 @@ function sanitizeScrapedData(data: Partial<DomainAnalysisResult>): Partial<Domai
   }
 
   // Copy non-string fields as-is
-  if (data.error) sanitized.error = data.error;
-  if (data.scrapeAttempts) sanitized.scrapeAttempts = data.scrapeAttempts;
-  if (data.fallbackUsed) sanitized.fallbackUsed = data.fallbackUsed;
-  if (data.errorCategory) sanitized.errorCategory = data.errorCategory;
-  if (data.timestamp) sanitized.timestamp = data.timestamp;
+  if (data.error) {sanitized.error = data.error;}
+  if (data.scrapeAttempts) {sanitized.scrapeAttempts = data.scrapeAttempts;}
+  if (data.fallbackUsed) {sanitized.fallbackUsed = data.fallbackUsed;}
+  if (data.errorCategory) {sanitized.errorCategory = data.errorCategory;}
+  if (data.timestamp) {sanitized.timestamp = data.timestamp;}
 
   return sanitized;
 }
@@ -748,8 +748,8 @@ function sanitizeAIAnalysis(analysis: Partial<CompanyAnalysis>): Partial<Company
   }
 
   // Copy numeric/boolean fields as-is
-  if (analysis.confidence !== undefined) sanitized.confidence = analysis.confidence;
-  if (analysis.fallbackUsed !== undefined) sanitized.fallbackUsed = analysis.fallbackUsed;
+  if (analysis.confidence !== undefined) {sanitized.confidence = analysis.confidence;}
+  if (analysis.fallbackUsed !== undefined) {sanitized.fallbackUsed = analysis.fallbackUsed;}
 
   return sanitized;
 }
@@ -801,7 +801,7 @@ function calculateStringSimilarity(str1: string, str2: string): number {
 }
 
 function sanitizeString(input: string): string {
-  if (typeof input !== 'string') return '';
+  if (typeof input !== 'string') {return '';}
   
   return input
     .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')

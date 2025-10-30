@@ -1,5 +1,3 @@
-import { generateStructuredResponse } from './openai-client';
-import type { CompanyAnalysis } from './domain-analyzer';
 import {
   ICPData,
   ValidatedICP,
@@ -8,6 +6,8 @@ import {
   BuyerPersona,
   CompanySizeProfile
 } from '../types/icp';
+
+import type { CompanyAnalysis } from './domain-analyzer';
 import {
   validateICP,
   calculateCompletenessScore,
@@ -15,6 +15,7 @@ import {
   applyICPFallback,
   sanitizeICPData
 } from './icp-validator';
+import { generateStructuredResponse } from './openai-client';
 
 // Re-export types for backward compatibility
 export type { BuyerPersona, CompanySizeProfile, ICPData };

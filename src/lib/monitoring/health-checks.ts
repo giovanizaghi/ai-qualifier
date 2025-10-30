@@ -3,14 +3,14 @@
  * Provides comprehensive health monitoring for system components
  */
 
+import { openai } from '@/lib/openai-client'
+import { prisma } from '@/lib/prisma'
 import { 
   HealthCheckStatus, 
   HealthCheckResponse, 
   SystemHealth,
   MonitoringConfig
 } from '@/types/monitoring'
-import { prisma } from '@/lib/prisma'
-import { openai } from '@/lib/openai-client'
 
 class HealthCheckService {
   private config: MonitoringConfig['healthChecks'] = {
@@ -42,20 +42,20 @@ class HealthCheckService {
     ])
 
     // Process results
-    if (databaseHealth.status === 'fulfilled') checks.push(databaseHealth.value)
-    else checks.push(this.createErrorCheck('database', databaseHealth.reason))
+    if (databaseHealth.status === 'fulfilled') {checks.push(databaseHealth.value)}
+    else {checks.push(this.createErrorCheck('database', databaseHealth.reason))}
 
-    if (openaiHealth.status === 'fulfilled') checks.push(openaiHealth.value)
-    else checks.push(this.createErrorCheck('openai', openaiHealth.reason))
+    if (openaiHealth.status === 'fulfilled') {checks.push(openaiHealth.value)}
+    else {checks.push(this.createErrorCheck('openai', openaiHealth.reason))}
 
-    if (diskHealth.status === 'fulfilled') checks.push(diskHealth.value)
-    else checks.push(this.createErrorCheck('disk', diskHealth.reason))
+    if (diskHealth.status === 'fulfilled') {checks.push(diskHealth.value)}
+    else {checks.push(this.createErrorCheck('disk', diskHealth.reason))}
 
-    if (memoryHealth.status === 'fulfilled') checks.push(memoryHealth.value)
-    else checks.push(this.createErrorCheck('memory', memoryHealth.reason))
+    if (memoryHealth.status === 'fulfilled') {checks.push(memoryHealth.value)}
+    else {checks.push(this.createErrorCheck('memory', memoryHealth.reason))}
 
-    if (externalHealth.status === 'fulfilled') checks.push(...externalHealth.value)
-    else checks.push(this.createErrorCheck('external', externalHealth.reason))
+    if (externalHealth.status === 'fulfilled') {checks.push(...externalHealth.value)}
+    else {checks.push(this.createErrorCheck('external', externalHealth.reason))}
 
     // Calculate overall status
     const summary = this.calculateSummary(checks)
@@ -168,8 +168,8 @@ class HealthCheckService {
       const diskUsagePercent = (stats.disk.used / stats.disk.total) * 100
       
       let status: HealthCheckStatus['status'] = 'healthy'
-      if (diskUsagePercent > 90) status = 'unhealthy'
-      else if (diskUsagePercent > 80) status = 'degraded'
+      if (diskUsagePercent > 90) {status = 'unhealthy'}
+      else if (diskUsagePercent > 80) {status = 'degraded'}
       
       return {
         service: 'disk',
@@ -203,8 +203,8 @@ class HealthCheckService {
       const memoryPercent = (usedMemory / totalMemory) * 100
       
       let status: HealthCheckStatus['status'] = 'healthy'
-      if (memoryPercent > 90) status = 'unhealthy'
-      else if (memoryPercent > 80) status = 'degraded'
+      if (memoryPercent > 90) {status = 'unhealthy'}
+      else if (memoryPercent > 80) {status = 'degraded'}
       
       return {
         service: 'memory',
@@ -349,8 +349,8 @@ class HealthCheckService {
    * Determine overall system status
    */
   private getOverallStatus(summary: { healthy: number; degraded: number; unhealthy: number }): HealthCheckResponse['status'] {
-    if (summary.unhealthy > 0) return 'unhealthy'
-    if (summary.degraded > 0) return 'degraded'
+    if (summary.unhealthy > 0) {return 'unhealthy'}
+    if (summary.degraded > 0) {return 'degraded'}
     return 'healthy'
   }
 

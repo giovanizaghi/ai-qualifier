@@ -4,8 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { healthCheckService } from '@/lib/monitoring/health-checks'
+
 import { requireAuth } from '@/lib/api/middleware'
+import { healthCheckService } from '@/lib/monitoring/health-checks'
 
 export async function GET(request: NextRequest) {
   try {

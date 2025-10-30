@@ -4,8 +4,9 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
-import { metricsService } from '@/lib/monitoring/metrics'
+
 import { requireAuth, requireAdmin, checkRateLimit, rateLimitConfigs } from '@/lib/api/middleware'
+import { metricsService } from '@/lib/monitoring/metrics'
 
 export async function GET(request: NextRequest) {
   try {

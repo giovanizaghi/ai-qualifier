@@ -1,9 +1,5 @@
 "use client"
 
-import { User } from "next-auth"
-import { useState } from "react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
 import {
   Building2,
   Sparkles,
@@ -20,12 +16,12 @@ import {
   Trash2,
   ExternalLink,
 } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { User } from "next-auth"
+import { useState } from "react"
 
-import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Separator } from "@/components/ui/separator"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -37,6 +33,10 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import { toast } from "@/lib/toast"
 
 interface ICP {

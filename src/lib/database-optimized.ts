@@ -3,6 +3,7 @@
  */
 
 import { PrismaClient } from '@prisma/client';
+
 import { cache, generateCacheKey, CACHE_CONFIG } from './cache';
 
 // Optimized Prisma client configuration
@@ -324,8 +325,8 @@ export class QualificationRunQueries {
 
         if (minScore !== undefined || maxScore !== undefined) {
           where.score = {};
-          if (minScore !== undefined) where.score.gte = minScore;
-          if (maxScore !== undefined) where.score.lte = maxScore;
+          if (minScore !== undefined) {where.score.gte = minScore;}
+          if (maxScore !== undefined) {where.score.lte = maxScore;}
         }
 
         if (search) {

@@ -337,7 +337,7 @@ export function calculateCompletenessScore(icp: Partial<ICPData>): number {
     const avgPainPoints = icp.buyerPersonas.reduce((acc, p) => acc + (p.painPoints?.length || 0), 0) / icp.buyerPersonas.length;
     const avgGoals = icp.buyerPersonas.reduce((acc, p) => acc + (p.goals?.length || 0), 0) / icp.buyerPersonas.length;
     
-    if (avgPainPoints >= 2 && avgGoals >= 2) score += 10;
+    if (avgPainPoints >= 2 && avgGoals >= 2) {score += 10;}
   }
 
   // Quality bonus: specific key indicators

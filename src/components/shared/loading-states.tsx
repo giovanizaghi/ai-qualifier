@@ -1,9 +1,10 @@
 "use client";
 
 import { Loader2, Brain, Search, CheckCircle2 } from "lucide-react";
+
 import { Card, CardContent } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 interface LoadingStateProps {
   message?: string;

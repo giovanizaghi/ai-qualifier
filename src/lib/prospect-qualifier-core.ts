@@ -31,9 +31,9 @@ export function validateScore(score: number): number {
 export function getFitLevel(score: number): FitLevel {
   const validatedScore = validateScore(score);
   
-  if (validatedScore >= FIT_LEVEL_THRESHOLDS.EXCELLENT) return 'EXCELLENT';
-  if (validatedScore >= FIT_LEVEL_THRESHOLDS.GOOD) return 'GOOD';
-  if (validatedScore >= FIT_LEVEL_THRESHOLDS.FAIR) return 'FAIR';
+  if (validatedScore >= FIT_LEVEL_THRESHOLDS.EXCELLENT) {return 'EXCELLENT';}
+  if (validatedScore >= FIT_LEVEL_THRESHOLDS.GOOD) {return 'GOOD';}
+  if (validatedScore >= FIT_LEVEL_THRESHOLDS.FAIR) {return 'FAIR';}
   return 'POOR';
 }
 

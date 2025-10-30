@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+
 import { cache, generateCacheKey, CACHE_CONFIG } from './cache';
 
 // Initialize OpenAI client

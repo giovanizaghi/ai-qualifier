@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
+
 import { auth } from '@/lib/auth';
+import { metricsService } from '@/lib/monitoring/metrics';
 import { prisma } from '@/lib/prisma';
 import { getRunManager } from '@/lib/qualification-run-manager';
-import { metricsService } from '@/lib/monitoring/metrics';
 
 /**
  * GET /api/qualify/[runId]

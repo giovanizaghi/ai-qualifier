@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
 import { Loader2, X, ChevronRight, CheckCircle2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 interface ActiveRun {
   id: string;

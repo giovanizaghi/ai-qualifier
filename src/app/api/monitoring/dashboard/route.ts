@@ -4,9 +4,10 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server'
+
+import { requireAuth } from '@/lib/api/middleware'
 import { healthCheckService } from '@/lib/monitoring/health-checks'
 import { metricsService } from '@/lib/monitoring/metrics'
-import { requireAuth } from '@/lib/api/middleware'
 
 export async function GET(request: NextRequest) {
   try {
