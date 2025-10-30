@@ -74,14 +74,14 @@ export function useRealTimePolling(
 
       // Check if we should stop polling
       if (updatedRun.status === "COMPLETED") {
-        console.log(`✅ Qualification completed! Stopping polling.`);
+        console.log(`Qualification completed! Stopping polling.`);
         toast.success(`Qualification completed! ${updatedRun.totalProspects} prospects analyzed.`);
         setPolling(false);
         return;
       }
 
       if (updatedRun.status === "FAILED") {
-        console.log(`❌ Qualification failed! Stopping polling.`);
+        console.log(`Qualification failed! Stopping polling.`);
         toast.error("Qualification failed. Please try again.");
         setPolling(false);
         return;

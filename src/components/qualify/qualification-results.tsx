@@ -112,11 +112,11 @@ export function QualificationResults({ run: initialRun }: QualificationResultsPr
     }
     
     if (run.status === "COMPLETED") {
-      toast.success(`✅ Qualification completed! ${run.totalProspects} prospects analyzed`);
+      toast.success(`Qualification completed! ${run.totalProspects} prospects analyzed`);
     }
     
     if (run.status === "FAILED") {
-      toast.error("❌ Qualification failed. Please try again.");
+      toast.error("Qualification failed. Please try again.");
     }
   }, [run.status, run.completed, run.totalProspects, run.id]);
 
