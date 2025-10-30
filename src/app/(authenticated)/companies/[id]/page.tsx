@@ -1,9 +1,9 @@
 import { Metadata } from "next"
 import { redirect, notFound } from "next/navigation"
 
+import { ErrorBoundary } from "@/components/error-boundary"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { ErrorBoundary } from "@/components/error-boundary"
 
 import CompanyDetailsContent from "./company-details-content"
 
