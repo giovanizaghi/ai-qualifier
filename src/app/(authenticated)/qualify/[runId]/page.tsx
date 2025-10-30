@@ -1,9 +1,9 @@
 import { redirect } from "next/navigation"
 
+import { ErrorBoundary } from "@/components/error-boundary"
 import { QualificationResults } from "@/components/qualify"
 import { auth } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
-import { ErrorBoundary } from "@/components/error-boundary"
 
 interface PageProps {
   params: Promise<{
