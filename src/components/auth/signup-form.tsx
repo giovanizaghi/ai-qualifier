@@ -5,11 +5,12 @@ import { Github, Mail } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react"
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { useForm } from "react-hook-form"
 import { toast } from "sonner"
 import { z } from "zod"
 
+import { startNavigationProgress } from "@/components/shared"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -32,6 +33,7 @@ type SignUpFormData = z.infer<typeof signUpSchema>
 export function SignUpForm() {
   const [isLoading, setIsLoading] = useState(false)
   const [isOAuthLoading, setIsOAuthLoading] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
   const router = useRouter()
 
   const {
@@ -76,10 +78,16 @@ export function SignUpForm() {
 
       if (signInResult?.error) {
         toast.error("Account created but failed to sign in. Please try signing in manually.")
-        router.push("/auth/signin")
+        startNavigationProgress();
+        startTransition(() => {
+          router.push("/auth/signin")
+        });
       } else {
-        router.push("/dashboard")
-        router.refresh()
+        startNavigationProgress();
+        startTransition(() => {
+          router.push("/dashboard")
+          router.refresh()
+        });
       }
     } catch (error) {
       toast.error("Something went wrong. Please try again.")

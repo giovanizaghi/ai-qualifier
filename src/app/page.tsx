@@ -618,7 +618,7 @@ export default async function Home() {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="w-4 h-4 text-muted-foreground" />
-                    <span>zaghi.giovani@gmail.com</span>
+                    <span>giovanizaghinogueira@gmail.com</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="w-4 h-4 text-muted-foreground" />

@@ -2,9 +2,10 @@
 
 import { Sparkles, Loader2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useState, useEffect, useTransition } from "react";
 
+import { startNavigationProgress } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,16 +17,32 @@ interface ICP {
   id: string;
   title: string;
   description: string;
+  companyId?: string;
   companyName: string;
 }
 
 interface QualifyFormProps {
   icps: ICP[];
+  defaultIcpId?: string;
 }
 
-export function QualifyForm({ icps }: QualifyFormProps) {
+export function QualifyForm({ icps, defaultIcpId }: QualifyFormProps) {
   const router = useRouter();
-  const [selectedIcpId, setSelectedIcpId] = useState(icps[0]?.id || "");
+  const searchParams = useSearchParams();
+  const [selectedIcpId, setSelectedIcpId] = useState(defaultIcpId || icps[0]?.id || "");
+  const [isPending, startTransition] = useTransition();
+
+  // Auto-select ICP for companyId from query string
+  useEffect(() => {
+    const companyId = searchParams.get("companyId");
+    if (companyId) {
+      // Match by companyId field
+      const icpForCompany = icps.find(icp => icp.companyId === companyId);
+      if (icpForCompany) {
+        setSelectedIcpId(icpForCompany.id);
+      }
+    }
+  }, [searchParams, icps]);
   const [domains, setDomains] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -68,8 +85,11 @@ export function QualifyForm({ icps }: QualifyFormProps) {
         throw new Error(data.error || "Failed to start qualification");
       }
 
-      // Redirect to results page
-      router.push(`/qualify/${data.run.id}`);
+      // Show progress bar and redirect to results page
+      startNavigationProgress();
+      startTransition(() => {
+        router.push(`/qualify/${data.run.id}`);
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
@@ -84,9 +104,12 @@ export function QualifyForm({ icps }: QualifyFormProps) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="sm" asChild>
-          <Link href="/dashboard">
+          <Link 
+            href={searchParams.get("companyId") ? `/companies/${searchParams.get("companyId")}` : "/dashboard"}
+            prefetch={true}
+          >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Dashboard
+            Back to Company
           </Link>
         </Button>
       </div>
@@ -157,11 +180,11 @@ export function QualifyForm({ icps }: QualifyFormProps) {
             </div>
 
             <div className="flex items-center gap-4">
-              <Button type="submit" size="lg" className="flex-1" disabled={loading || domainCount === 0}>
-                {loading ? (
+              <Button type="submit" size="lg" className="flex-1" disabled={loading || isPending || domainCount === 0}>
+                {loading || isPending ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Starting Qualification...
+                    {loading ? "Starting Qualification..." : "Navigating..."}
                   </>
                 ) : (
                   <>
