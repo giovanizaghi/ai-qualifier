@@ -10,41 +10,90 @@ export const metadata: Metadata = {
 
 export default function SignUpPage() {
   return (
-    <div className="min-h-screen flex">
-      {/* Left Side - Creative Text (Hidden on mobile) */}
-      <div className="hidden lg:flex lg:flex-1 bg-gradient-to-br from-primary/10 via-primary/5 to-background relative overflow-hidden">
-        <div className="flex flex-col items-center justify-center px-12 py-12 text-center space-y-8">
-          <h1 className="text-4xl font-bold text-foreground">
-            AI-Powered Customer Qualification
-          </h1>
-          
-          <div className="w-80 h-80">
-            <LottieAnimation
-              animationPath="/animations/BrainAnimation.json"
-              className="w-full h-full"
-              loop={true}
-              autoplay={true}
-            />
-          </div>
-          
-          <p className="text-lg text-muted-foreground max-w-md">
-            Generate Ideal Customer Profiles for your company and automatically qualify prospects using advanced AI analysis.
-          </p>
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800 relative overflow-hidden">
+      {/* SVG Filters for Liquid Glass Effect */}
+      <svg className="glass-filters" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence baseFrequency="0.02 0.1" numOctaves="2" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="2"/>
+            <feGaussianBlur stdDeviation="0.5"/>
+          </filter>
+          <filter id="auth-glass" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence baseFrequency="0.01 0.05" numOctaves="1" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1"/>
+            <feGaussianBlur stdDeviation="0.3"/>
+          </filter>
+        </defs>
+      </svg>
+
+      {/* Animated Gradient Wave Background */}
+      <div className="hero-bg pointer-events-none absolute inset-0 w-full h-full z-0" aria-hidden="true">
+        <div className="wave3" />
       </div>
 
-      {/* Right Side - Form */}
-      <div className="flex-1 lg:flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-12 bg-background">
-        <div className="w-full max-w-md mx-auto lg:mx-0 space-y-6">
-          <div className="flex flex-col space-y-2 text-center lg:text-left">
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Create an account
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Enter your details to get started with AI Qualifier
-            </p>
+      {/* Main Layout - Two Column */}
+      <div className="min-h-screen flex relative z-10">
+        {/* Left Column - Welcome Content (Hidden on mobile) */}
+        <div className="hidden lg:flex lg:flex-1 flex-col justify-center px-12 py-12 relative">
+          <div className="max-w-lg mx-auto text-center">
+            <div className="glass-nav bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 shadow-2xl">
+              <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-6">
+                AI-Powered Lead Qualification
+              </h1>
+              
+              <div className="w-64 h-64 mx-auto mb-6">
+                <LottieAnimation
+                  animationPath="/animations/BrainAnimation.json"
+                  className="w-full h-full drop-shadow-lg"
+                  loop={true}
+                  autoplay={true}
+                />
+              </div>
+              
+              <p className="text-lg text-white/90 drop-shadow-md mb-8">
+                Generate Ideal Customer Profiles for your business and automatically qualify prospects using advanced AI analysis.
+              </p>
+
+              <div className="space-y-4 text-left max-w-sm mx-auto">
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-blue-400 rounded-full shadow-lg shadow-blue-400/50 flex-shrink-0"></div>
+                  <span className="text-sm text-white/90 drop-shadow-sm">GPT-4 powered ICP generation</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-green-400 rounded-full shadow-lg shadow-green-400/50 flex-shrink-0"></div>
+                  <span className="text-sm text-white/90 drop-shadow-sm">Intelligent prospect scoring (0-100)</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-purple-400 rounded-full shadow-lg shadow-purple-400/50 flex-shrink-0"></div>
+                  <span className="text-sm text-white/90 drop-shadow-sm">Real-time progress tracking</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <div className="w-3 h-3 bg-orange-400 rounded-full shadow-lg shadow-orange-400/50 flex-shrink-0"></div>
+                  <span className="text-sm text-white/90 drop-shadow-sm">Automated qualification insights</span>
+                </div>
+              </div>
+            </div>
           </div>
-          <SignUpForm />
+        </div>
+
+        {/* Right Column - Sign Up Form */}
+        <div className="flex-1 lg:flex-1 flex flex-col justify-center px-4 sm:px-6 lg:px-12 py-12 relative">
+          <div className="w-full max-w-md mx-auto lg:mx-0">
+            <div className="glass-nav bg-white/20 dark:bg-slate-800/20 backdrop-blur-md rounded-3xl p-8 border border-white/30 shadow-2xl relative z-20">
+              <div className="flex flex-col space-y-2 text-center lg:text-left mb-6">
+                <h1 className="text-2xl font-semibold tracking-tight glass-text">
+                  Create an account
+                </h1>
+                <p className="text-sm glass-text-light">
+                  Enter your details to get started with AI Qualifier
+                </p>
+              </div>
+              <div className="relative z-30">
+                <SignUpForm />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
