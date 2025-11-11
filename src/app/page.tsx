@@ -11,12 +11,28 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
+      {/* SVG Filters for Liquid Glass Effect */}
+      <svg className="glass-filters" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <filter id="liquid-glass" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence baseFrequency="0.02 0.1" numOctaves="2" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="2"/>
+            <feGaussianBlur stdDeviation="0.5"/>
+          </filter>
+          <filter id="button-glass" x="-20%" y="-20%" width="140%" height="140%">
+            <feTurbulence baseFrequency="0.01 0.05" numOctaves="1" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1"/>
+            <feGaussianBlur stdDeviation="0.3"/>
+          </filter>
+        </defs>
+      </svg>
+      
       {/* Navigation */}
-      <nav className="border-b bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-0 z-50" role="navigation" aria-label="Main navigation">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+      <nav className="glass-nav" role="navigation" aria-label="Main navigation">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between relative z-10">
           <div className="flex items-center gap-2">
-            <Brain className="w-8 h-8 text-primary" aria-hidden="true" />
-            <Link href="/" className="text-xl sm:text-2xl font-bold text-foreground focus-enhanced">
+            <Brain className="w-8 h-8 text-slate-900 drop-shadow-sm" aria-hidden="true" />
+            <Link href="/" className="text-xl sm:text-2xl font-bold glass-text focus-enhanced">
               <span className="sr-only">AI Qualifier - </span>
               AI Qualifier
             </Link>
@@ -24,26 +40,26 @@ export default async function Home() {
           <div className="flex items-center gap-2 sm:gap-4">
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center gap-4" role="menubar">
-              <Button variant="ghost" asChild className="focus-enhanced">
-                <Link href="#features" role="menuitem">Features</Link>
+              <Button variant="ghost" asChild className="focus-enhanced glass-button">
+                <Link href="#features" role="menuitem" className="glass-text relative z-10">Features</Link>
               </Button>
-              <Button variant="ghost" asChild className="focus-enhanced">
-                <Link href="#about" role="menuitem">About</Link>
+              <Button variant="ghost" asChild className="focus-enhanced glass-button">
+                <Link href="#about" role="menuitem" className="glass-text relative z-10">About</Link>
               </Button>
             </div>
             
             {/* Auth Buttons */}
             {session?.user ? (
-              <Button asChild className="text-sm sm:text-base focus-enhanced">
-                <Link href="/dashboard" aria-label="Go to your dashboard">Dashboard</Link>
+              <Button asChild className="text-sm sm:text-base focus-enhanced glass-button-solid">
+                <Link href="/dashboard" aria-label="Go to your dashboard" className="glass-text relative z-10">Dashboard</Link>
               </Button>
             ) : (
               <>
-                <Button variant="outline" asChild className="hidden sm:flex text-sm focus-enhanced">
-                  <Link href="/auth/signin" aria-label="Sign in to your account">Sign In</Link>
+                <Button variant="outline" asChild className="hidden sm:flex text-sm focus-enhanced glass-button-outline">
+                  <Link href="/auth/signin" aria-label="Sign in to your account" className="glass-text relative z-10">Sign In</Link>
                 </Button>
-                <Button asChild className="text-sm sm:text-base focus-enhanced">
-                  <Link href="/auth/signup" aria-label="Create a new account">
+                <Button asChild className="text-sm sm:text-base focus-enhanced glass-button-solid">
+                  <Link href="/auth/signup" aria-label="Create a new account" className="glass-text relative z-10">
                     <span className="hidden sm:inline">Get Started</span>
                     <span className="sm:hidden">Join</span>
                   </Link>
@@ -55,32 +71,38 @@ export default async function Home() {
       </nav>
 
       {/* Hero Section */}
-      <section className="container mx-auto px-4 py-12 sm:py-16 lg:py-20 text-center" role="main" aria-labelledby="hero-heading">
-        <div className="max-w-4xl mx-auto">
-          <Badge variant="secondary" className="mb-4 text-xs sm:text-sm" role="status" aria-label="Platform status">
+      <section className="hero relative flex items-center justify-center min-h-screen overflow-hidden" role="main" aria-labelledby="hero-heading">
+        {/* Animated Gradient Wave Background */}
+        <div className="hero-bg pointer-events-none absolute inset-0 w-full h-full z-0" aria-hidden="true">
+          <div className="wave3" />
+        </div>
+        <div className="container mx-auto px-4 max-w-4xl relative z-10 text-center pt-20">
+          <Badge variant="secondary" className="mb-4 text-xs sm:text-sm bg-white/90 text-slate-800 border-white/20" role="status" aria-label="Platform status">
             🚀 AI-Powered Lead Qualification Platform
           </Badge>
-          <h1 id="hero-heading" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-slate-900 to-slate-600 dark:from-slate-100 dark:to-slate-400 bg-clip-text text-transparent leading-tight">
+          <h1 id="hero-heading" className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 sm:mb-6 text-white drop-shadow-lg leading-tight">
             Intelligent Lead Qualification
             <br className="hidden sm:block" />
             <span className="sm:hidden"> </span>Powered by AI
           </h1>
-          <p className="text-base sm:text-lg lg:text-xl text-muted-foreground mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
+          <p className="text-base sm:text-lg lg:text-xl text-white/90 drop-shadow-md mb-6 sm:mb-8 max-w-2xl mx-auto px-2">
             Analyze your business, generate AI-powered Ideal Customer Profiles, and automatically 
             qualify prospects with precision scoring and detailed insights.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 mb-8 sm:mb-12 px-4" role="group" aria-label="Get started actions">
             {session?.user ? (
-              <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 focus-enhanced" asChild>
-                <Link href="/dashboard" aria-label="Access your AI Qualifier dashboard">Go to Dashboard</Link>
+              <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 focus-enhanced glass-button-solid" asChild>
+                <Link href="/dashboard" aria-label="Access your AI Qualifier dashboard" className="glass-text relative z-10">Go to Dashboard</Link>
               </Button>
             ) : (
               <>
-                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 focus-enhanced" asChild>
-                  <Link href="/auth/signup" aria-label="Sign up for AI Qualifier">Start Your Journey</Link>
+                <Button size="lg" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 focus-enhanced glass-button-solid" asChild>
+                  <Link href="/auth/signup" aria-label="Sign up for AI Qualifier" className="glass-text relative z-10">Start Your Journey</Link>
                 </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 focus-enhanced" aria-label="Watch platform demonstration video">
-                  Watch Demo
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 focus-enhanced glass-button-outline" asChild>
+                  <Link href="https://www.youtube.com/watch?v=hUkq3k-VAvU" target="_blank" rel="noopener noreferrer" aria-label="Watch platform demonstration video">
+                    <span className="glass-text-light relative z-10">Watch Demo</span>
+                  </Link>
                 </Button>
               </>
             )}
@@ -89,16 +111,16 @@ export default async function Home() {
           {/* Stats */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 mt-12 sm:mt-16" role="region" aria-label="Platform statistics">
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-primary mb-2" aria-label="GPT-4 powered analysis">GPT-4</div>
-              <div className="text-sm sm:text-base text-muted-foreground">AI-Powered Analysis</div>
+              <div className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg mb-2" aria-label="GPT-4 powered analysis">GPT-4</div>
+              <div className="text-sm sm:text-base text-white/80">AI-Powered Analysis</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-primary mb-2" aria-label="Real-time prospect scoring">0-100</div>
-              <div className="text-sm sm:text-base text-muted-foreground">Precision Scoring</div>
+              <div className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg mb-2" aria-label="Real-time prospect scoring">0-100</div>
+              <div className="text-sm sm:text-base text-white/80">Precision Scoring</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl sm:text-4xl font-bold text-primary mb-2" aria-label="Instant qualification">Instant</div>
-              <div className="text-sm sm:text-base text-muted-foreground">Qualification Results</div>
+              <div className="text-3xl sm:text-4xl font-bold text-white drop-shadow-lg mb-2" aria-label="Instant qualification">Instant</div>
+              <div className="text-sm sm:text-base text-white/80">Qualification Results</div>
             </div>
           </div>
         </div>
@@ -494,8 +516,8 @@ export default async function Home() {
                   </div>
                 </div>
                 <div className="mt-4 pt-4 border-t">
-                  <Button variant="outline" asChild className="w-full">
-                    <Link href="https://github.com/giovanizaghi/ai-qualifier/tree/main/docs" target="_blank" className="flex items-center gap-2">
+                  <Button variant="outline" asChild className="w-full glass-button">
+                    <Link href="https://github.com/giovanizaghi/ai-qualifier/tree/main/docs" target="_blank" className="flex items-center gap-2 glass-text relative z-10">
                       <ExternalLink className="w-4 h-4" />
                       View All Documentation on GitHub
                     </Link>
@@ -618,7 +640,9 @@ export default async function Home() {
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Mail className="w-4 h-4 text-muted-foreground" />
-                    <span>giovanizaghinogueira@gmail.com</span>
+                    <a href="mailto:giovanizaghinogueira@gmail.com" className="hover:text-primary transition-colors">
+                      giovanizaghinogueira@gmail.com
+                    </a>
                   </div>
                   <div className="flex items-center gap-2 text-sm">
                     <Calendar className="w-4 h-4 text-muted-foreground" />
@@ -627,14 +651,14 @@ export default async function Home() {
                 </div>
                 
                 <div className="flex gap-2 mt-6">
-                  <Button asChild className="flex-1">
-                    <Link href="https://github.com/giovanizaghi" target="_blank" className="flex items-center gap-2">
+                  <Button asChild className="flex-1 glass-button-solid">
+                    <Link href="https://github.com/giovanizaghi" target="_blank" className="flex items-center gap-2 glass-text relative z-10">
                       <Github className="w-4 h-4" />
                       GitHub
                     </Link>
                   </Button>
-                  <Button variant="outline" asChild className="flex-1">
-                    <Link href="https://www.linkedin.com/in/giovanizaghi/" target="_blank" className="flex items-center gap-2">
+                  <Button variant="outline" asChild className="flex-1 glass-button">
+                    <Link href="https://www.linkedin.com/in/giovanizaghi/" target="_blank" className="flex items-center gap-2 glass-text relative z-10">
                       <ExternalLink className="w-4 h-4" />
                       LinkedIn
                     </Link>
@@ -643,8 +667,8 @@ export default async function Home() {
                 
                 {/* Buy Me a Coffee Button */}
                 <div className="mt-3">
-                  <Button asChild variant="secondary" className="w-full bg-orange-500 hover:bg-orange-600 text-white border-0">
-                    <Link href="https://buymeacoffee.com/giovanizagu" target="_blank" className="flex items-center gap-2">
+                  <Button asChild variant="secondary" className="w-full glass-button bg-orange-500/90 hover:bg-orange-600/90 text-white border-0">
+                    <Link href="https://buymeacoffee.com/giovanizagu" target="_blank" className="flex items-center gap-2 text-white relative z-10">
                       <Coffee className="w-4 h-4" />
                       Buy Me a Coffee
                     </Link>
@@ -741,8 +765,8 @@ export default async function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild className="w-full">
-                  <a href="/cv/Giovani_Zaghi_CV_v2.pdf" download="Giovani_Zaghi_CV.pdf" className="flex items-center gap-2">
+                <Button asChild className="w-full glass-button-solid">
+                  <a href="/cv/Giovani_Zaghi_CV_v2.pdf" download="Giovani_Zaghi_CV.pdf" className="flex items-center gap-2 glass-text relative z-10">
                     <FileText className="w-4 h-4" />
                     Download PDF Resume
                   </a>
@@ -764,8 +788,8 @@ export default async function Home() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <Button asChild variant="outline" className="w-full">
-                  <Link href="https://github.com/giovanizaghi/ai-qualifier" target="_blank" className="flex items-center gap-2">
+                <Button asChild variant="outline" className="w-full glass-button">
+                  <Link href="https://github.com/giovanizaghi/ai-qualifier" target="_blank" className="flex items-center gap-2 glass-text relative z-10">
                     <Github className="w-4 h-4" />
                     View Project Repository
                   </Link>
@@ -788,16 +812,18 @@ export default async function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md sm:max-w-none mx-auto">
             {session?.user ? (
-              <Button size="lg" variant="secondary" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6" asChild>
-                <Link href="/dashboard">View Dashboard</Link>
+              <Button size="lg" variant="secondary" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 glass-button-solid" asChild>
+                <Link href="/dashboard" className="glass-text relative z-10">View Dashboard</Link>
               </Button>
             ) : (
               <>
-                <Button size="lg" variant="secondary" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6" asChild>
-                  <Link href="/auth/signup">Get Started Free</Link>
+                <Button size="lg" variant="secondary" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 glass-button-solid" asChild>
+                  <Link href="/auth/signup" className="glass-text relative z-10">Get Started Free</Link>
                 </Button>
-                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                  View Demo
+                <Button size="lg" variant="outline" className="w-full sm:w-auto text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 glass-button-outline" asChild>
+                  <Link href="https://www.youtube.com/watch?v=hUkq3k-VAvU" target="_blank" rel="noopener noreferrer">
+                    <span className="glass-text-light relative z-10">View Demo</span>
+                  </Link>
                 </Button>
               </>
             )}
