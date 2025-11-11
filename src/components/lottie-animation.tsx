@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react"
 import { Brain, Sparkles, Zap } from "lucide-react"
+import { useEffect, useState } from "react"
 
 function LottieLoadingFallback() {
   return (
